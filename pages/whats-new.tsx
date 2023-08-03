@@ -1,5 +1,5 @@
 import React from "react";
-import { WhatsNewPage } from "../components/WhatsNewPage";
+import { WhatsNewPage } from "../components/pages/WhatsNewPage";
 
 export const config = {
   unstable_runtimeJS: false,

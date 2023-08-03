@@ -2,8 +2,8 @@ import React from "react";
 import { GetStaticPropsResult } from "next";
 import { getAllStepchartData } from "../lib/getAllStepchartData";
 import { dateReleased, groupedOrder } from "../lib/meta";
-import { IndexPage } from "../components/IndexPage";
-import { IndexPageMix, IndexPageProps } from "../components/IndexPage";
+import { IndexPage } from "../components/pages/IndexPage";
+import { IndexPageMix, IndexPageProps } from "../components/pages/IndexPage";
 
 export const config = {
   unstable_runtimeJS: false,

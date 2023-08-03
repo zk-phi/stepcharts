@@ -1,8 +1,8 @@
 import React from "react";
 import { GetStaticPropsContext, GetStaticPropsResult } from "next";
 import { getAllStepchartData } from "../lib/getAllStepchartData";
-import { AllSongsPage } from "../components/AllSongsPage";
-import type { AllSongsPageProps } from "../components/AllSongsPage";
+import { AllSongsPage } from "../components/pages/AllSongsPage";
+import type { AllSongsPageProps } from "../components/pages/AllSongsPage";
 import { calculateStats } from "../lib/calculateStats";
 
 function getTempShiftCount(sf: Simfile): number {

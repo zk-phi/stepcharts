@@ -1,10 +1,10 @@
 import React from "react";
-import { Root } from "./layout/Root";
-import { ImageFrame } from "./ImageFrame";
-import { Breadcrumbs } from "./Breadcrumbs";
-import { CompactTitleCard } from "./CompactTitleCard";
-import { useSort } from "./SortHook";
-import { SortBar } from "./SortBar";
+import { Root } from "../../layout/Root";
+import { ImageFrame } from "../../ImageFrame";
+import { Breadcrumbs } from "../../Breadcrumbs";
+import { CompactTitleCard } from "../../CompactTitleCard";
+import { useSort } from "../../SortHook";
+import { SortBar } from "../../SortBar";
 
 type MixPageTitle = {
   title: {
@@ -62,7 +62,7 @@ function MixPage({ mix, titles }: MixPageProps) {
     ["stops", "t.shifts"]
   );
 
-  const mixBannerUrl = require(`../prodStepcharts/${mix.mixDir}/mix-banner.png`);
+  const mixBannerUrl = require(`../../../prodStepcharts/${mix.mixDir}/mix-banner.png`);
   return (
     <Root
       title={mix.mixName}

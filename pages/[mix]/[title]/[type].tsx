@@ -7,8 +7,8 @@ import {
 } from "next";
 
 import { getAllStepchartData } from "../../../lib/getAllStepchartData";
-import { StepchartPage } from "../../../components/StepchartPage";
-import type { StepchartPageProps } from "../../../components/StepchartPage";
+import { StepchartPage } from "../../../components/pages/[mix]/[title]/StepchartPage";
+import type { StepchartPageProps } from "../../../components/pages/[mix]/[title]/StepchartPage";
 import { Step } from "@material-ui/core";
 
 export async function getStaticPaths(

@@ -1,13 +1,13 @@
 import React from "react";
-import { Root } from "./layout/Root";
-import { StepchartTypePageItem } from "./StepchartTypePageItem";
-import { ImageFrame } from "./ImageFrame";
-import { TitleDetailsRow, TitleDetailsTable } from "./TitleDetailsTable";
+import { Root } from "../../../layout/Root";
+import { StepchartTypePageItem } from "../../../StepchartTypePageItem";
+import { ImageFrame } from "../../../ImageFrame";
+import { TitleDetailsRow, TitleDetailsTable } from "../../../TitleDetailsTable";
 
-import singleSvg from "./single.svg";
-import doubleSvg from "./double.svg";
-import { Breadcrumbs } from "./Breadcrumbs";
-import { Banner } from "./Banner";
+import singleSvg from "../../../single.svg";
+import doubleSvg from "../../../double.svg";
+import { Breadcrumbs } from "../../../Breadcrumbs";
+import { Banner } from "../../../Banner";
 
 const modeSvgs = {
   single: singleSvg,

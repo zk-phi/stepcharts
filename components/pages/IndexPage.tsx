@@ -1,6 +1,6 @@
 import React from "react";
-import { Root } from "./layout/Root";
-import { CompactMixCard } from "./CompactMixCard";
+import { Root } from "../layout/Root";
+import { CompactMixCard } from "../CompactMixCard";
 
 type IndexPageMix = {
   mixName: string;

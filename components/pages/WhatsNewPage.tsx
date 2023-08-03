@@ -1,8 +1,8 @@
 import React, { ReactNode } from "react";
-import { Root } from "./layout/Root";
+import { Root } from "../layout/Root";
 
-import printPreviewPng from "./printPreview.png";
-import linkToBarScreeshotPng from "./linkToBarScreenshot.png";
+import printPreviewPng from "../printPreview.png";
+import linkToBarScreeshotPng from "../linkToBarScreenshot.png";
 
 function dateToHumanString(input: string): string {
   const date = new Date(input);

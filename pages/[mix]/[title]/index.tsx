@@ -6,8 +6,8 @@ import {
   GetStaticPropsResult,
 } from "next";
 import { getAllStepchartData } from "../../../lib/getAllStepchartData";
-import { TitlePage } from "../../../components/TitlePage";
-import type { TitlePageProps } from "../../../components/TitlePage";
+import { TitlePage } from "../../../components/pages/[mix]/[title]/TitlePage";
+import type { TitlePageProps } from "../../../components/pages/[mix]/[title]/TitlePage";
 
 export const config = {
   unstable_runtimeJS: false,
