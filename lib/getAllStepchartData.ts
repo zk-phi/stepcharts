@@ -3,7 +3,9 @@ import * as path from "path";
 import { parseSimfile } from "./parseSimfile";
 
 const ROOT =
-  process.env.NODE_ENV === "production" ? "prodStepcharts" : "devStepcharts";
+  process.env.NODE_ENV === "production"
+  ? "resources/prodStepcharts"
+  : "resources/devStepcharts";
 
 type EntireMix = Mix & {
   simfiles: Simfile[];
