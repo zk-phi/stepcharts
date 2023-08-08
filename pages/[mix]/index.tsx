@@ -7,7 +7,7 @@ import {
 } from "next";
 import { getAllStepchartData } from "../../lib/getAllStepchartData";
 import { MixPage } from "../../components/pages/[mix]/MixPage";
-import type { MixPageProps } from "../../components/pages/[mix]/MixPage.tsx";
+import type { MixPageProps } from "../../components/pages/[mix]/MixPage";
 import { calculateStats } from "../../lib/calculateStats";
 
 export async function getStaticPaths(
