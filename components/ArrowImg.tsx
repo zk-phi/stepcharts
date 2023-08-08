@@ -1,13 +1,6 @@
 import React, { CSSProperties } from "react";
 import clsx from "clsx";
 
-import arrow4Svg from "./arrow4.svg";
-import arrow6Svg from "./arrow6.svg";
-import arrow8Svg from "./arrow8.svg";
-import arrow16Svg from "./arrow16.svg";
-import arrowShockSvg from "./arrowShock.svg";
-import arrowFreezeSvg from "./arrowFreeze.svg";
-
 import styles from "./ArrowImg.module.css";
 
 type ArrowImgProps = {
@@ -29,13 +22,13 @@ const arrowClasses = {
 };
 
 const arrowImgs: Record<ArrowImgProps["beat"], string> = {
-  4: arrow4Svg,
-  6: arrow6Svg,
-  8: arrow8Svg,
-  12: arrow6Svg,
-  16: arrow16Svg,
-  shock: arrowShockSvg,
-  freeze: arrowFreezeSvg,
+  4: "/arrow4.svg",
+  6: "/arrow6.svg",
+  8: "/arrow8.svg",
+  12: "/arrow6.svg",
+  16: "/arrow16.svg",
+  shock: "/arrowShock.svg",
+  freeze: "/arrowFreeze.svg",
 };
 
 function ArrowImg({ className, style, position, beat }: ArrowImgProps) {

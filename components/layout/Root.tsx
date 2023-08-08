@@ -3,8 +3,6 @@ import clsx from "clsx";
 import { Head } from "./Head";
 import { Footer } from "./Footer";
 
-import logoSvg from "./logoArrow.svg";
-
 import styles from "./Root.module.css";
 
 type RootProps = {
@@ -12,7 +10,6 @@ type RootProps = {
   title: string;
   subheading?: React.ReactNode;
   metaDescription: string;
-  socialMediaImg?: string;
   children: React.ReactNode;
 };
 
@@ -21,7 +18,6 @@ function Root({
   title,
   subheading,
   metaDescription,
-  socialMediaImg,
   children,
 }: RootProps) {
   return (
@@ -36,7 +32,6 @@ function Root({
       <Head
         title={title}
         metaDescription={metaDescription}
-        metaImg={socialMediaImg}
       />
       <header className="shadow">
         <div className="bg-heading h-16 flex flex-row items-center justify-between lg:px-4">
@@ -45,7 +40,7 @@ function Root({
               <a href="/" className={clsx(styles.logo, "block lg:-ml-4")}>
                 <img
                   className="w-full h-full"
-                  src={logoSvg}
+                  src="/logoArrow.svg"
                   alt="Stepcharts logo"
                   width={52}
                   height={52}

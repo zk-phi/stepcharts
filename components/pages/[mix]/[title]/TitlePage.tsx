@@ -4,14 +4,12 @@ import { StepchartTypePageItem } from "../../../StepchartTypePageItem";
 import { ImageFrame } from "../../../ImageFrame";
 import { TitleDetailsRow, TitleDetailsTable } from "../../../TitleDetailsTable";
 
-import singleSvg from "../../../single.svg";
-import doubleSvg from "../../../double.svg";
 import { Breadcrumbs } from "../../../Breadcrumbs";
 import { Banner } from "../../../Banner";
 
 const modeSvgs = {
-  single: singleSvg,
-  double: doubleSvg,
+  single: "/single.svg",
+  double: "/double.svg",
 };
 
 const modeSvgWidths = {

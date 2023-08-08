@@ -4,8 +4,6 @@ import { GiStopSign } from "react-icons/gi";
 
 import { ImageFrame } from "./ImageFrame";
 import { shortMixNames } from "../lib/meta";
-import singleSvg from "./single.svg";
-import doubleSvg from "./double.svg";
 
 import styles from "./CompactTitleCard.module.css";
 import { Banner } from "./Banner";
@@ -29,8 +27,8 @@ type CompactTitleCardProps = {
 };
 
 const modeSvgs = {
-  single: singleSvg,
-  double: doubleSvg,
+  single: "/single.svg",
+  double: "/double.svg",
 };
 
 const modeSvgWidths = {

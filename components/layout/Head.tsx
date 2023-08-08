@@ -1,12 +1,10 @@
 import NextHead from "next/head";
 import React from "react";
 import getConfig from "next/config";
-import fallbackImg from "./fallback_openGraph.png";
 
 type HeadProps = {
   title: string;
   metaDescription: string;
-  metaImg?: string;
 };
 
 function getPageTitle(incomingTitle: string): string {
@@ -31,11 +29,7 @@ function getAbsoluteUrl(url: string): string {
   return `https://${domain}/${url}`;
 }
 
-function Head({ title, metaDescription, metaImg }: HeadProps) {
-  const finalMetaImg = `${getAbsoluteUrl(
-    metaImg ?? fallbackImg
-  )}?t=${title.substring(0, 10)}`;
-
+function Head({ title, metaDescription }: HeadProps) {
   return (
     <NextHead>
       <title>{getPageTitle(title)}</title>
@@ -49,12 +43,12 @@ function Head({ title, metaDescription, metaImg }: HeadProps) {
       <meta name="twitter:site" content="mattgreer.dev" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:card" content="summary" />
-      <meta name="twitter:image" content={finalMetaImg} />
+      <meta name="twitter:image" content="/fallback_openGraph.png" />
 
       {/* open graph, Twitter also uses some of these */}
       <meta property="og:title" content={title} />
       <meta property="og:description" content={metaDescription} />
-      <meta property="og:image" content={finalMetaImg} />
+      <meta property="og:image" content="/fallback_openGraph.png" />
     </NextHead>
   );
 }

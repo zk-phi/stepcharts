@@ -1,9 +1,6 @@
 import React from "react";
 import clsx from "clsx";
 
-import singleSvg from "./single.svg";
-import doubleSvg from "./double.svg";
-
 import styles from "./difficultyBackgroundColors.module.css";
 
 type StepchartTypePageItemProps = {
@@ -14,8 +11,8 @@ type StepchartTypePageItemProps = {
 };
 
 const modeSvgs = {
-  single: singleSvg,
-  double: doubleSvg,
+  single: "/single.svg",
+  double: "/double.svg",
 };
 
 const modeSvgWidths = {

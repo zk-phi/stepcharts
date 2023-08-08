@@ -1,9 +1,6 @@
 import React, { ReactNode } from "react";
 import { Root } from "../layout/Root";
 
-import printPreviewPng from "../printPreview.png";
-import linkToBarScreeshotPng from "../linkToBarScreenshot.png";
-
 function dateToHumanString(input: string): string {
   const date = new Date(input);
 
@@ -72,7 +69,7 @@ function WhatsNewPage() {
           <img
             className="block w-1/2 shadow-lg"
             style={{ margin: "3rem auto" }}
-            src={linkToBarScreeshotPng}
+            src="/linkToBarScreenshot.png"
             alt="print preview of a step chart"
             width={288}
             height={213}
@@ -102,7 +99,7 @@ function WhatsNewPage() {
           <img
             className="block w-1/2 shadow-lg"
             style={{ margin: "3rem auto" }}
-            src={printPreviewPng}
+            src="/printPreview.png"
             alt="print preview of a step chart"
             width={495}
             height={654}
