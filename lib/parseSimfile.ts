@@ -70,7 +70,7 @@ function parseSimfile(
     const publicName = toSafeName(`${mixDir}-${rawStepchart.banner}`);
     fs.copyFileSync(
       path.join(stepchartSongDirPath, rawStepchart.banner),
-      path.join("components/bannerImages", publicName)
+      path.join("public/bannerImages", publicName)
     );
     rawStepchart.banner = publicName;
   } else {
