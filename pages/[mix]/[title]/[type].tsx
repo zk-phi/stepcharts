@@ -6,7 +6,7 @@ import {
   GetStaticPropsResult,
 } from "next";
 
-import { getAllStepchartData } from "../../../lib/getAllStepchartData";
+import allData from "../../../lib/allStepchartData";
 import { StepchartPage } from "../../../components/pages/[mix]/[title]/StepchartPage";
 import type { StepchartPageProps } from "../../../components/pages/[mix]/[title]/StepchartPage";
 import { Step } from "@material-ui/core";
@@ -14,8 +14,6 @@ import { Step } from "@material-ui/core";
 export async function getStaticPaths(
   _context: GetStaticPathsContext
 ): Promise<GetStaticPathsResult> {
-  const allData = getAllStepchartData();
-
   const allSimfiles = allData.reduce<Simfile[]>((building, mix) => {
     return building.concat(mix.simfiles);
   }, []);
@@ -54,7 +52,6 @@ export async function getStaticProps(
   const titleDir = context.params!.title as string;
   const type = context.params!.type as string;
 
-  const allData = getAllStepchartData();
   const simfile = allData
     .find((m) => m.mixDir === mixDir)!
     .simfiles.find((s) => s.title.titleDir === titleDir)!;

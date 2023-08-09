@@ -1,6 +1,6 @@
 import React from "react";
 import { GetStaticPropsResult } from "next";
-import { getAllStepchartData } from "../lib/getAllStepchartData";
+import entireMixes from "../lib/allStepchartData";
 import { dateReleased, groupedOrder } from "../lib/meta";
 import { IndexPage } from "../components/pages/IndexPage";
 import { IndexPageMix, IndexPageProps } from "../components/pages/IndexPage";
@@ -12,7 +12,6 @@ export const config = {
 export async function getStaticProps(): Promise<
   GetStaticPropsResult<IndexPageProps>
 > {
-  const entireMixes = getAllStepchartData();
   const mixes: IndexPageMix[] = entireMixes.map((em) => {
     return {
       mixName: em.mixName,

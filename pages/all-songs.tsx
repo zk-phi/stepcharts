@@ -1,6 +1,6 @@
 import React from "react";
 import { GetStaticPropsContext, GetStaticPropsResult } from "next";
-import { getAllStepchartData } from "../lib/getAllStepchartData";
+import allData from "../lib/allStepchartData";
 import { AllSongsPage } from "../components/pages/AllSongsPage";
 import type { AllSongsPageProps } from "../components/pages/AllSongsPage";
 import { calculateStats } from "../lib/calculateStats";
@@ -23,8 +23,6 @@ function getFilterString(sf: Simfile): string {
 export async function getStaticProps(
   _context: GetStaticPropsContext
 ): Promise<GetStaticPropsResult<AllSongsPageProps>> {
-  const allData = getAllStepchartData();
-
   const allSimfiles = allData.reduce<Simfile[]>((building, mix) => {
     return building.concat(mix.simfiles);
   }, []);

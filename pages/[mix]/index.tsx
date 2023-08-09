@@ -5,7 +5,7 @@ import {
   GetStaticPropsContext,
   GetStaticPropsResult,
 } from "next";
-import { getAllStepchartData } from "../../lib/getAllStepchartData";
+import allData from "../../lib/allStepchartData";
 import { MixPage } from "../../components/pages/[mix]/MixPage";
 import type { MixPageProps } from "../../components/pages/[mix]/MixPage";
 import { calculateStats } from "../../lib/calculateStats";
@@ -13,8 +13,6 @@ import { calculateStats } from "../../lib/calculateStats";
 export async function getStaticPaths(
   _context: GetStaticPathsContext
 ): Promise<GetStaticPathsResult> {
-  const allData = getAllStepchartData();
-
   return {
     paths: allData.map((mix) => ({ params: { mix: mix.mixDir } })),
     fallback: false,
@@ -53,7 +51,6 @@ export async function getStaticProps(
   context: GetStaticPropsContext
 ): Promise<GetStaticPropsResult<MixPageProps>> {
   const mixDir = context.params!.mix as string;
-  const allData = getAllStepchartData();
   const mix = allData.find((m) => m.mixDir === mixDir)!;
 
   const results = {
