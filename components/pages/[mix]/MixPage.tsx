@@ -62,7 +62,7 @@ function MixPage({ mix, titles }: MixPageProps) {
     ["stops", "t.shifts"]
   );
 
-  const mixBannerUrl = require(`../../../prodStepcharts/${mix.mixDir}/mix-banner.png`);
+  const mixBannerUrl = require(`../../../resources/prodStepcharts/${mix.mixDir}/mix-banner.png`);
   return (
     <Root
       title={mix.mixName}
