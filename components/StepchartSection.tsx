@@ -285,24 +285,8 @@ function StepchartSection({
     );
   });
 
-  // for noscript users, use scroll-margin-top to help ensure targeted beat is out
-  // from under the header. JS users don't need this, as scrollTargetBeatJustUnderHeader
-  // moves the targeted beat to the right spot
-  const noscriptStyle =
-    // only add this style once, with the very first section
-    startOffset === 0 ? (
-      <noscript>
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `.${styles.bar}:target, .${styles.targeted} { scroll-margin-top: 30vh }`,
-          }}
-        />
-      </noscript>
-    ) : null;
-
   return (
     <>
-      {noscriptStyle}
       <div
         className={clsx(className, "relative", {
           "border-b-4 border-yellow-400": process.env.NODE_ENV !== "production",

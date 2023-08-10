@@ -175,7 +175,7 @@ function StepchartPage({ simfile, currentType }: StepchartPageProps) {
             />
           </TitleDetailsTable>
         </div>
-        <div className="hide-if-noscript sm:flex sm:flex-col mt-2 sm:mt-0 sm:flex-1 w-full max-w-xl justify-center">
+        <div className="sm:flex sm:flex-col mt-2 sm:mt-0 sm:flex-1 w-full max-w-xl justify-center">
           <div className="hidden sm:block text-sm ml-2 mb-1">speedmod</div>
           <ToggleBar
             namespace="speedmod"

@@ -96,7 +96,7 @@ function MixPage({ mix, titles }: MixPageProps) {
             aria-label={`${mix.mixName} banner`}
           />
         </div>
-        <div className="hide-if-noscript sm:flex sm:flex-col mt-2 sm:mt-0 sm:flex-1 w-full max-w-xl justify-center">
+        <div className="sm:flex sm:flex-col mt-2 sm:mt-0 sm:flex-1 w-full max-w-xl justify-center">
           <div className="hidden sm:block text-xs mb-1">sort by</div>
           <SortBar sorts={sorts} sortedBy={sortedBy} onSortChange={setSortBy} />
         </div>

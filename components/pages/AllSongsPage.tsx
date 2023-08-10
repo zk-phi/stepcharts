@@ -518,11 +518,6 @@ function AllSongsPage({ titles }: AllSongsPageProps) {
       metaDescription={`All ${titles.length} songs available at stepcharts.com`}
     >
       <RotateYourPhone />
-      <noscript>
-        <div className="bg-red-200 text-red-900 w-96 p-2 m-2 mt-8 mx-auto text-center">
-          This page requires JavaScript to be enabled
-        </div>
-      </noscript>
       <ImageFrame className="hidden sm:grid grid-cols-1 sm:grid-cols-3 mt-0 gap-y-4 sm:gap-x-6 w-screen sm:w-auto border-none sm:border-solid sm:border-1 -mx-4 sm:mx-auto sm:mt-8 w-full p-4 bg-focal-300 sm:rounded-tl-xl sm:rounded-br-xl">
         <div className="sm:col-span-1">
           <div className="text-xs ml-2">Filter</div>
