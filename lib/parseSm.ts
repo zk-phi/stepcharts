@@ -32,12 +32,8 @@ function getMeasureLength(lines: string[], i: number): number {
   return measureLength;
 }
 
-function trimNoteLine(line: string, mode: "single" | "double"): string {
-  if (mode === "single") {
-    return line.substring(0, 4);
-  } else {
-    return line.substring(0, 8);
-  }
+function trimNoteLine(line: string): string {
+  return line.substring(0, 4);
 }
 
 function isRest(line: string): boolean {
@@ -45,7 +41,6 @@ function isRest(line: string): boolean {
 }
 
 function findFirstNonEmptyMeasure(
-  mode: "single" | "double",
   lines: string[],
   i: number
 ): { firstNonEmptyMeasureIndex: number; numMeasuresSkipped: number } {
@@ -64,7 +59,7 @@ function findFirstNonEmptyMeasure(
       continue;
     }
 
-    if (!isRest(trimNoteLine(line, mode))) {
+    if (!isRest(trimNoteLine(line))) {
       return { firstNonEmptyMeasureIndex: measureIndex, numMeasuresSkipped };
     }
   }
@@ -141,7 +136,6 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
   function parseFreezes(
     lines: string[],
     i: number,
-    mode: string,
     difficulty: string
   ): FreezeBody[] {
     const freezes: FreezeBody[] = [];
@@ -177,7 +171,7 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
         if (cleanedLine[d] === "2") {
           if (open[d]) {
             throw new Error(
-              `${sc.title}, ${mode}, ${difficulty} -- error parsing freezes, found a new starting freeze before a previous one finished`
+              `${sc.title}, ${difficulty} -- error parsing freezes, found a new starting freeze before a previous one finished`
             );
           }
           const startBeatFraction = curOffset;
@@ -188,7 +182,7 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
         } else if (cleanedLine[d] === "3") {
           if (!open[d]) {
             throw new Error(
-              `${sc.title}, ${mode}, ${difficulty} -- error parsing freezes, needed to close a freeze that never opened`
+              `${sc.title}, ${difficulty} -- error parsing freezes, needed to close a freeze that never opened`
             );
           }
 
@@ -209,16 +203,17 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
     // move past #NOTES into the note metadata
     i++;
     const mode = lines[i++].replace("dance-", "").replace(":", "");
+
+    // skip double, couple, versus, etc for now
+    if (mode !== "single") {
+      return i + 1;
+    }
+
     i++; // skip author for now
     const difficulty =
       normalizedDifficultyMap[lines[i++].replace(":", "").toLowerCase()];
     const feet = Number(lines[i++].replace(":", ""));
     i++; // skip groove meter data for now
-
-    // skip couple, versus, etc for now
-    if (mode !== "single" && mode !== "double") {
-      return i + 1;
-    }
 
     // now i is pointing at the first measure
     let arrows: Arrow[] = [];
@@ -226,7 +221,7 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
     const {
       firstNonEmptyMeasureIndex,
       numMeasuresSkipped,
-    } = findFirstNonEmptyMeasure(mode, lines, i);
+    } = findFirstNonEmptyMeasure(lines, i);
     i = firstNonEmptyMeasureIndex;
 
     const firstMeasureIndex = i;
@@ -240,7 +235,7 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
     for (; i < lines.length && !concludesANoteTag(lines[i]); ++i) {
       // for now, remove freeze ends as they are handled in parseFreezes
       // TODO: deal with freezes here, no need to have two functions doing basically the same thing
-      const line = trimNoteLine(lines[i], mode).replace(/3/g, "0");
+      const line = trimNoteLine(lines[i]).replace(/3/g, "0");
 
       if (line.trim() === "") {
         continue;
@@ -264,9 +259,9 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
       curOffset = curOffset.add(curMeasureFraction);
     }
 
-    const freezes = parseFreezes(lines, firstMeasureIndex, mode, difficulty);
+    const freezes = parseFreezes(lines, firstMeasureIndex, difficulty);
 
-    sc.charts![`${mode}-${difficulty}`] = {
+    sc.charts![`single-${difficulty}`] = {
       arrows,
       freezes,
       bpm: parseBpms(bpmString, numMeasuresSkipped),
@@ -274,8 +269,8 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
     };
 
     sc.availableTypes!.push({
-      slug: `${mode}-${difficulty}`,
-      mode,
+      slug: `single-${difficulty}`,
+      mode: "single",
       difficulty: difficulty as any,
       feet,
     });

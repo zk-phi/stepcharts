@@ -249,7 +249,7 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
     banner: titlePath ? findBanner(titlePath) : null,
   };
 
-  function parseNotes(mode: "single" | "double", rawNotes: string) {
+  function parseNotes(rawNotes: string) {
     const values = rawNotes.split(":");
     const difficulty = normalizedDifficultyMap[values[0].toLowerCase()];
     const feet = Number(values[1]);
@@ -263,23 +263,14 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
 
     let arrowResult = parseArrowStream(notes, firstNonEmptyMeasureIndex);
 
-    if (mode === "double") {
-      const playerTwoResult = parseArrowStream(
-        playerTwoNotes,
-        firstNonEmptyMeasureIndex
-      );
-
-      arrowResult = combinePadsIntoOneStream(arrowResult, playerTwoResult);
-    }
-
     sc.availableTypes!.push({
-      slug: `${mode}-${difficulty}`,
-      mode,
+      slug: `single-${difficulty}`,
+      mode: "single",
       difficulty: difficulty as any,
       feet,
     });
 
-    sc.charts![`${mode}-${difficulty}`] = {
+    sc.charts![`single-${difficulty}`] = {
       arrows: arrowResult.arrows,
       freezes: arrowResult.freezes,
       bpm: determineBpm(firstNonEmptyMeasureIndex),
@@ -390,8 +381,8 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
         changebpm = value;
       } else if (tag === "freeze") {
         stops = value;
-      } else if (tag === "single" || tag === "double") {
-        parseNotes(tag, value);
+      } else if (tag === "single") {
+        parseNotes(value);
       }
     }
 
