@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { parseSimfile } from "../lib/parseSimfile";
+import { parseSimfileAndCopyBanners } from "../lib/parseSimfile";
 import { dateReleased } from "../lib/meta";
 
 const ROOT = "resources/prodStepcharts";
@@ -27,7 +27,7 @@ function getDirectories(...dirPath: string[]): string[] {
   });
 }
 
-function getAllStepchartData(): EntireMix[] {
+function getAllStepchartDataAndCopyBanners(): EntireMix[] {
   const mixDirs = getDirectories(ROOT);
 
   return mixDirs.map((mixDir) => {
@@ -47,7 +47,7 @@ function getAllStepchartData(): EntireMix[] {
     const simfiles = mixSongDirs.map((songDir) => {
       try {
         return {
-          ...parseSimfile(ROOT, mixDir, songDir),
+          ...parseSimfileAndCopyBanners(ROOT, mixDir, songDir),
           mix,
         };
       } catch (e) {
@@ -68,5 +68,5 @@ function getAllStepchartData(): EntireMix[] {
 
 fs.writeFileSync(
   `${__dirname}/../resources/stepchartData.json`,
-  JSON.stringify(getAllStepchartData()),
+  JSON.stringify(getAllStepchartDataAndCopyBanners()),
 );

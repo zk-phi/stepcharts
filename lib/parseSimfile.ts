@@ -44,7 +44,7 @@ function getBpms(sm: RawSimfile): number[] {
   return chart.bpm.map((b) => b.bpm);
 }
 
-function parseSimfile(
+function parseSimfileAndCopyBanners(
   rootDir: string,
   mixDir: string,
   titleDir: string
@@ -99,5 +99,5 @@ function parseSimfile(
   };
 }
 
-export { parseSimfile };
+export { parseSimfileAndCopyBanners };
 export type { RawSimfile };
