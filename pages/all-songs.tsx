@@ -46,7 +46,7 @@ export async function getStaticProps(
           types: sm.availableTypes.map((t) => {
             return {
               ...t,
-              stats: calculateStats(sm.charts[t.slug]),
+              stats: calculateStats(sm.charts[t.difficulty]),
             };
           }),
           displayBpm: sm.displayBpm,

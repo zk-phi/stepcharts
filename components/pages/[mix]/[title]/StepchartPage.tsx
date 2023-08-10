@@ -49,7 +49,7 @@ function StepchartPage({ simfile, currentType }: StepchartPageProps) {
   const sectionSizeInMeasures = sectionSizesInMeasures[speedmod];
 
   const currentTypeMeta = simfile.availableTypes.find(
-    (at) => at.slug === currentType
+    (at) => at.difficulty === currentType
   )!;
 
   const chart = simfile.charts[currentType];
@@ -90,9 +90,8 @@ function StepchartPage({ simfile, currentType }: StepchartPageProps) {
     );
   }
 
-  const title = `${
-    simfile.title.translitTitleName || simfile.title.titleName
-  } - ${currentType.replace(/-/g, ", ")} (${currentTypeMeta.feet})`;
+  const normalizedTitle = simfile.title.translitTitleName || simfile.title.titleName;
+  const title = `${normalizedTitle} - ${currentType} (${currentTypeMeta.feet})`;
 
   return (
     <Root
@@ -111,13 +110,13 @@ function StepchartPage({ simfile, currentType }: StepchartPageProps) {
               pathSegment: simfile.title.titleDir,
             },
             {
-              display: currentType.replace(/-/g, " "),
+              display: currentType,
               pathSegment: currentType,
             },
           ]}
         />
       }
-      metaDescription={`${currentType.replace(/-/g, " ")} stepchart for ${
+      metaDescription={`${currentType} stepchart for ${
         simfile.title.translitTitleName || simfile.title.titleName
       }`}
     >

@@ -38,7 +38,7 @@ function buildStepchartUrl(
   title: CompactTitleCardProps["title"],
   type: StepchartType
 ): string {
-  return `/${mix.mixDir}/${title.titleDir}/${type.slug}`;
+  return `/${mix.mixDir}/${title.titleDir}/${type.difficulty}`;
 }
 
 const difficulties = ["beginner", "basic", "difficult", "expert", "challenge"];

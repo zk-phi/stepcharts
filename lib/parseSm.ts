@@ -261,7 +261,7 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
 
     const freezes = parseFreezes(lines, firstMeasureIndex, difficulty);
 
-    sc.charts![`single-${difficulty}`] = {
+    sc.charts![difficulty] = {
       arrows,
       freezes,
       bpm: parseBpms(bpmString, numMeasuresSkipped),
@@ -269,7 +269,6 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
     };
 
     sc.availableTypes!.push({
-      slug: `single-${difficulty}`,
       difficulty: difficulty as any,
       feet,
     });

@@ -26,7 +26,6 @@ type Difficulty =
   | "edit";
 
 type StepchartType = {
-  slug: string;
   difficulty: Difficulty;
   feet: number;
 };

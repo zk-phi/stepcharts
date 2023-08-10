@@ -40,7 +40,7 @@ function getMostDifficultChart(simfile: Simfile) {
     );
 
     if (matchingType) {
-      return charts[matchingType.slug];
+      return charts[matchingType.difficulty];
     }
   }
 

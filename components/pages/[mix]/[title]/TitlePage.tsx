@@ -20,8 +20,8 @@ type TitlePageProps = {
   types: StepchartType[];
 };
 
-function buildTypeUrl(mixDir: string, titleDir: string, slug: string): string {
-  return `/${mixDir}/${titleDir}/${slug}`;
+function buildTypeUrl(mixDir: string, titleDir: string, difficulty: string): string {
+  return `/${mixDir}/${titleDir}/${difficulty}`;
 }
 
 function TitlePage({ title, displayBpm, artist, mix, types }: TitlePageProps) {
@@ -73,7 +73,7 @@ function TitlePage({ title, displayBpm, artist, mix, types }: TitlePageProps) {
             {types.map((type, index) => {
               return (
                 <li key={type.difficulty}>
-                  <a href={buildTypeUrl(mix.mixDir, title.titleDir, type.slug)}>
+                  <a href={buildTypeUrl(mix.mixDir, title.titleDir, type.difficulty)}>
                     <StepchartTypePageItem
                         type={type}
                         isLast={index === types.length - 1}

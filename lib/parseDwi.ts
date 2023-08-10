@@ -264,12 +264,11 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
     let arrowResult = parseArrowStream(notes, firstNonEmptyMeasureIndex);
 
     sc.availableTypes!.push({
-      slug: `single-${difficulty}`,
       difficulty: difficulty as any,
       feet,
     });
 
-    sc.charts![`single-${difficulty}`] = {
+    sc.charts![difficulty] = {
       arrows: arrowResult.arrows,
       freezes: arrowResult.freezes,
       bpm: determineBpm(firstNonEmptyMeasureIndex),

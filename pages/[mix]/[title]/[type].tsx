@@ -38,7 +38,7 @@ export async function getStaticPaths(
       params: {
         mix: sdt.mix.mixDir,
         title: sdt.title.titleDir,
-        type: sdt.type.slug,
+        type: sdt.type.difficulty,
       },
     })),
     fallback: false,

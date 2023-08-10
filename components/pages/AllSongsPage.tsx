@@ -58,7 +58,7 @@ function RotateYourPhone() {
 }
 
 function buildStepchartUrl(t: AllSongsPageTitle, type: StepchartType): string {
-  return `/${t.mix.mixDir}/${t.title.titleDir}/${type.slug}`;
+  return `/${t.mix.mixDir}/${t.title.titleDir}/${type.difficulty}`;
 }
 
 function buildTitleUrl(t: AllSongsPageTitle): string {
@@ -165,7 +165,7 @@ function TitleSubRows({
           <tbody>
             {row.original.types.map((t, i, a) => {
               return (
-                <tr key={t.slug}>
+                <tr key={t.difficulty}>
                   <td
                     className={clsx("block p-0 pl-6", {
                       "pt-2": i === 0,

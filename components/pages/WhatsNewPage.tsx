@@ -79,7 +79,7 @@ function WhatsNewPage() {
             example,{" "}
             <a
               className="text-link cursor-pointer"
-              href="/3rdMix/AFRONOVA/single-expert/#beat-50"
+              href="/3rdMix/AFRONOVA/expert/#beat-50"
             >
               here are the famous "Afronova steps"
             </a>{" "}

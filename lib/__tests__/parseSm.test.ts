@@ -80,7 +80,6 @@ ${notes}
         {
           difficulty: "beginner",
           feet: 5,
-          slug: "single-beginner",
         },
       ]);
     });
@@ -92,7 +91,7 @@ ${notes}
 0000`;
       const result = parse(notes);
 
-      expect(result.charts["single-beginner"].arrows).toEqual([
+      expect(result.charts["beginner"].arrows).toEqual([
         { beat: 4, direction: "1000", offset: 0 / 4 },
         { beat: 4, direction: "0100", offset: 2 / 4 },
       ]);
@@ -110,7 +109,7 @@ ${notes}
 
       const result = parse(notes);
 
-      expect(result.charts["single-beginner"].arrows).toEqual([
+      expect(result.charts["beginner"].arrows).toEqual([
         { beat: 4, direction: "1000", offset: 0 / 8 },
         { beat: 8, direction: "0100", offset: 1 / 8 },
         { beat: 4, direction: "0001", offset: 2 / 8 },
@@ -131,7 +130,7 @@ ${notes}
 1010`;
 
       const result = parse(notes);
-      expect(result.charts["single-beginner"].arrows).toEqual([
+      expect(result.charts["beginner"].arrows).toEqual([
         { beat: 4, direction: "1001", offset: 0 / 6 },
         { beat: 6, direction: "0110", offset: 1 / 6 },
         { beat: 6, direction: "1100", offset: 2 / 6 },
@@ -169,7 +168,7 @@ ${notes}
 
       const result = parse(notes);
 
-      expect(result.charts["single-beginner"].arrows).toEqual([
+      expect(result.charts["beginner"].arrows).toEqual([
         {
           direction: "0001",
           beat: 4,
@@ -202,7 +201,7 @@ ${notes}
         },
       ]);
 
-      expect(result.charts["single-beginner"].freezes).toEqual([
+      expect(result.charts["beginner"].freezes).toEqual([
         {
           direction: 0,
           startOffset: 0.25,
@@ -238,7 +237,7 @@ ${notes}
 0300`;
 
       const result = parse(notes);
-      const { arrows, freezes } = result.charts["single-beginner"];
+      const { arrows, freezes } = result.charts["beginner"];
 
       expect(arrows).toEqual([
         { beat: 4, offset: 0, direction: "0020" },
