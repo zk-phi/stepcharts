@@ -1,5 +1,8 @@
 import * as fs from "fs";
 
-const data = fs.readFileSync("resources/stepchartData.json");
+type MixData = Mix & { simfiles: Simfile[] };
 
-export default JSON.parse(data);
+const data = fs.readFileSync("resources/stepchartData.json", "utf-8");
+const parsed = JSON.parse(data) as MixData[];
+
+export default parsed;
