@@ -31,6 +31,10 @@ function getAllStepchartData(): EntireMix[] {
   const mixDirs = getDirectories(ROOT);
 
   return mixDirs.map((mixDir) => {
+    if (fs.existsSync(`${ROOT}/${mixDir}/mix-banner.png`)) {
+      fs.copyFileSync(`${ROOT}/${mixDir}/mix-banner.png`, `public/bannerImages/${mixDir}.png`);
+    }
+
     const mixSongDirs = getDirectories(ROOT, mixDir);
 
     const mix = {

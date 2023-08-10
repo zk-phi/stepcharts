@@ -24,7 +24,7 @@ function buildMixUrl(mix: CompactMixCardProps["mix"]): string {
 }
 
 function CompactMixCard({ className, mix }: CompactMixCardProps) {
-  const bannerUrl = require(`../resources/prodStepcharts/${mix.mixDir}/mix-banner.png`);
+  const bannerUrl = `/bannerImages/${mix.mixDir}.png`;
 
   return (
     <ImageFrame
