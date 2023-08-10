@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { parseSimfile } from "../lib/parseSimfile";
+import { dateReleased } from "../lib/meta";
 
 const ROOT = "resources/prodStepcharts";
 
@@ -36,6 +37,7 @@ function getAllStepchartData(): EntireMix[] {
       mixName: mixDir.replace(/-/g, " "),
       mixDir,
       songCount: mixSongDirs.length,
+      yearReleased: new Date(dateReleased[mixDir]).getFullYear(),
     };
 
     const simfiles = mixSongDirs.map((songDir) => {
@@ -55,7 +57,9 @@ function getAllStepchartData(): EntireMix[] {
       ...mix,
       simfiles,
     };
-  });
+  }).sort((a, b) => (
+    a.yearReleased - b.yearReleased
+  ));
 }
 
 fs.writeFileSync(

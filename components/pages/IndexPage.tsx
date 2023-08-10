@@ -2,12 +2,8 @@ import React from "react";
 import { Root } from "../layout/Root";
 import { CompactMixCard } from "../CompactMixCard";
 
-type IndexPageMix = Mix & {
-  yearReleased: number;
-};
-
 type IndexPageProps = {
-  mixes: IndexPageMix[];
+  mixes: Mix[];
 };
 
 function IndexPage({ mixes }: IndexPageProps) {
@@ -29,4 +25,4 @@ function IndexPage({ mixes }: IndexPageProps) {
 }
 
 export { IndexPage };
-export type { IndexPageMix, IndexPageProps };
+export type { IndexPageProps };
