@@ -9,6 +9,7 @@ type CompactMixCardProps = {
     mixDir: string;
     songCount: number;
     yearReleased: number;
+    banner: string | null;
   };
 };
 
@@ -57,7 +58,7 @@ function CompactMixCard({ className, mix }: CompactMixCardProps) {
           >
             <img
               className="absolute top-0 left-0 w-full h-full"
-              src={mix.banner}
+              src={mix.banner || ""}
               alt={`${mix.mixName} banner`}
               loading="lazy"
             />
