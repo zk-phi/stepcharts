@@ -9,10 +9,6 @@ import allData from "../../../lib/allStepchartData";
 import { TitlePage } from "../../../components/pages/[mix]/[title]/TitlePage";
 import type { TitlePageProps } from "../../../components/pages/[mix]/[title]/TitlePage";
 
-export const config = {
-  unstable_runtimeJS: false,
-};
-
 export async function getStaticPaths(
   _context: GetStaticPathsContext
 ): Promise<GetStaticPathsResult> {

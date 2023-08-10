@@ -4,10 +4,6 @@ import entireMixes from "../lib/allStepchartData";
 import { IndexPage } from "../components/pages/IndexPage";
 import { IndexPageProps } from "../components/pages/IndexPage";
 
-export const config = {
-  unstable_runtimeJS: false,
-};
-
 export async function getStaticProps(): Promise<
   GetStaticPropsResult<IndexPageProps>
 > {
