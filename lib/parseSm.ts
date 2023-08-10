@@ -270,7 +270,6 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
 
     sc.availableTypes!.push({
       slug: `single-${difficulty}`,
-      mode: "single",
       difficulty: difficulty as any,
       feet,
     });

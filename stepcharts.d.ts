@@ -17,7 +17,6 @@ type FreezeBody = {
   endOffset: number;
 };
 
-type Mode = "single" | "double";
 type Difficulty =
   | "beginner"
   | "basic"
@@ -28,7 +27,6 @@ type Difficulty =
 
 type StepchartType = {
   slug: string;
-  mode: Mode;
   difficulty: Difficulty;
   feet: number;
 };

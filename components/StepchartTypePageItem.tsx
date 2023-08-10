@@ -7,24 +7,12 @@ type StepchartTypePageItemProps = {
   className?: string;
   type: StepchartType;
   isLast?: boolean;
-  showMode?: boolean;
-};
-
-const modeSvgs = {
-  single: "/single.svg",
-  double: "/double.svg",
-};
-
-const modeSvgWidths = {
-  single: 16,
-  double: 32,
 };
 
 function StepchartTypePageItem({
   className,
   type,
   isLast,
-  showMode,
 }: StepchartTypePageItemProps) {
   return (
     <div
@@ -33,19 +21,9 @@ function StepchartTypePageItem({
       <div
         className={clsx(
           "bg-focal-100 text-focal-700 p-2 border-b border-gray-900",
-          {
-            "border-none": isLast,
-            "flex flex-row justify-between items-center": showMode,
-          }
+          { "border-none": isLast },
         )}
       >
-        {showMode && (
-          <img
-            src={modeSvgs[type.mode]}
-            width={modeSvgWidths[type.mode]}
-            alt={`${type.mode} mode icon`}
-          />
-        )}
         <div className="text-right">{type.difficulty}</div>
       </div>
       <div

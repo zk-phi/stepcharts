@@ -48,7 +48,6 @@ function StepchartPage({ simfile, currentType }: StepchartPageProps) {
   const [speedmod, setSpeedmod] = useState(speedmods[0]);
   const sectionSizeInMeasures = sectionSizesInMeasures[speedmod];
 
-  const isSingle = currentType.includes("single");
   const currentTypeMeta = simfile.availableTypes.find(
     (at) => at.slug === currentType
   )!;
@@ -77,10 +76,9 @@ function StepchartPage({ simfile, currentType }: StepchartPageProps) {
   }
 
   const sectionGroups = [];
-  const sectionsPerChunk = isSingle ? 7 : 4;
 
   while (sections.length) {
-    const sectionChunk = sections.splice(0, sectionsPerChunk);
+    const sectionChunk = sections.splice(0, 7);
     sectionGroups.push(
       <div
         key={sectionGroups.length}

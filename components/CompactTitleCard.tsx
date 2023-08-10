@@ -26,16 +26,6 @@ type CompactTitleCardProps = {
   stats: Stats;
 };
 
-const modeSvgs = {
-  single: "/single.svg",
-  double: "/double.svg",
-};
-
-const modeSvgWidths = {
-  single: 18,
-  double: 39,
-};
-
 function buildTitleUrl(
   mix: CompactTitleCardProps["mix"],
   title: CompactTitleCardProps["title"]
@@ -48,13 +38,10 @@ function buildStepchartUrl(
   title: CompactTitleCardProps["title"],
   type: StepchartType
 ): string {
-  return `/${mix.mixDir}/${title.titleDir}/${type.mode}-${type.difficulty}`;
+  return `/${mix.mixDir}/${title.titleDir}/${type.slug}`;
 }
 
-const difficulties = {
-  single: ["beginner", "basic", "difficult", "expert", "challenge"],
-  double: ["basic", "difficult", "expert", "challenge"],
-};
+const difficulties = ["beginner", "basic", "difficult", "expert", "challenge"];
 
 function Types({
   mix,
@@ -69,21 +56,18 @@ function Types({
     return null;
   }
 
-  const { mode } = types[0];
-
   return (
     <div
       className={clsx(
         "w-full flex flex-row justify-around text-white font-bold items-center"
       )}
     >
-      <img src={modeSvgs[mode]} width={modeSvgWidths[mode]} />
-      {difficulties[mode].map((d) => {
+      {difficulties.map((d) => {
         const t = types.find((t) => t.difficulty === d);
 
         if (!t) {
           return (
-            <div key={`${mode}-${d}`} className="text-gray-500">
+            <div key={d} className="text-gray-500">
               -
             </div>
           );
@@ -92,7 +76,7 @@ function Types({
         return (
           <a
             href={buildStepchartUrl(mix, title, t)}
-            key={`${mode}-${d}`}
+            key={d}
             className={clsx(
               styles[t.difficulty],
               "block hover:bg-gray-600 transform hover:scale-150 w-6 h-6 text-center"
@@ -158,16 +142,7 @@ function CompactTitleCard({
       </div>
 
       <div className="flex flex-row justify-items-stretch xmx-2 xmy-2 p-2 pt-0">
-        <Types
-          mix={mix}
-          title={title}
-          types={types.filter((t) => t.mode === "single")}
-        />
-        <Types
-          mix={mix}
-          title={title}
-          types={types.filter((t) => t.mode === "double")}
-        />
+        <Types mix={mix} title={title} types={types} />
       </div>
       <div className="text-gray-100 bg-gray-400 text-sm px-2 pr-4 py-1 text-center flex flex-row justify-between">
         <div className="px-2 -ml-2 -my-1  bg-gray-700 text-gray-200 grid place-items-center">

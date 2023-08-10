@@ -176,7 +176,7 @@ function TitleSubRows({
                       className="block"
                       href={buildStepchartUrl(row.original, t)}
                     >
-                      <StepchartTypePageItem type={t} showMode />
+                      <StepchartTypePageItem type={t} />
                     </a>
                   </td>
                   {Object.keys(t.stats).map((k) => (

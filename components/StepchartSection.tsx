@@ -75,9 +75,6 @@ function StepchartSection({
 
   const { arrows, freezes, bpm, stops } = chart;
 
-  const isSingle = arrows[0].direction.length === 4;
-  const singleDoubleClass = isSingle ? "single" : "double";
-
   const barHeight = `var(--arrow-size) * ${speedMod}`;
   const measureHeight = `${barHeight} * 4`;
   const arrowAdjustment = `(${barHeight} - var(--arrow-size)) / 2`;
@@ -296,7 +293,6 @@ function StepchartSection({
         <div
           className={clsx(
             styles.container,
-            styles[`container-${singleDoubleClass}`],
             "relative bg-indigo-100 z-10"
           )}
           style={
@@ -310,9 +306,6 @@ function StepchartSection({
           {barDivs}
           {bpmRangeDivs}
           {freezeDivs}
-          {!isSingle && (
-            <div className={clsx(styles.doubleDivider, "h-full")} />
-          )}
           {arrowImgs}
         </div>
         {bpmLabelDivs}

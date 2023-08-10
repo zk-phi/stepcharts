@@ -80,7 +80,6 @@ ${notes}
         {
           difficulty: "beginner",
           feet: 5,
-          mode: "single",
           slug: "single-beginner",
         },
       ]);
