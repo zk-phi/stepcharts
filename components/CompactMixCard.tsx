@@ -24,8 +24,6 @@ function buildMixUrl(mix: CompactMixCardProps["mix"]): string {
 }
 
 function CompactMixCard({ className, mix }: CompactMixCardProps) {
-  const bannerUrl = `/bannerImages/${mix.mixDir}.png`;
-
   return (
     <ImageFrame
       className={clsx(
@@ -59,7 +57,7 @@ function CompactMixCard({ className, mix }: CompactMixCardProps) {
           >
             <img
               className="absolute top-0 left-0 w-full h-full"
-              src={bannerUrl}
+              src={mix.banner}
               alt={`${mix.mixName} banner`}
               loading="lazy"
             />

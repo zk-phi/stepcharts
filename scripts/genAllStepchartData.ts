@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { toSafeName } from "../lib/util";
 import { parseSimfileAndCopyBanners } from "../lib/parseSimfile";
 import { dateReleased } from "../lib/meta";
 
@@ -31,8 +32,13 @@ function getAllStepchartDataAndCopyBanners(): EntireMix[] {
   const mixDirs = getDirectories(ROOT);
 
   return mixDirs.map((mixDir) => {
+    let publicName = toSafeName(`${mixDir}.png`);
+    let banner: string | null;
     if (fs.existsSync(`${ROOT}/${mixDir}/mix-banner.png`)) {
-      fs.copyFileSync(`${ROOT}/${mixDir}/mix-banner.png`, `public/bannerImages/${mixDir}.png`);
+      fs.copyFileSync(`${ROOT}/${mixDir}/mix-banner.png`, `public/bannerImages/${publicName}`);
+      banner = `/bannerImages/${publicName}`;
+    } else {
+      banner = null;
     }
 
     const mixSongDirs = getDirectories(ROOT, mixDir);
@@ -42,6 +48,7 @@ function getAllStepchartDataAndCopyBanners(): EntireMix[] {
       mixDir,
       songCount: mixSongDirs.length,
       yearReleased: new Date(dateReleased[mixDir]).getFullYear(),
+      banner,
     };
 
     const simfiles = mixSongDirs.map((songDir) => {

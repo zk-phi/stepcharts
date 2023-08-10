@@ -62,7 +62,6 @@ function MixPage({ mix, titles }: MixPageProps) {
     ["stops", "t.shifts"]
   );
 
-  const mixBannerUrl = `/bannerImages/${mix.mixDir}.png`;
   return (
     <Root
       title={mix.mixName}
@@ -78,7 +77,7 @@ function MixPage({ mix, titles }: MixPageProps) {
           className="border-b-4 border-white w-full bg-no-repeat bg-cover mx-auto"
           style={{
             paddingTop: "calc(80 / 256 * 100%)",
-            backgroundImage: `url(${mixBannerUrl})`,
+            backgroundImage: `url(${mix.banner})`,
           }}
           role="image"
           aria-label={`${mix.mixName} banner`}
@@ -90,7 +89,7 @@ function MixPage({ mix, titles }: MixPageProps) {
             className="border-2 border-white w-full bg-no-repeat bg-cover"
             style={{
               paddingTop: "calc(80 / 256 * 100%)",
-              backgroundImage: `url(${mixBannerUrl})`,
+              backgroundImage: `url(${mix.banner})`,
             }}
             role="image"
             aria-label={`${mix.mixName} banner`}

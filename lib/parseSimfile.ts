@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { toSafeName } from "./util";
 import { parseDwi } from "./parseDwi";
 import { parseSm } from "./parseSm";
 
@@ -29,13 +30,6 @@ function getSongFile(songDir: string): string {
   }
 
   return songFile;
-}
-
-function toSafeName(name: string): string {
-  name = name.replace(".png", "");
-  name = name.replace(/\s/g, "-").replace(/[^\w]/g, "_");
-
-  return `${name}.png`;
 }
 
 function getBpms(sm: RawSimfile): number[] {
@@ -72,7 +66,7 @@ function parseSimfileAndCopyBanners(
       path.join(stepchartSongDirPath, rawStepchart.banner),
       path.join("public/bannerImages", publicName)
     );
-    rawStepchart.banner = publicName;
+    rawStepchart.banner = `/bannerImages/${publicName}`;
   } else {
     rawStepchart.banner = null;
   }

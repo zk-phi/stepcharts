@@ -76,6 +76,7 @@ type Mix = {
   mixDir: string;
   songCount: number;
   yearReleased: number;
+  banner: string | null;
 };
 
 type Title = {
