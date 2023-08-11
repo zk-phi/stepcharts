@@ -1,9 +1,9 @@
 import React from "react";
 import { GetStaticPropsContext, GetStaticPropsResult } from "next";
-import allData from "../lib/allStepchartData";
-import { AllSongsPage } from "../components/pages/AllSongsPage";
-import type { AllSongsPageProps } from "../components/pages/AllSongsPage";
-import { calculateStats } from "../lib/calculateStats";
+import allData from "../../lib/allStepchartData";
+import { AllSongsPage } from "../../components/pages/all-songs";
+import type { AllSongsPageProps } from "../../components/pages/all-songs";
+import { calculateStats } from "../../lib/calculateStats";
 
 function getTempShiftCount(sf: Simfile): number {
   const chart = Object.values(sf.charts)[0];

@@ -1,5 +1,5 @@
 import React from "react";
-import { ToggleBar } from "./ToggleBar";
+import { ToggleBar } from "../../ToggleBar";
 
 type PageBarProps = {
   className?: string;

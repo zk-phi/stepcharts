@@ -6,8 +6,8 @@ import {
   GetStaticPropsResult,
 } from "next";
 import allData from "../../lib/allStepchartData";
-import { MixPage } from "../../components/pages/[mix]/MixPage";
-import type { MixPageProps } from "../../components/pages/[mix]/MixPage";
+import { MixPage } from "../../components/pages/[mix]";
+import type { MixPageProps } from "../../components/pages/[mix]";
 import { calculateStats } from "../../lib/calculateStats";
 
 export async function getStaticPaths(

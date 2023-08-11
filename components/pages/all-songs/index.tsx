@@ -6,18 +6,18 @@ import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import { IoIosPhoneLandscape } from "react-icons/io";
 import debounce from "lodash.debounce";
 
-import { Root } from "../layout/Root";
+import { Root } from "../../layout/Root";
 
-import { shortMixNames } from "../../lib/meta";
-import { FilterInput } from "../FilterInput";
-import { useSort } from "../SortHook";
-import { SortBar } from "../SortBar";
-import { PageBar } from "../PageBar";
+import { shortMixNames } from "../../../lib/meta";
+import { FilterInput } from "../../FilterInput";
+import { useSort } from "../../SortHook";
+import { SortBar } from "../../SortBar";
+import { PageBar } from "./PageBar";
 
-import styles from "./AllSongsPage.module.css";
-import difficultyBgStyles from "../difficultyBackgroundColors.module.css";
-import { ImageFrame } from "../ImageFrame";
-import { StepchartTypePageItem } from "../StepchartTypePageItem";
+import styles from "./index.module.css";
+import difficultyBgStyles from "../../difficultyBackgroundColors.module.css";
+import { ImageFrame } from "../../ImageFrame";
+import { StepchartTypePageItem } from "../../StepchartTypePageItem";
 
 type AllSongsPageStepchartType = StepchartType & { stats: Stats };
 

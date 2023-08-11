@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Root } from "../layout/Root";
+import { Root } from "../../layout/Root";
 
 function dateToHumanString(input: string): string {
   const date = new Date(input);

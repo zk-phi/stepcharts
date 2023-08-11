@@ -6,8 +6,8 @@ import {
   GetStaticPropsResult,
 } from "next";
 import allData from "../../../lib/allStepchartData";
-import { TitlePage } from "../../../components/pages/[mix]/[title]/TitlePage";
-import type { TitlePageProps } from "../../../components/pages/[mix]/[title]/TitlePage";
+import { TitlePage } from "../../../components/pages/[mix]/[title]";
+import type { TitlePageProps } from "../../../components/pages/[mix]/[title]";
 
 export async function getStaticPaths(
   _context: GetStaticPathsContext

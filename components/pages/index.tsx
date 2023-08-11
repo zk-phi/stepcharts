@@ -1,6 +1,6 @@
 import React from "react";
 import { Root } from "../layout/Root";
-import { CompactMixCard } from "../CompactMixCard";
+import { CompactMixCard } from "./CompactMixCard";
 
 type IndexPageProps = {
   mixes: Mix[];

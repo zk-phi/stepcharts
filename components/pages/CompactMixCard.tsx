@@ -1,6 +1,6 @@
 import React from "react";
 import clsx from "clsx";
-import { ImageFrame } from "./ImageFrame";
+import { ImageFrame } from "../ImageFrame";
 
 type CompactMixCardProps = {
   className?: string;

@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 
-import { Root } from "../../../layout/Root";
-import { ImageFrame } from "../../../ImageFrame";
-import { Breadcrumbs } from "../../../Breadcrumbs";
-import { TitleDetailsTable, TitleDetailsRow } from "../../../TitleDetailsTable";
-import { ToggleBar } from "../../../ToggleBar";
+import { Root } from "../../../../layout/Root";
+import { ImageFrame } from "../../../../ImageFrame";
+import { Breadcrumbs } from "../../../../Breadcrumbs";
+import { TitleDetailsTable, TitleDetailsRow } from "../../../../TitleDetailsTable";
+import { ToggleBar } from "../../../../ToggleBar";
 
-import styles from "./StepchartPage.module.css";
-import { Banner } from "../../../Banner";
+import styles from "./index.module.css";
+import { Banner } from "../../../../Banner";
 import {
   scrollTargetBeatJustUnderHeader,
   StepchartSection,
-} from "../../../StepchartSection";
+} from "./StepchartSection";
 
 type StepchartPageProps = {
   simfile: Simfile;
