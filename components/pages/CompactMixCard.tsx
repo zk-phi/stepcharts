@@ -4,13 +4,7 @@ import { ImageFrame } from "../ImageFrame";
 
 type CompactMixCardProps = {
   className?: string;
-  mix: {
-    mixName: string;
-    mixDir: string;
-    songCount: number;
-    yearReleased: number;
-    banner: string | null;
-  };
+  mix: MixMeta;
 };
 
 function pluralize(str: string, count: number): string {
@@ -20,8 +14,8 @@ function pluralize(str: string, count: number): string {
   return str + "s";
 }
 
-function buildMixUrl(mix: CompactMixCardProps["mix"]): string {
-  return `/${mix.mixDir}`;
+function buildMixUrl(mix: MixMeta): string {
+  return `/${mix.id}`;
 }
 
 function CompactMixCard({ className, mix }: CompactMixCardProps) {
@@ -43,7 +37,7 @@ function CompactMixCard({ className, mix }: CompactMixCardProps) {
             href={buildMixUrl(mix)}
             className="inline-block xfont-bold text-white px-1"
           >
-            {mix.mixName}
+            {mix.name}
           </a>
         </div>
       </div>
@@ -58,8 +52,8 @@ function CompactMixCard({ className, mix }: CompactMixCardProps) {
           >
             <img
               className="absolute top-0 left-0 w-full h-full"
-              src={mix.banner || ""}
-              alt={`${mix.mixName} banner`}
+              src={mix.bannerSrc || ""}
+              alt={`${mix.name} banner`}
               loading="lazy"
             />
           </div>
@@ -67,10 +61,10 @@ function CompactMixCard({ className, mix }: CompactMixCardProps) {
       </div>
 
       <div className="text-gray-100 bg-gray-400 text-sm px-3 py-1 text-center flex flex-row justify-between">
-        <div>{mix.yearReleased}</div>
+        <div>{mix.year}</div>
         <div>
-          <span className="font-bold">{mix.songCount}</span>{" "}
-          {pluralize("song", mix.songCount)}
+          <span className="font-bold">{mix.songs}</span>{" "}
+          {pluralize("song", mix.songs)}
         </div>
       </div>
     </ImageFrame>

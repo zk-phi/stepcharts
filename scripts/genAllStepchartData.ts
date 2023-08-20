@@ -35,7 +35,9 @@ function getAllStepchartDataAndCopyBanners(): EntireMix[] {
     let publicName = toSafeName(`${mixDir}.png`);
     let banner: string | null;
     if (fs.existsSync(`${ROOT}/${mixDir}/mix-banner.png`)) {
-      fs.copyFileSync(`${ROOT}/${mixDir}/mix-banner.png`, `public/bannerImages/${publicName}`);
+      if (!fs.existsSync(`public/bannerImages/${publicName}`)) {
+        fs.copyFileSync(`${ROOT}/${mixDir}/mix-banner.png`, `public/bannerImages/${publicName}`);
+      }
       banner = `/bannerImages/${publicName}`;
     } else {
       banner = null;
@@ -73,7 +75,20 @@ function getAllStepchartDataAndCopyBanners(): EntireMix[] {
   ));
 }
 
+const data = getAllStepchartDataAndCopyBanners();
+
 fs.writeFileSync(
-  `${__dirname}/../resources/stepchartData.json`,
-  JSON.stringify(getAllStepchartDataAndCopyBanners()),
+  `resources/stepchartData.json`,
+  JSON.stringify(data),
+);
+
+fs.writeFileSync(
+  `_data/allMixes.json`,
+  JSON.stringify(data.map((mix) => ({
+    name: mix.mixName,
+    id: mix.mixDir,
+    songs: mix.songCount,
+    year: mix.yearReleased,
+    bannerSrc: mix.banner,
+  }))),
 );

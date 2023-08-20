@@ -3,7 +3,7 @@ import { Root } from "../layout/Root";
 import { CompactMixCard } from "./CompactMixCard";
 
 type IndexPageProps = {
-  mixes: Mix[];
+  mixes: MixMeta[];
 };
 
 function IndexPage({ mixes }: IndexPageProps) {
@@ -18,7 +18,7 @@ function IndexPage({ mixes }: IndexPageProps) {
             rowGap: "2rem",
           }}
       >
-        { mixes.map((mix) => <CompactMixCard key={mix.mixDir} mix={mix} />) }
+        { mixes.map((mix) => <CompactMixCard key={mix.id} mix={mix} />) }
       </ul>
     </Root>
   );
