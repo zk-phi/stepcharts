@@ -4,7 +4,7 @@
   "scripts": {
     "develop": "next",
     "gen-data": "NODE_ENV=production ts-node --files --compilerOptions '{\"module\":\"commonjs\"}' scripts/genAllStepchartData.ts",
-    "prepare": "node scripts/removeSpacesInDirectories.js ./resources/prodStepcharts && yarn run gen-data",
+    "prepare": "node scripts/removeSpacesInDirectories.js ./resources/stepcharts && yarn run gen-data",
     "build": "yarn run prepare && next build",
     "start": "next start",
     "type-check": "tsc --noemit",

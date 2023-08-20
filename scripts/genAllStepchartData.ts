@@ -4,7 +4,7 @@ import { toSafeName } from "../lib/util";
 import { parseSimfileAndCopyBanners } from "../lib/parseSimfile";
 import { dateReleased } from "../lib/meta";
 
-const ROOT = "resources/prodStepcharts";
+const ROOT = "resources/stepcharts";
 
 type EntireMix = Mix & {
   simfiles: Simfile[];
