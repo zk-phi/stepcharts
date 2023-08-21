@@ -60,6 +60,8 @@ type Simfile = {
   artist: string;
   mix: Mix;
   availableTypes: StepchartType[];
+  topDifficulty: Difficulty;
+  stats: Record<Difficulty, Stats>;
   charts: Record<string, Stepchart>;
   minBpm: number;
   maxBpm: number;

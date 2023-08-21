@@ -3,6 +3,7 @@ import * as path from "path";
 import { toSafeName } from "./util";
 import { parseDwi } from "./parseDwi";
 import { parseSm } from "./parseSm";
+import { calculateStats } from "./calculateStats";
 
 type RawSimfile = Omit<Simfile, "mix" | "title"> & {
   title: string;
@@ -86,6 +87,15 @@ function parseSimfileAndCopyBanners(
       titleDir,
       banner: rawStepchart.banner,
     },
+    // the default type definition of .fromEntries in typescript is too weak
+    // to make this type-safe.
+    stats: Object.fromEntries(rawStepchart.availableTypes.map((dif) => ([
+      dif.difficulty,
+      calculateStats(rawStepchart.charts[dif.difficulty]),
+    ]))) as Record<Difficulty, Stats>,
+    topDifficulty: rawStepchart.availableTypes.reduce((l, r) => (
+      r.feet < l.feet ? l : r
+    ), { feet: 0, difficulty: "beginner" }).difficulty,
     minBpm,
     maxBpm,
     displayBpm,
