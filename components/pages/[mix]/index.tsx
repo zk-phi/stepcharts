@@ -6,21 +6,9 @@ import { CompactTitleCard } from "../../CompactTitleCard";
 import { useSort } from "../../SortHook";
 import { SortBar } from "../../SortBar";
 
-type MixPageTitle = {
-  title: {
-    titleName: string;
-    translitTitleName: string | null;
-    titleDir: string;
-    banner: string | null;
-  };
-  types: StepchartType[];
-  displayBpm: string;
-  stats: Stats;
-};
-
 type MixPageProps = {
   mix: Mix;
-  titles: MixPageTitle[];
+  titles: Simfile[];
 };
 
 function getMaxBpm(displayBpm: string): number {
@@ -36,7 +24,7 @@ function getMaxBpm(displayBpm: string): number {
 function getSortFunction(key: string) {
   switch (key) {
     case "title":
-      return (a: MixPageTitle, b: MixPageTitle) => {
+      return (a: Simfile, b: Simfile) => {
         return (a.title.translitTitleName || a.title.titleName)
           .toLowerCase()
           .localeCompare(
@@ -44,12 +32,12 @@ function getSortFunction(key: string) {
           );
       };
     case "bpm":
-      return (a: MixPageTitle, b: MixPageTitle) => {
+      return (a: Simfile, b: Simfile) => {
         return getMaxBpm(b.displayBpm) - getMaxBpm(a.displayBpm);
       };
 
     default:
-      return (a: MixPageTitle, b: MixPageTitle) => {
+      return (a: Simfile, b: Simfile) => {
         return b.stats[key as keyof Stats] - a.stats[key as keyof Stats];
       };
   }
@@ -115,8 +103,8 @@ function MixPage({ mix, titles }: MixPageProps) {
               title={title.title}
               mix={mix}
               displayBpm={title.displayBpm}
-              types={title.types}
-              stats={title.stats}
+              types={title.availableTypes}
+              stats={title.stats[title.topDifficulty]}
               hideMix
             />
           );
