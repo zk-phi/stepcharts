@@ -65,7 +65,6 @@ type Simfile = {
   maxBpm: number;
   displayBpm: string;
   stopCount: number;
-  stats: Stats;
 };
 
 type Mix = {
