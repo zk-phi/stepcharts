@@ -19,7 +19,7 @@ import difficultyBgStyles from "../../difficultyBackgroundColors.module.css";
 import { ImageFrame } from "../../ImageFrame";
 import { StepchartTypePageItem } from "../../StepchartTypePageItem";
 
-type AllSongsPageStepchartType = StepchartType & { stats: Stats };
+const STAT_KEYS = ["jumps", "jacks", "freezes", "gallops"];
 
 type AllSongsPageTitle = {
   id: number;
@@ -33,7 +33,9 @@ type AllSongsPageTitle = {
     mixName: string;
     mixDir: string;
   };
-  types: AllSongsPageStepchartType[];
+  types: StepchartType[];
+  topDifficulty: Difficulty,
+  stats: Record<Difficulty, Stats>;
   artist: string;
   displayBpm: string;
   minBpm: number;
@@ -116,24 +118,6 @@ const columns = [
   },
 ];
 
-function sortTypes(
-  types: AllSongsPageStepchartType[],
-  sortBy: string
-): AllSongsPageStepchartType[] {
-  if (sortBy in types[0].stats) {
-    return [...types].sort(
-      (a: AllSongsPageStepchartType, b: AllSongsPageStepchartType) => {
-        const aValue = a.stats[sortBy as keyof Stats];
-        const bValue = b.stats[sortBy as keyof Stats];
-
-        return bValue - aValue;
-      }
-    );
-  }
-
-  return [...types];
-}
-
 function TitleSubRows({
   row,
   sortedBy,
@@ -141,9 +125,7 @@ function TitleSubRows({
   row: Row<AllSongsPageTitle>;
   sortedBy: string;
 }) {
-  const maxStat = Math.max(
-    ...row.original.types.map((t) => t.stats[sortedBy as keyof Stats])
-  );
+  const maxStat = row.original.stats[row.original.topDifficulty][sortedBy as keyof Stats];
   return (
     <tr>
       <td colSpan={7} className="text-focal-100" style={{ padding: 0 }}>
@@ -151,7 +133,7 @@ function TitleSubRows({
           <thead>
             <tr className="bg-focal-50 text-focal-700">
               <th className="w-2/6"></th>
-              {Object.keys(row.original.types[0].stats).map((k) => (
+              {STAT_KEYS.map((k) => (
                 <th key={k} className="text-left py-2 w-1/6">
                   {k}
                 </th>
@@ -175,18 +157,18 @@ function TitleSubRows({
                       <StepchartTypePageItem type={t} />
                     </a>
                   </td>
-                  {Object.keys(t.stats).map((k) => (
+                  {STAT_KEYS.map((k) => (
                     <td key={k}>
                       <div
                         className={clsx({
                           [`inline-block px-1 py-1 -mx-1 text-white ${
                             difficultyBgStyles[t.difficulty]
                           }`]:
-                            t.stats[k as keyof Stats] === maxStat &&
+                            row.original.stats[t.difficulty][k as keyof Stats] === maxStat &&
                             sortedBy === k,
                         })}
                       >
-                        {t.stats[k as keyof Stats]}
+                        {row.original.stats[t.difficulty][k as keyof Stats]}
                       </div>
                     </td>
                   ))}
@@ -230,16 +212,16 @@ function getSortFunction(key: string) {
 
     default:
       return (a: AllSongsPageTitle, b: AllSongsPageTitle) => {
-        const aStats = a.types.map((t) => t.stats[key as keyof Stats]);
-        const bStats = b.types.map((t) => t.stats[key as keyof Stats]);
+        const aStats = a.stats[a.topDifficulty][key as keyof Stats];
+        const bStats = b.stats[b.topDifficulty][key as keyof Stats];
 
-        return Math.max(...bStats) - Math.max(...aStats);
+        return bStats - aStats;
       };
   }
 }
 
 function isSortingOnStats(sortKey: string, title: AllSongsPageTitle): boolean {
-  return sortKey in title.types[0].stats;
+  return STAT_KEYS.findIndex((k) => k === sortKey) !== -1;
 }
 
 function depluralize(s: string, count: number): string {
@@ -259,10 +241,10 @@ function TopStatLink({
   title: AllSongsPageTitle;
   stat: keyof Stats;
 }) {
-  const topType = title.types.reduce<AllSongsPageStepchartType>(
+  const topType = title.types.reduce<StepchartType>(
     (champ, contender) => {
-      const champValue = champ.stats[stat];
-      const contenderValue = contender.stats[stat];
+      const champValue = title.stats[champ.difficulty][stat];
+      const contenderValue = title.stats[contender.difficulty][stat];
 
       if (champValue >= contenderValue) {
         return champ;
@@ -273,7 +255,7 @@ function TopStatLink({
     title.types[0]
   );
 
-  const topStatValue = topType.stats[stat];
+  const topStatValue = title.stats[topType.difficulty][stat];
 
   return (
     <a
