@@ -37,3 +37,4 @@ yarn-error.log*
 public/bannerImages/*.png
 resources/stepchartData.json
 _data
+out

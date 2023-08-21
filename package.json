@@ -8,6 +8,7 @@
     "prepare": "yarn run prepare:filename && yarn run prepare:data",
     "build:app": "next build",
     "build": "yarn run prepare && yarn run build:app",
+    "export": "next export",
     "start": "next start",
     "type-check": "tsc --noemit",
     "test": "yarn jest",
