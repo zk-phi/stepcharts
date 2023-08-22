@@ -5,10 +5,12 @@ import { Breadcrumbs } from "../../Breadcrumbs";
 import { CompactTitleCard } from "../../CompactTitleCard";
 import { useSort } from "../../SortHook";
 import { SortBar } from "../../SortBar";
+import type { MixData } from "../../../scripts/genAllStepchartData";
+
+type SongData = SongMeta & { charts: ChartMeta[] };
 
 type MixPageProps = {
-  mix: Mix;
-  titles: Simfile[];
+  mix: MixData;
 };
 
 function getMaxBpm(displayBpm: string): number {
@@ -24,51 +26,48 @@ function getMaxBpm(displayBpm: string): number {
 function getSortFunction(key: string) {
   switch (key) {
     case "title":
-      return (a: Simfile, b: Simfile) => {
-        return (a.title.translitTitleName || a.title.titleName)
+      return (a: SongData, b: SongData) => {
+        return (a.titleTranslit || a.title)
           .toLowerCase()
           .localeCompare(
-            (b.title.translitTitleName || b.title.titleName).toLowerCase()
+            (b.titleTranslit || b.title).toLowerCase()
           );
       };
     case "bpm":
-      return (a: Simfile, b: Simfile) => {
-        return getMaxBpm(b.displayBpm) - getMaxBpm(a.displayBpm);
+      return (a: SongData, b: SongData) => {
+        return b.maxBpm - a.maxBpm;
       };
-
     default:
-      return (a: Simfile, b: Simfile) => {
-        return b.stats[key as keyof Stats] - a.stats[key as keyof Stats];
-      };
+      return (a: SongData, b: SongData) => 0;
   }
 }
 
-function MixPage({ mix, titles }: MixPageProps) {
+function MixPage({ mix }: MixPageProps) {
   const { sortedBy, setSortBy, sorts, sortedTitles } = useSort(
-    titles,
+    mix.songs,
     getSortFunction,
-    ["stops", "t.shifts"]
+    ["jumps", "jacks", "freezes", "gallops", "t.shifts", "stops"]
   );
 
   return (
     <Root
-      title={mix.mixName}
+      title={mix.name}
       subheading={
         <Breadcrumbs
-          crumbs={[{ display: mix.mixName, pathSegment: mix.mixDir }]}
+          crumbs={[{ display: mix.name, pathSegment: mix.id }]}
         />
       }
-      metaDescription={`Step charts for DDR ${mix.mixName}`}
+      metaDescription={`Step charts for DDR ${mix.name}`}
     >
       <div className="w-screen -mx-4 bg-focal-300 sticky top-0 z-10 shadow-lg sm:hidden">
         <div
           className="border-b-4 border-white w-full bg-no-repeat bg-cover mx-auto"
           style={{
             paddingTop: "calc(80 / 256 * 100%)",
-            backgroundImage: `url(${mix.banner})`,
+            backgroundImage: `url(${mix.bannerSrc})`,
           }}
           role="image"
-          aria-label={`${mix.mixName} banner`}
+          aria-label={`${mix.name} banner`}
         />
       </div>
       <ImageFrame className="mt-0 w-screen sm:w-auto border-none sm:border-solid sm:border-1 -mx-4 sm:mx-auto sm:mt-8 mb-8 sm:sticky sm:top-0 sm:z-10 w-full p-4 bg-focal-300 sm:rounded-tl-xl sm:rounded-br-xl flex flex-col sm:flex-row items-center sm:justify-start sm:space-x-4">
@@ -77,10 +76,10 @@ function MixPage({ mix, titles }: MixPageProps) {
             className="border-2 border-white w-full bg-no-repeat bg-cover"
             style={{
               paddingTop: "calc(80 / 256 * 100%)",
-              backgroundImage: `url(${mix.banner})`,
+              backgroundImage: `url(${mix.bannerSrc})`,
             }}
             role="image"
-            aria-label={`${mix.mixName} banner`}
+            aria-label={`${mix.name} banner`}
           />
         </div>
         <div className="sm:flex sm:flex-col mt-2 sm:mt-0 sm:flex-1 w-full max-w-xl justify-center">
@@ -96,19 +95,9 @@ function MixPage({ mix, titles }: MixPageProps) {
           rowGap: "2rem",
         }}
       >
-        {sortedTitles.map((title) => {
-          return (
-            <CompactTitleCard
-              key={title.title.titleDir}
-              title={title.title}
-              mix={mix}
-              displayBpm={title.displayBpm}
-              types={title.availableTypes}
-              stats={title.stats[title.topDifficulty]}
-              hideMix
-            />
-          );
-        })}
+        {sortedTitles.map((song) => (
+          <CompactTitleCard key={song.id} song={song} mix={mix} hideMix />
+        ))}
       </div>
     </Root>
   );

@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import React from "react";
 import {
   GetStaticPathsContext,
@@ -5,42 +6,34 @@ import {
   GetStaticPropsContext,
   GetStaticPropsResult,
 } from "next";
-import allData from "../../lib/allStepchartData";
 import { MixPage } from "../../components/pages/[mix]";
 import type { MixPageProps } from "../../components/pages/[mix]";
+import type { AllMixesData, MixData } from "../../scripts/genAllStepchartData";
 
 export async function getStaticPaths(
   _context: GetStaticPathsContext
 ): Promise<GetStaticPathsResult> {
+  const allMixes = JSON.parse(
+    fs.readFileSync("_data/allMixes.json", "utf-8"),
+  ) as AllMixesData;
+
   return {
-    paths: allData.map((mix) => ({ params: { mix: mix.mixDir } })),
+    paths: allMixes.map((mix) => ({ params: { mix: mix.id } })),
     fallback: false,
   };
 }
 
-// used as the tie breaker when one song has more than one chart with the same max feet
-const difficultyPriority = [
-  "expert",
-  "challenge",
-  "difficult",
-  "basic",
-  "beginner",
-];
-
 export async function getStaticProps(
   context: GetStaticPropsContext
 ): Promise<GetStaticPropsResult<MixPageProps>> {
-  const mixDir = context.params!.mix as string;
-  const mix = allData.find((m) => m.mixDir === mixDir)!;
+  const id = context.params!.mix as string;
+  const mix = JSON.parse(
+    fs.readFileSync(`_data/${id}/data.json`, "utf-8"),
+  ) as MixData;
 
-  const results = {
-    props: {
-      mix,
-      titles: mix.simfiles,
-    },
+  return {
+    props: { mix },
   };
-
-  return results;
 }
 
 export default function NextMixIndexPage(props: MixPageProps) {

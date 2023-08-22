@@ -28,10 +28,3 @@ type ChartMeta = {
   jacks: number;
   gallops: number;
 };
-
-type Chart = {
-  arrows: Arrow[];
-  freezes: FreezeBody[];
-  bpm: Bpm[];
-  stops: Stop[];
-};

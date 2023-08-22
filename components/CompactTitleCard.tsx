@@ -10,93 +10,57 @@ import { Banner } from "./Banner";
 
 type CompactTitleCardProps = {
   className?: string;
-  title: {
-    titleName: string;
-    translitTitleName: string | null;
-    titleDir: string;
-    banner: string | null;
-  };
-  mix: {
-    mixName: string;
-    mixDir: string;
-  };
-  displayBpm: string;
-  types: StepchartType[];
+  song: SongMeta & { charts: ChartMeta[] },
+  mix: MixMeta;
   hideMix?: boolean;
-  stats: Stats;
 };
 
 function buildTitleUrl(
-  mix: CompactTitleCardProps["mix"],
-  title: CompactTitleCardProps["title"]
+  mix: MixMeta,
+  song: SongMeta,
 ): string {
-  return `/${mix.mixDir}/${title.titleDir}`;
+  return `/${mix.id}/${song.id}`;
 }
 
 function buildStepchartUrl(
-  mix: CompactTitleCardProps["mix"],
-  title: CompactTitleCardProps["title"],
-  type: StepchartType
+  mix: MixMeta,
+  song: SongMeta,
+  chart: ChartMeta,
 ): string {
-  return `/${mix.mixDir}/${title.titleDir}/${type.difficulty}`;
+  return `/${mix.id}/${song.id}/${chart.difficulty}`;
 }
 
-const difficulties = ["beginner", "basic", "difficult", "expert", "challenge"];
-
-function Types({
+const Types = ({
   mix,
-  title,
-  types,
+  song,
 }: {
-  mix: CompactTitleCardProps["mix"];
-  title: CompactTitleCardProps["title"];
-  types: StepchartType[];
-}) {
-  if (types.length === 0) {
-    return null;
-  }
-
-  return (
-    <div
+  mix: MixMeta;
+  song: SongMeta & { charts: ChartMeta[] };
+}) => (
+  <div
       className={clsx(
         "w-full flex flex-row justify-around text-white font-bold items-center"
       )}
-    >
-      {difficulties.map((d) => {
-        const t = types.find((t) => t.difficulty === d);
-
-        if (!t) {
-          return (
-            <div key={d} className="text-gray-500">
-              -
-            </div>
-          );
-        }
-
-        return (
-          <a
-            href={buildStepchartUrl(mix, title, t)}
-            key={d}
-            className={clsx(
-              styles[t.difficulty],
-              "block hover:bg-gray-600 transform hover:scale-150 w-6 h-6 text-center"
-            )}
-          >
-            {t.feet}
-          </a>
-        );
-      })}
-    </div>
-  );
-}
+  >
+    {song.charts.map((chart) => (
+      <a
+          href={buildStepchartUrl(mix, song, chart)}
+          key={chart.difficulty}
+          className={clsx(
+            styles[chart.difficulty],
+            "block hover:bg-gray-600 transform hover:scale-150 w-6 h-6 text-center"
+          )}
+      >
+        {chart.level}
+      </a>
+    ))}
+  </div>
+);
 
 function CompactTitleCard({
   className,
-  title,
   mix,
-  displayBpm,
-  types,
-  stats,
+  song,
   hideMix,
 }: CompactTitleCardProps) {
   return (
@@ -116,10 +80,10 @@ function CompactTitleCard({
       >
         <div>
           <a
-            href={buildTitleUrl(mix, title)}
+            href={buildTitleUrl(mix, song)}
             className="inline-block font-bold text-white px-1"
           >
-            {title.translitTitleName || title.titleName}
+            {song.titleTranslit || song.title}
           </a>
         </div>
         {!hideMix && (
@@ -127,44 +91,22 @@ function CompactTitleCard({
             className="ml-2 px-2 py-0.5 bg-gray-400 text-xs text-gray-800 grid place-items-center rounded-bl-lg mb-2"
             style={{ alignSelf: "start" }}
           >
-            <a href={`/${mix.mixDir}`}>{shortMixNames[mix.mixDir]}</a>
+            <a href={`/${mix.id}`}>{mix.shortName}</a>
           </div>
         )}
       </div>
 
       <div className="pb-2 xpx-3">
-        <a href={buildTitleUrl(mix, title)}>
+        <a href={buildTitleUrl(mix, song)}>
           <Banner
             className="w-full h-full border-b border-t border-white"
-            title={title}
+            song={song}
           />
         </a>
       </div>
 
       <div className="flex flex-row justify-items-stretch xmx-2 xmy-2 p-2 pt-0">
-        <Types mix={mix} title={title} types={types} />
-      </div>
-      <div className="text-gray-100 bg-gray-400 text-sm px-2 pr-4 py-1 text-center flex flex-row justify-between">
-        <div className="px-2 -ml-2 -my-1  bg-gray-700 text-gray-200 grid place-items-center">
-          <div>
-            <span className="font-bold">{displayBpm}</span>
-          </div>
-        </div>
-        <div>
-          Jmp <span className="font-bold">{stats.jumps}</span>
-        </div>
-        {/*<div>*/}
-        {/*  C <span className="font-bold">{stats.crossovers}</span>*/}
-        {/*</div>*/}
-        <div>
-          Jck <span className="font-bold">{stats.jacks}</span>
-        </div>
-        <div>
-          Frz <span className="font-bold">{stats.freezes}</span>
-        </div>
-        <div>
-          Glp <span className="font-bold">{stats.gallops}</span>
-        </div>
+        <Types mix={mix} song={song} />
       </div>
     </ImageFrame>
   );

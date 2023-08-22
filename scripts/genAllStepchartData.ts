@@ -139,3 +139,73 @@ const allChartsData: AllChartsData = data.flatMap((mix) => (
   ))
 ))
 fs.writeFileSync(`_data/allCharts.json`, JSON.stringify(allChartsData));
+
+export type MixData = MixMeta & {
+  songs: (SongMeta & {
+    charts: ChartMeta[],
+  })[],
+};
+data.forEach((mix) => {
+  if (!fs.existsSync(`_data/${mix.mixDir}`)) {
+    fs.mkdirSync(`_data/${mix.mixDir}`);
+  }
+  const mixData: MixData = {
+    ...legacyMixToMixMeta(mix),
+    songs: mix.simfiles.map((simfile) => ({
+      ...legacySongToSongMeta(simfile),
+      charts: simfile.availableTypes.map((chartType) => (
+        legacyChartToChartMeta(simfile, chartType)
+      )),
+    })),
+  };
+  fs.writeFileSync(`_data/${mix.mixDir}/data.json`, JSON.stringify(mixData));
+});
+
+export type SongData = {
+  mix: MixMeta,
+  song: SongMeta & { charts: ChartMeta[] },
+};
+data.forEach((mix) => {
+  mix.simfiles.forEach((simfile) => {
+    if (!fs.existsSync(`_data/${mix.mixDir}/${simfile.title.titleDir}`)) {
+      fs.mkdirSync(`_data/${mix.mixDir}/${simfile.title.titleDir}`);
+    }
+    const songData: SongData = {
+      mix: legacyMixToMixMeta(mix),
+      song: {
+        ...legacySongToSongMeta(simfile),
+        charts: simfile.availableTypes.map((chartType) => (
+          legacyChartToChartMeta(simfile, chartType)
+        )),
+      },
+    };
+    fs.writeFileSync(
+      `_data/${mix.mixDir}/${simfile.title.titleDir}/data.json`,
+      JSON.stringify(songData),
+    );
+  });
+});
+
+export type ChartData = {
+  mix: MixMeta,
+  song: SongMeta,
+  chart: Stepchart & { meta: ChartMeta },
+};
+data.forEach((mix) => {
+  mix.simfiles.forEach((simfile) => {
+    simfile.availableTypes.forEach((chartType) => {
+      const chartData: ChartData = {
+        mix: legacyMixToMixMeta(mix),
+        song: legacySongToSongMeta(simfile),
+        chart: {
+          ...simfile.charts[chartType.difficulty],
+          meta: legacyChartToChartMeta(simfile, chartType),
+        },
+      };
+      fs.writeFileSync(
+        `_data/${mix.mixDir}/${simfile.title.titleDir}/${chartType.difficulty}.json`,
+        JSON.stringify(chartData),
+      );
+    });
+  });
+});

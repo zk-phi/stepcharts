@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import React from "react";
 import { GetStaticPropsResult } from "next";
-import entireMixes from "../lib/allStepchartData";
 import { IndexPage } from "../components/pages/index";
 import { IndexPageProps } from "../components/pages/index";
 import type { AllMixesData } from "../scripts/genAllStepchartData";

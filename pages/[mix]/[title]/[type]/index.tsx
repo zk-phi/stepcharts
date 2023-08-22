@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import React from "react";
 import {
   GetStaticPathsContext,
@@ -5,40 +6,21 @@ import {
   GetStaticPropsContext,
   GetStaticPropsResult,
 } from "next";
-
-import allData from "../../../../lib/allStepchartData";
 import { StepchartPage } from "../../../../components/pages/[mix]/[title]/[type]";
 import type { StepchartPageProps } from "../../../../components/pages/[mix]/[title]/[type]";
-import { Step } from "@material-ui/core";
+import type { ChartData, AllChartsData } from "../../../../scripts/genAllStepchartData";
 
-export async function getStaticPaths(
-  _context: GetStaticPathsContext
-): Promise<GetStaticPathsResult> {
-  const allSimfiles = allData.reduce<Simfile[]>((building, mix) => {
-    return building.concat(mix.simfiles);
-  }, []);
-
-  const allSdts = allSimfiles.reduce<SongDifficultyType[]>(
-    (building, stepchart) => {
-      const sdts = stepchart.availableTypes.map((type) => {
-        return {
-          title: stepchart.title,
-          mix: stepchart.mix,
-          type,
-        };
-      });
-
-      return building.concat(sdts);
-    },
-    []
-  );
+export async function getStaticPaths(): Promise<GetStaticPathsResult> {
+  const allCharts = JSON.parse(
+    fs.readFileSync("_data/allCharts.json", "utf-8"),
+  ) as AllChartsData;
 
   return {
-    paths: allSdts.map((sdt) => ({
+    paths: allCharts.map((chart) => ({
       params: {
-        mix: sdt.mix.mixDir,
-        title: sdt.title.titleDir,
-        type: sdt.type.difficulty,
+        mix: chart.mix.id,
+        title: chart.song.id,
+        type: chart.chart.difficulty,
       },
     })),
     fallback: false,
@@ -48,22 +30,21 @@ export async function getStaticPaths(
 export async function getStaticProps(
   context: GetStaticPropsContext
 ): Promise<GetStaticPropsResult<StepchartPageProps>> {
-  const mixDir = context.params!.mix as string;
-  const titleDir = context.params!.title as string;
-  const type = context.params!.type as string;
+  const mixId = context.params!.mix as string;
+  const songId = context.params!.title as string;
+  const difficulty = context.params!.type as string;
 
-  const simfile = allData
-    .find((m) => m.mixDir === mixDir)!
-    .simfiles.find((s) => s.title.titleDir === titleDir)!;
+  const chartData = JSON.parse(
+    fs.readFileSync(`_data/${mixId}/${songId}/${difficulty}.json`, "utf-8"),
+  ) as ChartData;
 
-  const results = {
+  return {
     props: {
-      simfile,
-      currentType: type,
+      mix: chartData.mix,
+      song: chartData.song,
+      chart: chartData.chart,
     },
   };
-
-  return results;
 }
 
 export default function NextSongDifficultyTypePage(props: StepchartPageProps) {

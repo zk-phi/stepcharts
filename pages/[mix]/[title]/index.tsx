@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import React from "react";
 import {
   GetStaticPathsContext,
@@ -5,20 +6,18 @@ import {
   GetStaticPropsContext,
   GetStaticPropsResult,
 } from "next";
-import allData from "../../../lib/allStepchartData";
 import { TitlePage } from "../../../components/pages/[mix]/[title]";
 import type { TitlePageProps } from "../../../components/pages/[mix]/[title]";
+import type { AllChartsData, SongData } from "../../../scripts/genAllStepchartData";
 
-export async function getStaticPaths(
-  _context: GetStaticPathsContext
-): Promise<GetStaticPathsResult> {
-  const allSimfiles = allData.reduce<Simfile[]>((building, mix) => {
-    return building.concat(mix.simfiles);
-  }, []);
+export async function getStaticPaths(): Promise<GetStaticPathsResult> {
+  const allCharts = JSON.parse(
+    fs.readFileSync("_data/allCharts.json", "utf-8"),
+  ) as AllChartsData;
 
   return {
-    paths: allSimfiles.map((simfile) => ({
-      params: { mix: simfile.mix.mixDir, title: simfile.title.titleDir },
+    paths: allCharts.map((chart) => ({
+      params: { mix: chart.mix.id, title: chart.song.id },
     })),
     fallback: false,
   };
@@ -27,23 +26,17 @@ export async function getStaticPaths(
 export async function getStaticProps(
   context: GetStaticPropsContext
 ): Promise<GetStaticPropsResult<TitlePageProps>> {
-  const mixDir = context.params!.mix as string;
-  const titleDir = context.params!.title as string;
+  const mixId = context.params!.mix as string;
+  const songId = context.params!.title as string;
 
-  const simfile = allData
-    .find((m) => m.mixDir === mixDir)!
-    .simfiles.find((s) => s.title.titleDir === titleDir)!;
+  const songData = JSON.parse(
+    fs.readFileSync(`_data/${mixId}/${songId}/data.json`, "utf-8"),
+  ) as SongData;
 
   const results: GetStaticPropsResult<TitlePageProps> = {
     props: {
-      title: simfile.title,
-      artist: simfile.artist ?? null,
-      displayBpm: simfile.displayBpm,
-      mix: {
-        mixName: simfile.mix.mixName,
-        mixDir: simfile.mix.mixDir,
-      },
-      types: simfile.availableTypes,
+      song: songData.song,
+      mix: songData.mix,
     },
   };
 

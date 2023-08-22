@@ -3,12 +3,12 @@ import clsx from "clsx";
 
 type BannerProps = {
   className?: string;
-  title: Title;
+  song: SongMeta;
 };
 
-function Banner({ className, title }: BannerProps) {
-  const name = title.translitTitleName || title.titleName;
-  const [currentBanner, setCurrentBanner] = useState(title.banner);
+function Banner({ className, song }: BannerProps) {
+  const name = song.titleTranslit || song.title;
+  const [currentBanner, setCurrentBanner] = useState(song.bannerSrc);
 
   let bannerEl;
 

@@ -40,10 +40,6 @@ function buildStepchartUrl(t: ChartData): string {
   return `/${t.mix.id}/${t.song.id}/${t.chart.difficulty}`;
 }
 
-function buildTitleUrl(t: ChartData): string {
-  return `/${t.mix.id}/${t.song.id}`;
-}
-
 function buildMixUrl(t: ChartData): string {
   return `/${t.mix.id}`;
 }
@@ -52,10 +48,10 @@ const columns = [
   {
     Header: "Title",
     accessor: (t: ChartData) => (
-      <a className="hover:underline" href={buildTitleUrl(t)}>
+      <a className="hover:underline" href={buildStepchartUrl(t)}>
         {t.song.titleTranslit || t.song.title}
         {" "}
-        ({ t.chart.difficulty.substring(0, 1).toUpperCase() }SP)
+        ({ t.chart.difficulty })
       </a>
     ),
   },

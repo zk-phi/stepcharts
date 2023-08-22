@@ -15,8 +15,9 @@ import {
 } from "./StepchartSection";
 
 type StepchartPageProps = {
-  simfile: Simfile;
-  currentType: string;
+  mix: MixMeta,
+  song: SongMeta,
+  chart: Stepchart & { meta: ChartMeta },
 };
 
 const speedmods = [1, 1.5, 2, 3];
@@ -29,7 +30,7 @@ const sectionSizesInMeasures: Record<typeof speedmods[number], number> = {
 
 const HEADER_ID = "stepchart-page-header";
 
-function StepchartPage({ simfile, currentType }: StepchartPageProps) {
+function StepchartPage({ mix, song, chart }: StepchartPageProps) {
   useEffect(() => {
     // this is needed because :target is not very robust (tested in both chrome and ff)
     // when just using :target, if the user changes the speedmod, :target gets wiped out
@@ -48,11 +49,6 @@ function StepchartPage({ simfile, currentType }: StepchartPageProps) {
   const [speedmod, setSpeedmod] = useState(speedmods[0]);
   const sectionSizeInMeasures = sectionSizesInMeasures[speedmod];
 
-  const currentTypeMeta = simfile.availableTypes.find(
-    (at) => at.difficulty === currentType
-  )!;
-
-  const chart = simfile.charts[currentType];
   const { arrows, freezes } = chart;
 
   const lastArrowOffset = (arrows[arrows.length - 1]?.offset ?? 0) + 0.25;
@@ -90,8 +86,8 @@ function StepchartPage({ simfile, currentType }: StepchartPageProps) {
     );
   }
 
-  const normalizedTitle = simfile.title.translitTitleName || simfile.title.titleName;
-  const title = `${normalizedTitle} - ${currentType} (${currentTypeMeta.feet})`;
+  const normalizedTitle = song.titleTranslit || song.title;
+  const title = `${normalizedTitle} - ${chart.meta.difficulty} (${chart.meta.level})`;
 
   return (
     <Root
@@ -101,24 +97,21 @@ function StepchartPage({ simfile, currentType }: StepchartPageProps) {
         <Breadcrumbs
           crumbs={[
             {
-              display: simfile.mix.mixName,
-              pathSegment: simfile.mix.mixDir,
+              display: mix.name,
+              pathSegment: mix.id,
             },
             {
-              display:
-                simfile.title.translitTitleName || simfile.title.titleName,
-              pathSegment: simfile.title.titleDir,
+              display: normalizedTitle,
+              pathSegment: song.id,
             },
             {
-              display: currentType,
-              pathSegment: currentType,
+              display: chart.meta.difficulty,
+              pathSegment: chart.meta.difficulty,
             },
           ]}
         />
       }
-      metaDescription={`${currentType} stepchart for ${
-        simfile.title.translitTitleName || simfile.title.titleName
-      }`}
+      metaDescription={`${chart.meta.difficulty} stepchart for ${normalizedTitle}`}
     >
       <div
         className={clsx(
@@ -132,7 +125,7 @@ function StepchartPage({ simfile, currentType }: StepchartPageProps) {
               styles.hideForPrint,
               "mx-auto border-b-4 border-white w-full absolute top-0 left-0"
             )}
-            title={simfile.title}
+            song={song}
           />
         </a>
       </div>
@@ -148,27 +141,27 @@ function StepchartPage({ simfile, currentType }: StepchartPageProps) {
           <div className="hidden sm:block">
             <Banner
               className="mx-auto border-2 border-white w-full absolute top-0 left-0"
-              title={simfile.title}
+              song={song}
             />
           </div>
         </div>
         <div className="flex-1 flex flex-col sm:grid sm:grid-cols-2 space-y-2 sm:space-y-0">
           <TitleDetailsTable>
-            {simfile.title.translitTitleName && (
+            {song.titleTranslit && (
               <TitleDetailsRow
                 name="Native title"
-                value={simfile.title.titleName}
+                value={song.title}
               />
             ) || null}
-            <TitleDetailsRow name="BPM" value={simfile.displayBpm} />
+            <TitleDetailsRow name="BPM" value={song.displayBpm} />
             <TitleDetailsRow
               name="Artist"
-              value={simfile.artist ?? "unknown"}
+              value={song.artist ?? "unknown"}
             />
-            <TitleDetailsRow name="Mix" value={simfile.mix.mixName} />
+            <TitleDetailsRow name="Mix" value={mix.name} />
             <TitleDetailsRow
               name="difficulty"
-              value={`${currentTypeMeta.difficulty} (${currentTypeMeta.feet})`}
+              value={`${chart.meta.difficulty} (${chart.meta.level})`}
             />
           </TitleDetailsTable>
         </div>
@@ -186,7 +179,7 @@ function StepchartPage({ simfile, currentType }: StepchartPageProps) {
       </ImageFrame>
       <div className={styles.printTitle}>
         <div>
-          {simfile.mix.mixName}: {title}
+          {mix.name}: {title}
         </div>
         {currentUrl && (
           <div className="text-xs text-gray-400">{currentUrl}</div>
