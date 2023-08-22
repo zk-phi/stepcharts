@@ -20,33 +20,11 @@ import { StepchartTypePageItem } from "../../StepchartTypePageItem";
 
 const STAT_KEYS = ["jumps", "jacks", "freezes", "gallops"];
 
-type AllSongsPageTitle = {
-  id: number;
-  title: {
-    titleName: string;
-    translitTitleName: string | null;
-    titleDir: string;
-    banner: string | null;
-  };
-  mix: {
-    mixName: string;
-    mixDir: string;
-  };
-  types: StepchartType[];
-  topDifficulty: Difficulty,
-  stats: Record<Difficulty, Stats>;
-  artist: string;
-  displayBpm: string;
-  minBpm: number;
-  maxBpm: number;
-  filterString: string;
-  stopCount: number;
-  tempoShiftCount: number;
+type AllSongsPageProps = {
+  titles: AllChartsData;
 };
 
-type AllSongsPageProps = {
-  titles: AllSongsPageTitle[];
-};
+type ChartData = typeof AllChartsData[number];
 
 function RotateYourPhone() {
   return (
@@ -58,168 +36,94 @@ function RotateYourPhone() {
   );
 }
 
-function buildStepchartUrl(t: AllSongsPageTitle, type: StepchartType): string {
-  return `/${t.mix.mixDir}/${t.title.titleDir}/${type.difficulty}`;
+function buildStepchartUrl(t: ChartData): string {
+  return `/${t.mix.id}/${t.song.id}/${t.chart.difficulty}`;
 }
 
-function buildTitleUrl(t: AllSongsPageTitle): string {
-  return `/${t.mix.mixDir}/${t.title.titleDir}`;
+function buildTitleUrl(t: ChartData): string {
+  return `/${t.mix.id}/${t.song.id}`;
 }
 
-function buildMixUrl(t: AllSongsPageTitle): string {
-  return `/${t.mix.mixDir}`;
+function buildMixUrl(t: ChartData): string {
+  return `/${t.mix.id}`;
 }
 
 const columns = [
   {
-    Header: () => null, // No header
-    id: "expander",
-    Cell: ({ row }: { row: Row<AllSongsPageTitle> }) => (
-      <div
-        {...row.getToggleRowExpandedProps()}
-        className="grid place-items-center w-8 h-full hover:bg-focal-200 text-2xl"
-      >
-        {row.isExpanded ? <MdExpandMore /> : <MdExpandLess />}
-      </div>
-    ),
-  },
-  {
     Header: "Title",
-    accessor: (t: AllSongsPageTitle) => (
+    accessor: (t: ChartData) => (
       <a className="hover:underline" href={buildTitleUrl(t)}>
-        {t.title.translitTitleName || t.title.titleName}
+        {t.song.titleTranslit || t.song.title}
+        {" "}
+        ({ t.chart.difficulty.substring(0, 1).toUpperCase() }SP)
       </a>
     ),
   },
   {
     Header: "Mix",
-    accessor: (t: AllSongsPageTitle) => (
+    accessor: (t: ChartData) => (
       <a className="hover:underline" href={buildMixUrl(t)}>
-        {t.mix.shortMixName}
+        {t.mix.shortName}
       </a>
     ),
   },
   {
     Header: "Artist",
-    accessor: (t: AllSongsPageTitle) => t.artist,
+    accessor: (t: ChartData) => t.song.artist,
   },
   {
     Header: "bpm",
-    accessor: (t: AllSongsPageTitle) => t.displayBpm,
+    accessor: (t: ChartData) => t.song.displayBpm,
   },
   {
     Header: "tempo shifts",
-    accessor: (t: AllSongsPageTitle) => t.tempoShiftCount || "-",
+    accessor: (t: ChartData) => t.chart.bpmShifts || "-",
   },
   {
     Header: "stops",
-    accessor: (t: AllSongsPageTitle) => t.stopCount || "-",
+    accessor: (t: ChartData) => t.chart.stops || "-",
   },
 ];
 
-function TitleSubRows({
-  row,
-  sortedBy,
-}: {
-  row: Row<AllSongsPageTitle>;
-  sortedBy: string;
-}) {
-  const maxStat = row.original.stats[row.original.topDifficulty][sortedBy as keyof Stats];
-  return (
-    <tr>
-      <td colSpan={7} className="text-focal-100" style={{ padding: 0 }}>
-        <table className={clsx(styles.innerTable, "w-full")}>
-          <thead>
-            <tr className="bg-focal-50 text-focal-700">
-              <th className="w-2/6"></th>
-              {STAT_KEYS.map((k) => (
-                <th key={k} className="text-left py-2 w-1/6">
-                  {k}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {row.original.types.map((t, i, a) => {
-              return (
-                <tr key={t.difficulty}>
-                  <td
-                    className={clsx("block p-0 pl-6", {
-                      "pt-2": i === 0,
-                      "pb-2": i === a.length - 1,
-                    })}
-                  >
-                    <a
-                      className="block"
-                      href={buildStepchartUrl(row.original, t)}
-                    >
-                      <StepchartTypePageItem type={t} />
-                    </a>
-                  </td>
-                  {STAT_KEYS.map((k) => (
-                    <td key={k}>
-                      <div
-                        className={clsx({
-                          [`inline-block px-1 py-1 -mx-1 text-white ${
-                            difficultyBgStyles[t.difficulty]
-                          }`]:
-                            row.original.stats[t.difficulty][k as keyof Stats] === maxStat &&
-                            sortedBy === k,
-                        })}
-                      >
-                        {row.original.stats[t.difficulty][k as keyof Stats]}
-                      </div>
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  );
-}
-
-function getMaxBpmForAllTitles(titles: AllSongsPageTitle[]): number {
-  const bpms = titles.map((t) => t.maxBpm);
+function getMaxBpmForAllTitles(charts: ChartData[]): number {
+  const bpms = charts.map((t) => t.song.maxBpm);
   return Math.round(Math.max(...bpms));
 }
 
 function getSortFunction(key: string) {
   switch (key) {
     case "title":
-      return (a: AllSongsPageTitle, b: AllSongsPageTitle) => {
-        return (a.title.translitTitleName || a.title.titleName)
+      return (a: ChartData, b: ChartData) => {
+        return (a.song.titleTranslit || a.song.title)
           .toLowerCase()
           .localeCompare(
-            (b.title.translitTitleName || b.title.titleName).toLowerCase()
+            (b.song.titleTranslit || b.song.title).toLowerCase()
           );
       };
     case "bpm":
-      return (a: AllSongsPageTitle, b: AllSongsPageTitle) => {
-        return b.maxBpm - a.maxBpm;
+      return (a: ChartData, b: ChartData) => {
+        return b.song.maxBpm - a.song.maxBpm;
       };
     case "t.shifts":
-      return (a: AllSongsPageTitle, b: AllSongsPageTitle) => {
-        return b.tempoShiftCount - a.tempoShiftCount;
+      return (a: ChartData, b: ChartData) => {
+        return b.chart.bpmShifts - a.chart.bpmShifts;
       };
     case "stops":
-      return (a: AllSongsPageTitle, b: AllSongsPageTitle) => {
-        return b.stopCount - a.stopCount;
+      return (a: ChartData, b: ChartData) => {
+        return b.chart.stops - a.chart.stops;
       };
 
     default:
-      return (a: AllSongsPageTitle, b: AllSongsPageTitle) => {
-        const aStats = a.stats[a.topDifficulty][key as keyof Stats];
-        const bStats = b.stats[b.topDifficulty][key as keyof Stats];
+      return (a: ChartData, b: ChartData) => {
+        const aStats = a.chart[key as keyof Stats];
+        const bStats = b.chart[key as keyof Stats];
 
         return bStats - aStats;
       };
   }
 }
 
-function isSortingOnStats(sortKey: string, title: AllSongsPageTitle): boolean {
+function isSortingOnStats(sortKey: string): boolean {
   return STAT_KEYS.findIndex((k) => k === sortKey) !== -1;
 }
 
@@ -231,37 +135,21 @@ function depluralize(s: string, count: number): string {
   return s;
 }
 
-function TopStatLink({
+function StatLink({
   className,
   title,
   stat,
 }: {
   className?: string;
-  title: AllSongsPageTitle;
+  title: ChartData;
   stat: keyof Stats;
 }) {
-  const topType = title.types.reduce<StepchartType>(
-    (champ, contender) => {
-      const champValue = title.stats[champ.difficulty][stat];
-      const contenderValue = title.stats[contender.difficulty][stat];
-
-      if (champValue >= contenderValue) {
-        return champ;
-      }
-
-      return contender;
-    },
-    title.types[0]
-  );
-
-  const topStatValue = title.stats[topType.difficulty][stat];
-
   return (
     <a
-      className={clsx(className, difficultyBgStyles[topType.difficulty])}
-      href={buildStepchartUrl(title, topType)}
+      className={clsx(className, difficultyBgStyles[title.chart.difficulty])}
+      href={buildStepchartUrl(title, title.chart.difficulty)}
     >
-      {topStatValue} {depluralize(stat, topStatValue)}
+      {title.chart[stat]} {depluralize(stat, title.chart[stat])}
     </a>
   );
 }
@@ -271,16 +159,16 @@ function AllSongsPageCell({
   cell,
   sortedBy,
 }: {
-  row: Row<AllSongsPageTitle>;
-  cell: Cell<AllSongsPageTitle>;
+  row: Row<ChartData>;
+  cell: Cell<ChartData>;
   sortedBy: string;
 }) {
-  if (cell.column.id === "Title" && isSortingOnStats(sortedBy, row.original)) {
+  if (cell.column.id === "Title" && isSortingOnStats(sortedBy)) {
     return (
       <td {...cell.getCellProps()}>
         <div className="flex flex-row items-center justify-between pr-2">
           <div>{cell.render("Cell")}</div>
-          <TopStatLink
+          <StatLink
             className="whitespace-nowrap px-1 py-0.5 text-xs text-white"
             title={row.original}
             stat={sortedBy as keyof Stats}
@@ -317,7 +205,7 @@ const AllSongsTable = React.memo(function AllSongsTable({
   sortedBy,
 }: {
   className?: string;
-  titles: AllSongsPageTitle[];
+  titles: ChartData[];
   totalTitleCount: number;
   filter: Filter;
   sortedBy: string;
@@ -337,12 +225,12 @@ const AllSongsTable = React.memo(function AllSongsTable({
 
     if (filter.bpm[0] > 0 || filter.bpm[1] < maxBpm.current) {
       currentTitles = currentTitles.filter((t) => {
-        if (t.minBpm === t.maxBpm) {
-          return filter.bpm[0] <= t.minBpm && filter.bpm[1] >= t.minBpm;
+        if (t.song.minBpm === t.song.maxBpm) {
+          return filter.bpm[0] <= t.song.minBpm && filter.bpm[1] >= t.song.minBpm;
         } else {
           return (
-            (filter.bpm[0] <= t.minBpm && filter.bpm[1] >= t.minBpm) ||
-            (filter.bpm[0] <= t.maxBpm && filter.bpm[1] >= t.maxBpm)
+            (filter.bpm[0] <= t.song.minBpm && filter.bpm[1] >= t.song.minBpm) ||
+            (filter.bpm[0] <= t.song.maxBpm && filter.bpm[1] >= t.song.maxBpm)
           );
         }
       });
@@ -368,7 +256,7 @@ const AllSongsTable = React.memo(function AllSongsTable({
         pageSize: 200,
         expanded: {},
       },
-      getRowId: (row) => row.id.toString(),
+      getRowId: (row) => row.filterString,
     },
     useExpanded,
     usePagination
@@ -412,23 +300,18 @@ const AllSongsTable = React.memo(function AllSongsTable({
             const rowProps = row.getRowProps();
 
             return (
-              <React.Fragment key={rowProps.key}>
-                <tr {...row.getRowProps()}>
-                  {row.cells.map((cell) => {
-                    return (
-                      <AllSongsPageCell
+              <tr key={rowProps.key} {...row.getRowProps()}>
+                {row.cells.map((cell) => {
+                  return (
+                    <AllSongsPageCell
                         key={cell.getCellProps().key}
                         row={row}
                         cell={cell}
                         sortedBy={sortedBy}
-                      />
-                    );
-                  })}
-                </tr>
-                {row.isExpanded && (
-                  <TitleSubRows row={row} sortedBy={sortedBy} />
-                )}
-              </React.Fragment>
+                    />
+                  );
+                })}
+              </tr>
             );
           })}
         </tbody>
