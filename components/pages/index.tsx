@@ -1,9 +1,10 @@
 import React from "react";
 import { Root } from "../layout/Root";
 import { CompactMixCard } from "./CompactMixCard";
+import { AllMixesData } from "../../scripts/genAllStepchartData";
 
 type IndexPageProps = {
-  mixes: MixMeta[];
+  mixes: AllMixesData;
 };
 
 function IndexPage({ mixes }: IndexPageProps) {

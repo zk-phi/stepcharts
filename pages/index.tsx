@@ -4,13 +4,17 @@ import { GetStaticPropsResult } from "next";
 import entireMixes from "../lib/allStepchartData";
 import { IndexPage } from "../components/pages/index";
 import { IndexPageProps } from "../components/pages/index";
+import type { AllMixesData } from "../scripts/genAllStepchartData";
 
 export async function getStaticProps(): Promise<
   GetStaticPropsResult<IndexPageProps>
 > {
-  const allMixes = fs.readFileSync("_data/allMixes.json", "utf-8")
+  const mixes = JSON.parse(
+    fs.readFileSync("_data/allMixes.json", "utf-8")
+  ) as AllMixesData;
+
   return {
-    props: { mixes: JSON.parse(allMixes) },
+    props: { mixes },
   };
 }
 

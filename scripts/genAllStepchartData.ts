@@ -83,14 +83,15 @@ fs.writeFileSync(
   JSON.stringify(data),
 );
 
-fs.writeFileSync(
-  `_data/allMixes.json`,
-  JSON.stringify(data.map((mix) => ({
-    id: mix.mixDir,
-    name: mix.mixName,
-    shortName: mix.shortMixName,
-    songs: mix.songCount,
-    year: mix.yearReleased,
-    bannerSrc: mix.banner,
-  }))),
-);
+export type AllMixesData = (MixMeta & { songs: number })[];
+
+const allMixesData: AllMixesData = data.map((mix) => ({
+  id: mix.mixDir,
+  name: mix.mixName,
+  shortName: mix.shortMixName,
+  year: mix.yearReleased,
+  bannerSrc: mix.banner,
+  songs: mix.simfiles.length,
+}));
+
+fs.writeFileSync(`_data/allMixes.json`, JSON.stringify(allMixesData));
