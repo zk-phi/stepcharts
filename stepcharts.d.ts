@@ -71,6 +71,7 @@ type Simfile = {
 
 type Mix = {
   mixName: string;
+  shortMixName: string;
   mixDir: string;
   songCount: number;
   yearReleased: number;

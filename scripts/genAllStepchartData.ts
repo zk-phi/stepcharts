@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { toSafeName } from "../lib/util";
 import { parseSimfileAndCopyBanners } from "../lib/parseSimfile";
-import { dateReleased } from "../lib/meta";
+import { dateReleased, shortMixNames } from "../lib/meta";
 
 const ROOT = "resources/stepcharts";
 
@@ -50,6 +50,7 @@ function getAllStepchartDataAndCopyBanners(): EntireMix[] {
       mixDir,
       songCount: mixSongDirs.length,
       yearReleased: new Date(dateReleased[mixDir]).getFullYear(),
+      shortMixName: shortMixNames[mixDir],
       banner,
     };
 
@@ -85,8 +86,9 @@ fs.writeFileSync(
 fs.writeFileSync(
   `_data/allMixes.json`,
   JSON.stringify(data.map((mix) => ({
-    name: mix.mixName,
     id: mix.mixDir,
+    name: mix.mixName,
+    shortName: mix.shortMixName,
     songs: mix.songCount,
     year: mix.yearReleased,
     bannerSrc: mix.banner,

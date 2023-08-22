@@ -8,7 +8,6 @@ import debounce from "lodash.debounce";
 
 import { Root } from "../../layout/Root";
 
-import { shortMixNames } from "../../../lib/meta";
 import { FilterInput } from "../../FilterInput";
 import { useSort } from "../../SortHook";
 import { SortBar } from "../../SortBar";
@@ -96,7 +95,7 @@ const columns = [
     Header: "Mix",
     accessor: (t: AllSongsPageTitle) => (
       <a className="hover:underline" href={buildMixUrl(t)}>
-        {shortMixNames[t.mix.mixDir]}
+        {t.mix.shortMixName}
       </a>
     ),
   },
