@@ -9,7 +9,6 @@ import debounce from "lodash.debounce";
 import { Root } from "../../layout/Root";
 
 import { FilterInput } from "../../FilterInput";
-import { useSort } from "../../SortHook";
 import { SortBar } from "../../SortBar";
 import { PageBar } from "./PageBar";
 
@@ -72,6 +71,10 @@ const columns = [
     accessor: (t: ChartData) => t.song.displayBpm,
   },
   {
+    Header: "arrows",
+    accessor: (t: ChartData) => t.chart.arrows,
+  },
+  {
     Header: "tempo shifts",
     accessor: (t: ChartData) => t.chart.bpmShifts || "-",
   },
@@ -85,6 +88,18 @@ function getMaxBpmForAllTitles(charts: ChartData[]): number {
   const bpms = charts.map((t) => t.song.maxBpm);
   return Math.round(Math.max(...bpms));
 }
+
+const SORT_KEYS = [
+  "title",
+  "bpm",
+  "arrows",
+  "jumps",
+  "jacks",
+  "freezes",
+  "gallops",
+  "stops",
+  "t.shifts",
+];
 
 function getSortFunction(key: string) {
   switch (key) {
@@ -104,11 +119,6 @@ function getSortFunction(key: string) {
       return (a: ChartData, b: ChartData) => {
         return b.chart.bpmShifts - a.chart.bpmShifts;
       };
-    case "stops":
-      return (a: ChartData, b: ChartData) => {
-        return b.chart.stops - a.chart.stops;
-      };
-
     default:
       return (a: ChartData, b: ChartData) => {
         const aStats = a.chart[key as keyof Stats];
@@ -334,10 +344,10 @@ function AllSongsPage({ titles }: AllSongsPageProps) {
     0,
     maxBpm,
   ]);
-  const { sortedBy, setSortBy, sorts, sortedTitles } = useSort(
-    titles,
-    getSortFunction
-  );
+  const [sortedBy, setSortBy] = useState(SORT_KEYS[0]);
+  const sortedTitles = useMemo(() => (
+    [...titles].sort(getSortFunction(sortedBy))
+  ), [titles, sortedBy]);
 
   const [currentFilter, setCurrentFilter] = useState<Filter>({
     bpm: curBpmRange,
@@ -384,7 +394,7 @@ function AllSongsPage({ titles }: AllSongsPageProps) {
         </div>
         <div className="sm:col-span-1 sm:justify-self-stretch">
           <div className="text-xs ml-2">Sort</div>
-          <SortBar sorts={sorts} sortedBy={sortedBy} onSortChange={setSortBy} />
+          <SortBar sorts={SORT_KEYS} sortedBy={sortedBy} onSortChange={setSortBy} />
         </div>
         <div className="sm:col-span-1">
           <div className="text-xs ml-2">BPM</div>

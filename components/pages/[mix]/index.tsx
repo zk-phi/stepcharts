@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { Root } from "../../layout/Root";
 import { ImageFrame } from "../../ImageFrame";
 import { Breadcrumbs } from "../../Breadcrumbs";
 import { CompactTitleCard } from "../../CompactTitleCard";
-import { useSort } from "../../SortHook";
 import { SortBar } from "../../SortBar";
 import type { MixData } from "../../../scripts/genAllStepchartData";
 
@@ -22,6 +21,11 @@ function getMaxBpm(displayBpm: string): number {
 
   return Math.max(...range);
 }
+
+const SORT_KEYS = [
+  "title",
+  "bpm",
+];
 
 function getSortFunction(key: string) {
   switch (key) {
@@ -43,11 +47,10 @@ function getSortFunction(key: string) {
 }
 
 function MixPage({ mix }: MixPageProps) {
-  const { sortedBy, setSortBy, sorts, sortedTitles } = useSort(
-    mix.songs,
-    getSortFunction,
-    ["jumps", "jacks", "freezes", "gallops", "t.shifts", "stops"]
-  );
+  const [sortedBy, setSortBy] = useState(SORT_KEYS[0]);
+  const sortedTitles = useMemo(() => (
+    [...mix.songs].sort(getSortFunction(sortedBy))
+  ), [mix, sortedBy]);
 
   return (
     <Root
@@ -84,7 +87,7 @@ function MixPage({ mix }: MixPageProps) {
         </div>
         <div className="sm:flex sm:flex-col mt-2 sm:mt-0 sm:flex-1 w-full max-w-xl justify-center">
           <div className="hidden sm:block text-xs mb-1">sort by</div>
-          <SortBar sorts={sorts} sortedBy={sortedBy} onSortChange={setSortBy} />
+          <SortBar sorts={SORT_KEYS} sortedBy={sortedBy} onSortChange={setSortBy} />
         </div>
       </ImageFrame>
       <div
