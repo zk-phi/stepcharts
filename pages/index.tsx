@@ -3,14 +3,13 @@ import React from "react";
 import { GetStaticPropsResult } from "next";
 import { IndexPage } from "../components/pages/index";
 import { IndexPageProps } from "../components/pages/index";
-import type { AllMixesData } from "../scripts/genAllStepchartData";
 
 export async function getStaticProps(): Promise<
   GetStaticPropsResult<IndexPageProps>
 > {
   const mixes = JSON.parse(
     fs.readFileSync("_data/mixes.json", "utf-8")
-  ) as AllMixesData;
+  ) as MixMeta[];
 
   return {
     props: { mixes },

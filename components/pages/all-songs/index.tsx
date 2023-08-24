@@ -16,7 +16,6 @@ import { PageBar } from "./PageBar";
 import styles from "./index.module.css";
 import difficultyBgStyles from "../../difficultyBackgroundColors.module.css";
 import { ImageFrame } from "../../ImageFrame";
-import { StepchartTypePageItem } from "../../StepchartTypePageItem";
 
 const STAT_KEYS = ["jumps", "jacks", "freezes", "gallops"];
 

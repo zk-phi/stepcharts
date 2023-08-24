@@ -112,7 +112,7 @@ const legacyChartToChartMeta = (song: Simfile, chartType: StepchartType) => ({
   ...song.stats[chartType.difficulty],
 })
 
-const allMixesData: MixData[] = data.map(legacyMixToMixMeta);
+const allMixesData: MixMeta[] = data.map(legacyMixToMixMeta);
 fs.writeFileSync(`_data/mixes.json`, JSON.stringify(allMixesData));
 
 const allMixes: AllMeta[] = data.flatMap((mix) => {

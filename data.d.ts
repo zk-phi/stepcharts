@@ -4,9 +4,8 @@ type MixMeta = {
   shortName: string;
   year: number;
   bannerSrc: string | null;
+  songs: number;
 };
-
-type MixData = MixMeta & { songs: number };
 
 type SongMeta = {
   songId: string;
