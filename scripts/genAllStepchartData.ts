@@ -35,70 +35,66 @@ type AllData = {
   }[],
 }[];
 
-function getAllStepchartDataAndCopyBanners(): AllData {
-  const mixDirs = getDirectories(ROOT);
+const mixDirs = getDirectories(ROOT);
 
-  return mixDirs.map((mixDir) => {
-    let publicName = toSafeName(`${mixDir}.png`);
-    let banner: string | null;
-    if (fs.existsSync(`${ROOT}/${mixDir}/mix-banner.png`)) {
-      if (!fs.existsSync(`public/bannerImages/${publicName}`)) {
-        fs.copyFileSync(`${ROOT}/${mixDir}/mix-banner.png`, `public/bannerImages/${publicName}`);
-      }
-      banner = `/bannerImages/${publicName}`;
-    } else {
-      banner = null;
+const allData: AllData = mixDirs.map((mixDir) => {
+  let publicName = toSafeName(`${mixDir}.png`);
+  let banner: string | null;
+  if (fs.existsSync(`${ROOT}/${mixDir}/mix-banner.png`)) {
+    if (!fs.existsSync(`public/bannerImages/${publicName}`)) {
+      fs.copyFileSync(`${ROOT}/${mixDir}/mix-banner.png`, `public/bannerImages/${publicName}`);
     }
+    banner = `/bannerImages/${publicName}`;
+  } else {
+    banner = null;
+  }
 
-    const mixSongDirs = getDirectories(ROOT, mixDir);
+  const mixSongDirs = getDirectories(ROOT, mixDir);
 
-    return {
-      meta: {
-        mixId: mixDir,
-        name: mixDir.replace(/-/g, " "),
-        shortName: shortMixNames[mixDir],
-        year: new Date(dateReleased[mixDir]).getFullYear(),
-        bannerSrc: banner,
-        songs: mixSongDirs.length,
-      },
-      songs: mixSongDirs.map((songDir) => {
-        const simfile = parseSimfileAndCopyBanners(ROOT, mixDir, songDir);
-        return {
+  return {
+    meta: {
+      mixId: mixDir,
+      name: mixDir.replace(/-/g, " "),
+      shortName: shortMixNames[mixDir],
+      year: new Date(dateReleased[mixDir]).getFullYear(),
+      bannerSrc: banner,
+      songs: mixSongDirs.length,
+    },
+    songs: mixSongDirs.map((songDir) => {
+      const simfile = parseSimfileAndCopyBanners(ROOT, mixDir, songDir);
+      return {
+        meta: {
+          songId: simfile.title.titleDir,
+          title: simfile.title.titleName,
+          titleTranslit: simfile.title.translitTitleName,
+          artist: simfile.artist,
+          minBpm: simfile.minBpm,
+          maxBpm: simfile.maxBpm,
+          displayBpm: simfile.displayBpm,
+          bannerSrc: simfile.title.banner,
+        },
+        charts: simfile.availableTypes.map((chartType) => ({
           meta: {
-            songId: simfile.title.titleDir,
-            title: simfile.title.titleName,
-            titleTranslit: simfile.title.translitTitleName,
-            artist: simfile.artist,
-            minBpm: simfile.minBpm,
-            maxBpm: simfile.maxBpm,
-            displayBpm: simfile.displayBpm,
-            bannerSrc: simfile.title.banner,
+            difficulty: chartType.difficulty,
+            level: chartType.feet,
+            arrows: simfile.charts[chartType.difficulty].arrows.length,
+            stops: simfile.charts[chartType.difficulty].stops.length,
+            bpmShifts: simfile.charts[chartType.difficulty].bpm.length - 1,
+            ...simfile.stats[chartType.difficulty],
           },
-          charts: simfile.availableTypes.map((chartType) => ({
-            meta: {
-              difficulty: chartType.difficulty,
-              level: chartType.feet,
-              arrows: simfile.charts[chartType.difficulty].arrows.length,
-              stops: simfile.charts[chartType.difficulty].stops.length,
-              bpmShifts: simfile.charts[chartType.difficulty].bpm.length - 1,
-              ...simfile.stats[chartType.difficulty],
-            },
-            chart: simfile.charts[chartType.difficulty],
-          })),
-        };
-      }),
-    };
-  }).sort((a, b) => (
-    a.meta.year - b.meta.year
-  ));
-}
+          chart: simfile.charts[chartType.difficulty],
+        })),
+      };
+    }),
+  };
+}).sort((a, b) => (
+  a.meta.year - b.meta.year
+));
 
-const data = getAllStepchartDataAndCopyBanners();
-
-const allMixesData: MixMeta[] = data.map((mix) => mix.meta);
+const allMixesData: MixMeta[] = allData.map((mix) => mix.meta);
 fs.writeFileSync(`_data/mixes.json`, JSON.stringify(allMixesData));
 
-const allMixes: AllMeta[] = data.flatMap((mix) => {
+const allMixes: AllMeta[] = allData.flatMap((mix) => {
   if (!fs.existsSync(`_data/${mix.meta.mixId}`)) {
     fs.mkdirSync(`_data/${mix.meta.mixId}`);
   }
