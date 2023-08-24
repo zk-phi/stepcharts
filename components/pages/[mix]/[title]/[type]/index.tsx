@@ -15,9 +15,7 @@ import {
 } from "./StepchartSection";
 
 type StepchartPageProps = {
-  mix: MixMeta,
-  song: SongMeta,
-  chart: Stepchart & { meta: ChartMeta },
+  chart: ChartData,
 };
 
 const speedmods = [1, 1.5, 2, 3];
@@ -30,7 +28,7 @@ const sectionSizesInMeasures: Record<typeof speedmods[number], number> = {
 
 const HEADER_ID = "stepchart-page-header";
 
-function StepchartPage({ mix, song, chart }: StepchartPageProps) {
+function StepchartPage({ chart }: StepchartPageProps) {
   useEffect(() => {
     // this is needed because :target is not very robust (tested in both chrome and ff)
     // when just using :target, if the user changes the speedmod, :target gets wiped out
@@ -86,7 +84,7 @@ function StepchartPage({ mix, song, chart }: StepchartPageProps) {
     );
   }
 
-  const normalizedTitle = song.titleTranslit || song.title;
+  const normalizedTitle = chart.meta.titleTranslit || chart.meta.title;
   const title = `${normalizedTitle} - ${chart.meta.difficulty} (${chart.meta.level})`;
 
   return (
@@ -97,12 +95,12 @@ function StepchartPage({ mix, song, chart }: StepchartPageProps) {
         <Breadcrumbs
           crumbs={[
             {
-              display: mix.name,
-              pathSegment: mix.mixId,
+              display: chart.meta.name,
+              pathSegment: chart.meta.mixId,
             },
             {
               display: normalizedTitle,
-              pathSegment: song.songId,
+              pathSegment: chart.meta.songId,
             },
             {
               display: chart.meta.difficulty,
@@ -125,7 +123,7 @@ function StepchartPage({ mix, song, chart }: StepchartPageProps) {
               styles.hideForPrint,
               "mx-auto border-b-4 border-white w-full absolute top-0 left-0"
             )}
-            song={song}
+            song={chart.meta}
           />
         </a>
       </div>
@@ -141,24 +139,24 @@ function StepchartPage({ mix, song, chart }: StepchartPageProps) {
           <div className="hidden sm:block">
             <Banner
               className="mx-auto border-2 border-white w-full absolute top-0 left-0"
-              song={song}
+              song={chart.meta}
             />
           </div>
         </div>
         <div className="flex-1 flex flex-col sm:grid sm:grid-cols-2 space-y-2 sm:space-y-0">
           <TitleDetailsTable>
-            {song.titleTranslit && (
+            {chart.meta.titleTranslit && (
               <TitleDetailsRow
                 name="Native title"
-                value={song.title}
+                value={chart.meta.title}
               />
             ) || null}
-            <TitleDetailsRow name="BPM" value={song.displayBpm} />
+            <TitleDetailsRow name="BPM" value={chart.meta.displayBpm} />
             <TitleDetailsRow
               name="Artist"
-              value={song.artist ?? "unknown"}
+              value={chart.meta.artist ?? "unknown"}
             />
-            <TitleDetailsRow name="Mix" value={mix.name} />
+            <TitleDetailsRow name="Mix" value={chart.meta.name} />
             <TitleDetailsRow
               name="difficulty"
               value={`${chart.meta.difficulty} (${chart.meta.level})`}
@@ -179,7 +177,7 @@ function StepchartPage({ mix, song, chart }: StepchartPageProps) {
       </ImageFrame>
       <div className={styles.printTitle}>
         <div>
-          {mix.name}: {title}
+          {chart.meta.name}: {title}
         </div>
         {currentUrl && (
           <div className="text-xs text-gray-400">{currentUrl}</div>

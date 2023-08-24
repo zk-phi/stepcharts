@@ -186,21 +186,18 @@ data.forEach((mix) => {
   });
 });
 
-export type ChartData = {
-  mix: MixMeta,
-  song: SongMeta,
-  chart: Stepchart & { meta: ChartMeta },
-};
 data.forEach((mix) => {
+  const mixMeta = legacyMixToMixMeta(mix);
   mix.simfiles.forEach((simfile) => {
+    const songMeta = legacySongToSongMeta(simfile);
     simfile.availableTypes.forEach((chartType) => {
       const chartData: ChartData = {
-        mix: legacyMixToMixMeta(mix),
-        song: legacySongToSongMeta(simfile),
-        chart: {
-          ...simfile.charts[chartType.difficulty],
-          meta: legacyChartToChartMeta(simfile, chartType),
+        meta: {
+          ...mixMeta,
+          ...songMeta,
+          ...legacyChartToChartMeta(simfile, chartType),
         },
+        ...simfile.charts[chartType.difficulty],
       };
       fs.writeFileSync(
         `_data/${mix.mixDir}/${simfile.title.titleDir}/${chartType.difficulty}.json`,

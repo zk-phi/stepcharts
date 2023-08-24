@@ -8,7 +8,7 @@ import {
 } from "next";
 import { StepchartPage } from "../../../../components/pages/[mix]/[title]/[type]";
 import type { StepchartPageProps } from "../../../../components/pages/[mix]/[title]/[type]";
-import type { ChartData, AllChartsData } from "../../../../scripts/genAllStepchartData";
+import type { AllChartsData } from "../../../../scripts/genAllStepchartData";
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
   const allCharts = JSON.parse(
@@ -40,9 +40,7 @@ export async function getStaticProps(
 
   return {
     props: {
-      mix: chartData.mix,
-      song: chartData.song,
-      chart: chartData.chart,
+      chart: chartData,
     },
   };
 }

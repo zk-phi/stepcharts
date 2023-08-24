@@ -28,3 +28,6 @@ type ChartMeta = {
   jacks: number;
   gallops: number;
 };
+
+type AllMeta = MixMeta & SongMeta & ChartMeta;
+type ChartData = Stepchart & { meta: AllMeta };
