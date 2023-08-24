@@ -23,7 +23,7 @@ export async function getStaticPaths(): Promise<GetStaticPathsResult> {
 
 export async function getStaticProps(
   context: GetStaticPropsContext
-): Promise<GetStaticPropsResult<TitlePageProps>> {
+): Promise<GetStaticPropsResult<AllSongsPageProps>> {
   const mixId = context.params!.mix as string;
   const songId = context.params!.title as string;
 
@@ -31,7 +31,7 @@ export async function getStaticProps(
     fs.readFileSync(`_data/${mixId}/${songId}/all.json`, "utf-8"),
   ) as AllMeta[];
 
-  const results: GetStaticPropsResult<TitlePageProps> = {
+  const results: GetStaticPropsResult<AllSongsPageProps> = {
     props: {
       titles,
       crumbs: [

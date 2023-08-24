@@ -5,7 +5,7 @@ import { parseDwi } from "./parseDwi";
 import { parseSm } from "./parseSm";
 import { calculateStats } from "./calculateStats";
 
-type RawSimfile = Omit<Simfile, "mix" | "title"> & {
+type RawSimfile = Omit<Simfile, "title"> & {
   title: string;
   titletranslit: string | null;
   banner: string | null;
@@ -43,7 +43,7 @@ function parseSimfileAndCopyBanners(
   rootDir: string,
   mixDir: string,
   titleDir: string
-): Omit<Simfile, "mix"> {
+): Simfile {
   const stepchartSongDirPath = path.join(rootDir, mixDir, titleDir);
   const songFile = getSongFile(stepchartSongDirPath);
   const stepchartPath = path.join(stepchartSongDirPath, songFile);

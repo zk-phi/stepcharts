@@ -1,3 +1,11 @@
+type Difficulty =
+  | "beginner"
+  | "basic"
+  | "difficult"
+  | "expert"
+  | "challenge"
+  | "edit";
+
 type MixMeta = {
   mixId: string;
   name: string;
@@ -18,16 +26,12 @@ type SongMeta = {
   bannerSrc: string | null;
 };
 
-type ChartMeta = {
+type ChartMeta = Stats & {
   difficulty: Difficulty,
   level: number;
   arrows: number;
   stops: number;
   bpmShifts: number;
-  freezes: number;
-  jumps: number;
-  jacks: number;
-  gallops: number;
 };
 
 type AllMeta = MixMeta & SongMeta & ChartMeta & { filterString: string };

@@ -305,7 +305,7 @@ const AllSongsTable = React.memo(function AllSongsTable({
             const rowProps = row.getRowProps();
 
             return (
-              <tr key={rowProps.key} {...row.getRowProps()}>
+              <tr {...row.getRowProps()}>
                 {row.cells.map((cell) => {
                   return (
                     <AllSongsPageCell

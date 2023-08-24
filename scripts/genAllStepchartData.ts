@@ -73,7 +73,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
           displayBpm: simfile.displayBpm,
           bannerSrc: simfile.title.banner,
         },
-        charts: simfile.availableTypes.map((chartType) => ({
+        charts: simfile.availableTypes.map((chartType: StepchartType) => ({
           meta: {
             difficulty: chartType.difficulty,
             level: chartType.feet,

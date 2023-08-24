@@ -1,11 +1,10 @@
 import React from "react";
 import clsx from "clsx";
 import { ImageFrame } from "../ImageFrame";
-import { AllMixesData } from "../../scripts/genAllStepchartData";
 
 type CompactMixCardProps = {
   className?: string;
-  mix: typeof AllMixesData[number];
+  mix: MixMeta;
 };
 
 function pluralize(str: string, count: number): string {
