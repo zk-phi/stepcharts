@@ -6,6 +6,8 @@ type MixMeta = {
   bannerSrc: string | null;
 };
 
+type MixData = MixMeta & { songs: number };
+
 type SongMeta = {
   songId: string;
   title: string;
@@ -29,5 +31,5 @@ type ChartMeta = {
   gallops: number;
 };
 
-type AllMeta = MixMeta & SongMeta & ChartMeta;
+type AllMeta = MixMeta & SongMeta & ChartMeta & { filterString: string };
 type ChartData = Stepchart & { meta: AllMeta };

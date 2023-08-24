@@ -1,20 +1,16 @@
 import * as fs from "fs";
 import React from "react";
 import {
-  GetStaticPathsContext,
   GetStaticPathsResult,
   GetStaticPropsContext,
   GetStaticPropsResult,
 } from "next";
-import { MixPage } from "../../components/pages/[mix]";
-import type { MixPageProps } from "../../components/pages/[mix]";
-import type { AllMixesData, MixData } from "../../scripts/genAllStepchartData";
+import { AllSongsPage } from "../../components/pages/all-songs";
+import type { AllSongsPageProps } from "../../components/pages/all-songs";
 
-export async function getStaticPaths(
-  _context: GetStaticPathsContext
-): Promise<GetStaticPathsResult> {
+export async function getStaticPaths(): Promise<GetStaticPathsResult> {
   const allMixes = JSON.parse(
-    fs.readFileSync("_data/allMixes.json", "utf-8"),
+    fs.readFileSync("_data/mixes.json", "utf-8"),
   ) as AllMixesData;
 
   return {
@@ -25,17 +21,20 @@ export async function getStaticPaths(
 
 export async function getStaticProps(
   context: GetStaticPropsContext
-): Promise<GetStaticPropsResult<MixPageProps>> {
+): Promise<GetStaticPropsResult<AllSongsPageProps>> {
   const id = context.params!.mix as string;
-  const mix = JSON.parse(
-    fs.readFileSync(`_data/${id}/data.json`, "utf-8"),
-  ) as MixData;
+  const titles = JSON.parse(
+    fs.readFileSync(`_data/${id}/all.json`, "utf-8"),
+  ) as AllMeta[];
 
   return {
-    props: { mix },
+    props: {
+      titles,
+      crumbs: [{ display: titles[0].name, pathSegment: titles[0].mixId }],
+    },
   };
 }
 
-export default function NextMixIndexPage(props: MixPageProps) {
-  return <MixPage {...props} />;
+export default function NextMixIndexPage(props: AllSongsPageProps) {
+  return <AllSongsPage {...props} />;
 }

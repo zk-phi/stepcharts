@@ -112,97 +112,49 @@ const legacyChartToChartMeta = (song: Simfile, chartType: StepchartType) => ({
   ...song.stats[chartType.difficulty],
 })
 
-export type AllMixesData = (MixMeta & { songs: number })[];
-const allMixesData: AllMixesData = data.map(legacyMixToMixMeta);
-fs.writeFileSync(`_data/allMixes.json`, JSON.stringify(allMixesData));
+const allMixesData: MixData[] = data.map(legacyMixToMixMeta);
+fs.writeFileSync(`_data/mixes.json`, JSON.stringify(allMixesData));
 
-export type AllChartsData = ({
-  mix: MixMeta,
-  song: SongMeta,
-  chart: ChartMeta,
-  filterString: string,
-})[];
-const allChartsData: AllChartsData = data.flatMap((mix) => (
-  mix.simfiles.flatMap((simfile) => (
-    simfile.availableTypes.map((chartType) => ({
-      mix: legacyMixToMixMeta(mix),
-      song: legacySongToSongMeta(simfile),
-      chart: legacyChartToChartMeta(simfile, chartType),
-      filterString: [
-        simfile.title.translitTitleName,
-        simfile.title.titleName,
-        mix.mixName,
-        simfile.artist,
-        chartType.difficulty,
-      ].join(" ").toLowerCase(),
-    }))
-  ))
-))
-fs.writeFileSync(`_data/allCharts.json`, JSON.stringify(allChartsData));
-
-export type MixData = MixMeta & {
-  songs: (SongMeta & {
-    charts: ChartMeta[],
-  })[],
-};
-data.forEach((mix) => {
+const allMixes: AllMeta[] = data.flatMap((mix) => {
   if (!fs.existsSync(`_data/${mix.mixDir}`)) {
     fs.mkdirSync(`_data/${mix.mixDir}`);
   }
-  const mixData: MixData = {
-    ...legacyMixToMixMeta(mix),
-    songs: mix.simfiles.map((simfile) => ({
-      ...legacySongToSongMeta(simfile),
-      charts: simfile.availableTypes.map((chartType) => (
-        legacyChartToChartMeta(simfile, chartType)
-      )),
-    })),
-  };
-  fs.writeFileSync(`_data/${mix.mixDir}/data.json`, JSON.stringify(mixData));
-});
-
-export type SongData = {
-  mix: MixMeta,
-  song: SongMeta & { charts: ChartMeta[] },
-};
-data.forEach((mix) => {
-  mix.simfiles.forEach((simfile) => {
+  const mixMeta = legacyMixToMixMeta(mix);
+  const allSongs = mix.simfiles.flatMap((simfile) => {
     if (!fs.existsSync(`_data/${mix.mixDir}/${simfile.title.titleDir}`)) {
       fs.mkdirSync(`_data/${mix.mixDir}/${simfile.title.titleDir}`);
     }
-    const songData: SongData = {
-      mix: legacyMixToMixMeta(mix),
-      song: {
-        ...legacySongToSongMeta(simfile),
-        charts: simfile.availableTypes.map((chartType) => (
-          legacyChartToChartMeta(simfile, chartType)
-        )),
-      },
-    };
-    fs.writeFileSync(
-      `_data/${mix.mixDir}/${simfile.title.titleDir}/data.json`,
-      JSON.stringify(songData),
-    );
-  });
-});
-
-data.forEach((mix) => {
-  const mixMeta = legacyMixToMixMeta(mix);
-  mix.simfiles.forEach((simfile) => {
     const songMeta = legacySongToSongMeta(simfile);
-    simfile.availableTypes.forEach((chartType) => {
+    const allCharts: AllMeta[] = simfile.availableTypes.map((chartType) => {
+      const allMeta = {
+        ...mixMeta,
+        ...songMeta,
+        ...legacyChartToChartMeta(simfile, chartType),
+        filterString: [
+          simfile.title.translitTitleName,
+          simfile.title.titleName,
+          mix.mixName,
+          simfile.artist,
+          chartType.difficulty,
+        ].join(" ").toLowerCase(),
+      };
       const chartData: ChartData = {
-        meta: {
-          ...mixMeta,
-          ...songMeta,
-          ...legacyChartToChartMeta(simfile, chartType),
-        },
+        meta: allMeta,
         ...simfile.charts[chartType.difficulty],
       };
       fs.writeFileSync(
         `_data/${mix.mixDir}/${simfile.title.titleDir}/${chartType.difficulty}.json`,
         JSON.stringify(chartData),
       );
+      return allMeta;
     });
+    fs.writeFileSync(
+      `_data/${mix.mixDir}/${simfile.title.titleDir}/all.json`,
+      JSON.stringify(allCharts),
+    );
+    return allCharts;
   });
+  fs.writeFileSync(`_data/${mix.mixDir}/all.json`, JSON.stringify(allSongs));
+  return allSongs;
 });
+fs.writeFileSync(`_data/all.json`, JSON.stringify(allMixes));

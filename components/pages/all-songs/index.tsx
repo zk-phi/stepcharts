@@ -8,6 +8,7 @@ import debounce from "lodash.debounce";
 
 import { Root } from "../../layout/Root";
 
+import { Breadcrumbs } from "../../Breadcrumbs";
 import { FilterInput } from "../../FilterInput";
 import { SortBar } from "../../SortBar";
 import { PageBar } from "./PageBar";
@@ -20,10 +21,9 @@ import { StepchartTypePageItem } from "../../StepchartTypePageItem";
 const STAT_KEYS = ["jumps", "jacks", "freezes", "gallops"];
 
 type AllSongsPageProps = {
-  titles: AllChartsData;
+  titles: AllMeta[];
+  crumbs?: { display: string, pathSegment: string }[],
 };
-
-type ChartData = typeof AllChartsData[number];
 
 function RotateYourPhone() {
   return (
@@ -35,57 +35,57 @@ function RotateYourPhone() {
   );
 }
 
-function buildStepchartUrl(t: ChartData): string {
-  return `/${t.mix.mixId}/${t.song.songId}/${t.chart.difficulty}`;
+function buildStepchartUrl(t: AllMeta): string {
+  return `/${t.mixId}/${t.songId}/${t.difficulty}`;
 }
 
-function buildMixUrl(t: ChartData): string {
-  return `/${t.mix.mixId}`;
+function buildMixUrl(t: AllMeta): string {
+  return `/${t.mixId}`;
 }
 
 const columns = [
   {
     Header: "Title",
-    accessor: (t: ChartData) => (
+    accessor: (t: AllMeta) => (
       <a className="hover:underline" href={buildStepchartUrl(t)}>
-        {t.song.titleTranslit || t.song.title}
+        {t.titleTranslit || t.title}
         {" "}
-        ({ t.chart.difficulty })
+        ({ t.difficulty })
       </a>
     ),
   },
   {
     Header: "Mix",
-    accessor: (t: ChartData) => (
+    accessor: (t: AllMeta) => (
       <a className="hover:underline" href={buildMixUrl(t)}>
-        {t.mix.shortName}
+        {t.shortName}
       </a>
     ),
   },
   {
     Header: "Artist",
-    accessor: (t: ChartData) => t.song.artist,
+    accessor: (t: AllMeta) => t.artist,
   },
   {
     Header: "bpm",
-    accessor: (t: ChartData) => t.song.displayBpm,
+    accessor: (t: AllMeta) => t.displayBpm,
   },
   {
     Header: "arrows",
-    accessor: (t: ChartData) => t.chart.arrows,
+    accessor: (t: AllMeta) => t.arrows,
   },
   {
     Header: "tempo shifts",
-    accessor: (t: ChartData) => t.chart.bpmShifts || "-",
+    accessor: (t: AllMeta) => t.bpmShifts || "-",
   },
   {
     Header: "stops",
-    accessor: (t: ChartData) => t.chart.stops || "-",
+    accessor: (t: AllMeta) => t.stops || "-",
   },
 ];
 
-function getMaxBpmForAllTitles(charts: ChartData[]): number {
-  const bpms = charts.map((t) => t.song.maxBpm);
+function getMaxBpmForAllTitles(charts: AllMeta[]): number {
+  const bpms = charts.map((t) => t.maxBpm);
   return Math.round(Math.max(...bpms));
 }
 
@@ -104,25 +104,25 @@ const SORT_KEYS = [
 function getSortFunction(key: string) {
   switch (key) {
     case "title":
-      return (a: ChartData, b: ChartData) => {
-        return (a.song.titleTranslit || a.song.title)
+      return (a: AllMeta, b: AllMeta) => {
+        return (a.titleTranslit || a.title)
           .toLowerCase()
           .localeCompare(
-            (b.song.titleTranslit || b.song.title).toLowerCase()
+            (b.titleTranslit || b.title).toLowerCase()
           );
       };
     case "bpm":
-      return (a: ChartData, b: ChartData) => {
-        return b.song.maxBpm - a.song.maxBpm;
+      return (a: AllMeta, b: AllMeta) => {
+        return b.maxBpm - a.maxBpm;
       };
     case "t.shifts":
-      return (a: ChartData, b: ChartData) => {
-        return b.chart.bpmShifts - a.chart.bpmShifts;
+      return (a: AllMeta, b: AllMeta) => {
+        return b.bpmShifts - a.bpmShifts;
       };
     default:
-      return (a: ChartData, b: ChartData) => {
-        const aStats = a.chart[key as keyof Stats];
-        const bStats = b.chart[key as keyof Stats];
+      return (a: AllMeta, b: AllMeta) => {
+        const aStats = a[key as keyof Stats];
+        const bStats = b[key as keyof Stats];
 
         return bStats - aStats;
       };
@@ -147,15 +147,15 @@ function StatLink({
   stat,
 }: {
   className?: string;
-  title: ChartData;
+  title: AllMeta;
   stat: keyof Stats;
 }) {
   return (
     <a
-      className={clsx(className, difficultyBgStyles[title.chart.difficulty])}
-      href={buildStepchartUrl(title, title.chart.difficulty)}
+      className={clsx(className, difficultyBgStyles[title.difficulty])}
+      href={buildStepchartUrl(title)}
     >
-      {title.chart[stat]} {depluralize(stat, title.chart[stat])}
+      {title[stat]} {depluralize(stat, title[stat])}
     </a>
   );
 }
@@ -165,8 +165,8 @@ function AllSongsPageCell({
   cell,
   sortedBy,
 }: {
-  row: Row<ChartData>;
-  cell: Cell<ChartData>;
+  row: Row<AllMeta>;
+  cell: Cell<AllMeta>;
   sortedBy: string;
 }) {
   if (cell.column.id === "Title" && isSortingOnStats(sortedBy)) {
@@ -211,7 +211,7 @@ const AllSongsTable = React.memo(function AllSongsTable({
   sortedBy,
 }: {
   className?: string;
-  titles: ChartData[];
+  titles: AllMeta[];
   totalTitleCount: number;
   filter: Filter;
   sortedBy: string;
@@ -231,12 +231,12 @@ const AllSongsTable = React.memo(function AllSongsTable({
 
     if (filter.bpm[0] > 0 || filter.bpm[1] < maxBpm.current) {
       currentTitles = currentTitles.filter((t) => {
-        if (t.song.minBpm === t.song.maxBpm) {
-          return filter.bpm[0] <= t.song.minBpm && filter.bpm[1] >= t.song.minBpm;
+        if (t.minBpm === t.maxBpm) {
+          return filter.bpm[0] <= t.minBpm && filter.bpm[1] >= t.minBpm;
         } else {
           return (
-            (filter.bpm[0] <= t.song.minBpm && filter.bpm[1] >= t.song.minBpm) ||
-            (filter.bpm[0] <= t.song.maxBpm && filter.bpm[1] >= t.song.maxBpm)
+            (filter.bpm[0] <= t.minBpm && filter.bpm[1] >= t.minBpm) ||
+            (filter.bpm[0] <= t.maxBpm && filter.bpm[1] >= t.maxBpm)
           );
         }
       });
@@ -337,7 +337,7 @@ const AllSongsTable = React.memo(function AllSongsTable({
   );
 });
 
-function AllSongsPage({ titles }: AllSongsPageProps) {
+function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
   const maxBpm = getMaxBpmForAllTitles(titles);
   const [textFilter, _setTextFilter] = useState("");
   const [curBpmRange, _setCurBpmRange] = useState<[number, number]>([
@@ -381,6 +381,9 @@ function AllSongsPage({ titles }: AllSongsPageProps) {
   return (
     <Root
       title="All Songs"
+      subheading={crumbs && (
+        <Breadcrumbs crumbs={crumbs} />
+      )}
       metaDescription={`All ${titles.length} songs available at stepcharts.com`}
     >
       <RotateYourPhone />

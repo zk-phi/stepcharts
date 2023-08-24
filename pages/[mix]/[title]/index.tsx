@@ -1,23 +1,21 @@
 import * as fs from "fs";
 import React from "react";
 import {
-  GetStaticPathsContext,
   GetStaticPathsResult,
   GetStaticPropsContext,
   GetStaticPropsResult,
 } from "next";
-import { TitlePage } from "../../../components/pages/[mix]/[title]";
-import type { TitlePageProps } from "../../../components/pages/[mix]/[title]";
-import type { AllChartsData, SongData } from "../../../scripts/genAllStepchartData";
+import { AllSongsPage } from "../../../components/pages/all-songs";
+import type { AllSongsPageProps } from "../../../components/pages/all-songs";
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
   const allCharts = JSON.parse(
-    fs.readFileSync("_data/allCharts.json", "utf-8"),
-  ) as AllChartsData;
+    fs.readFileSync("_data/all.json", "utf-8"),
+  ) as AllMeta[];
 
   return {
     paths: allCharts.map((chart) => ({
-      params: { mix: chart.mix.mixId, title: chart.song.songId },
+      params: { mix: chart.mixId, title: chart.songId },
     })),
     fallback: false,
   };
@@ -29,20 +27,23 @@ export async function getStaticProps(
   const mixId = context.params!.mix as string;
   const songId = context.params!.title as string;
 
-  const songData = JSON.parse(
-    fs.readFileSync(`_data/${mixId}/${songId}/data.json`, "utf-8"),
-  ) as SongData;
+  const titles = JSON.parse(
+    fs.readFileSync(`_data/${mixId}/${songId}/all.json`, "utf-8"),
+  ) as AllMeta[];
 
   const results: GetStaticPropsResult<TitlePageProps> = {
     props: {
-      song: songData.song,
-      mix: songData.mix,
+      titles,
+      crumbs: [
+        { display: titles[0].name, pathSegment: titles[0].mixId },
+        { display: titles[0].title, pathSegment: titles[0].songId },
+      ],
     },
   };
 
   return results;
 }
 
-export default function NextTitleIndexPage(props: TitlePageProps) {
-  return <TitlePage {...props} />;
+export default function NextTitleIndexPage(props: AllSongsPageProps) {
+  return <AllSongsPage {...props} />;
 }
