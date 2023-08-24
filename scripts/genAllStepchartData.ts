@@ -94,6 +94,17 @@ const allData: AllData = mixDirs.map((mixDir) => {
 const allMixesData: MixMeta[] = allData.map((mix) => mix.meta);
 fs.writeFileSync(`_data/mixes.json`, JSON.stringify(allMixesData));
 
+const index: Index = allData.map((mix) => ({
+  id: mix.meta.mixId,
+  songs: mix.songs.map((song) => ({
+    id: song.meta.songId,
+    charts: song.charts.map((chart) => ({
+      difficulty: chart.meta.difficulty,
+    })),
+  })),
+}));
+fs.writeFileSync(`_data/index.json`, JSON.stringify(index));
+
 const allMixes: AllMeta[] = allData.flatMap((mix) => {
   if (!fs.existsSync(`_data/${mix.meta.mixId}`)) {
     fs.mkdirSync(`_data/${mix.meta.mixId}`);

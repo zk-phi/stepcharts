@@ -9,12 +9,12 @@ import { AllSongsPage } from "../../components/pages/all-songs";
 import type { AllSongsPageProps } from "../../components/pages/all-songs";
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
-  const allMixes = JSON.parse(
-    fs.readFileSync("_data/mixes.json", "utf-8"),
-  ) as AllMixesData;
+  const index = JSON.parse(
+    fs.readFileSync("_data/index.json", "utf-8"),
+  ) as Index;
 
   return {
-    paths: allMixes.map((mix) => ({ params: { mix: mix.mixId } })),
+    paths: index.map((mix) => ({ params: { mix: mix.id } })),
     fallback: false,
   };
 }

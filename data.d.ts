@@ -32,3 +32,13 @@ type ChartMeta = {
 
 type AllMeta = MixMeta & SongMeta & ChartMeta & { filterString: string };
 type ChartData = Stepchart & { meta: AllMeta };
+
+type Index = {
+  id: string,
+  songs: {
+    id: string,
+    charts: {
+      difficulty: string;
+    }[],
+  }[]
+}[];

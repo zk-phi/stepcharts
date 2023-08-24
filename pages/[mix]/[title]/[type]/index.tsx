@@ -8,21 +8,20 @@ import {
 } from "next";
 import { StepchartPage } from "../../../../components/pages/[mix]/[title]/[type]";
 import type { StepchartPageProps } from "../../../../components/pages/[mix]/[title]/[type]";
-import type { AllChartsData } from "../../../../scripts/genAllStepchartData";
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
-  const allCharts = JSON.parse(
-    fs.readFileSync("_data/allCharts.json", "utf-8"),
-  ) as AllChartsData;
+  const index = JSON.parse(
+    fs.readFileSync("_data/index.json", "utf-8"),
+  ) as Index;
 
   return {
-    paths: allCharts.map((chart) => ({
+    paths: index.flatMap((mix) => mix.songs.flatMap((song) => song.charts.map((chart) => ({
       params: {
-        mix: chart.mix.mixId,
-        title: chart.song.songId,
-        type: chart.chart.difficulty,
+        mix: mix.id,
+        title: song.id,
+        type: chart.difficulty,
       },
-    })),
+    })))),
     fallback: false,
   };
 }

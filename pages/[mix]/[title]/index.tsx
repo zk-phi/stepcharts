@@ -9,14 +9,14 @@ import { AllSongsPage } from "../../../components/pages/all-songs";
 import type { AllSongsPageProps } from "../../../components/pages/all-songs";
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
-  const allCharts = JSON.parse(
-    fs.readFileSync("_data/all.json", "utf-8"),
-  ) as AllMeta[];
+  const index = JSON.parse(
+    fs.readFileSync("_data/index.json", "utf-8"),
+  ) as Index;
 
   return {
-    paths: allCharts.map((chart) => ({
-      params: { mix: chart.mixId, title: chart.songId },
-    })),
+    paths: index.flatMap((mix) => mix.songs.map((song) => ({
+      params: { mix: mix.id, title: song.id },
+    }))),
     fallback: false,
   };
 }
