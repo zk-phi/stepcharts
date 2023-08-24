@@ -16,7 +16,7 @@ function pluralize(str: string, count: number): string {
 }
 
 function buildMixUrl(mix: MixMeta): string {
-  return `/${mix.id}`;
+  return `/${mix.mixId}`;
 }
 
 function CompactMixCard({ className, mix }: CompactMixCardProps) {

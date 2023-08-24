@@ -36,11 +36,11 @@ function RotateYourPhone() {
 }
 
 function buildStepchartUrl(t: ChartData): string {
-  return `/${t.mix.id}/${t.song.id}/${t.chart.difficulty}`;
+  return `/${t.mix.mixId}/${t.song.songId}/${t.chart.difficulty}`;
 }
 
 function buildMixUrl(t: ChartData): string {
-  return `/${t.mix.id}`;
+  return `/${t.mix.mixId}`;
 }
 
 const columns = [

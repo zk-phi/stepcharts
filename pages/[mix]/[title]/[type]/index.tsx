@@ -18,8 +18,8 @@ export async function getStaticPaths(): Promise<GetStaticPathsResult> {
   return {
     paths: allCharts.map((chart) => ({
       params: {
-        mix: chart.mix.id,
-        title: chart.song.id,
+        mix: chart.mix.mixId,
+        title: chart.song.songId,
         type: chart.chart.difficulty,
       },
     })),

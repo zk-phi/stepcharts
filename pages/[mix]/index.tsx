@@ -18,7 +18,7 @@ export async function getStaticPaths(
   ) as AllMixesData;
 
   return {
-    paths: allMixes.map((mix) => ({ params: { mix: mix.id } })),
+    paths: allMixes.map((mix) => ({ params: { mix: mix.mixId } })),
     fallback: false,
   };
 }

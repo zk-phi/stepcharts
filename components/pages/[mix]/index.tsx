@@ -57,7 +57,7 @@ function MixPage({ mix }: MixPageProps) {
       title={mix.name}
       subheading={
         <Breadcrumbs
-          crumbs={[{ display: mix.name, pathSegment: mix.id }]}
+          crumbs={[{ display: mix.name, pathSegment: mix.mixId }]}
         />
       }
       metaDescription={`Step charts for DDR ${mix.name}`}
@@ -99,7 +99,7 @@ function MixPage({ mix }: MixPageProps) {
         }}
       >
         {sortedTitles.map((song) => (
-          <CompactTitleCard key={song.id} song={song} mix={mix} hideMix />
+          <CompactTitleCard key={song.songId} song={song} mix={mix} hideMix />
         ))}
       </div>
     </Root>

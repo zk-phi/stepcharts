@@ -19,7 +19,7 @@ function buildTitleUrl(
   mix: MixMeta,
   song: SongMeta,
 ): string {
-  return `/${mix.id}/${song.id}`;
+  return `/${mix.mixId}/${song.songId}`;
 }
 
 function buildStepchartUrl(
@@ -27,7 +27,7 @@ function buildStepchartUrl(
   song: SongMeta,
   chart: ChartMeta,
 ): string {
-  return `/${mix.id}/${song.id}/${chart.difficulty}`;
+  return `/${mix.mixId}/${song.songId}/${chart.difficulty}`;
 }
 
 const Types = ({
@@ -91,7 +91,7 @@ function CompactTitleCard({
             className="ml-2 px-2 py-0.5 bg-gray-400 text-xs text-gray-800 grid place-items-center rounded-bl-lg mb-2"
             style={{ alignSelf: "start" }}
           >
-            <a href={`/${mix.id}`}>{mix.shortName}</a>
+            <a href={`/${mix.mixId}`}>{mix.shortName}</a>
           </div>
         )}
       </div>

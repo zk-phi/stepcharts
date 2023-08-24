@@ -22,8 +22,8 @@ function TitlePage({ song, mix }: TitlePageProps) {
   const breadcrumbs = (
     <Breadcrumbs
       crumbs={[
-        { display: mix.name, pathSegment: mix.id },
-        { display: title, pathSegment: song.id },
+        { display: mix.name, pathSegment: mix.mixId },
+        { display: title, pathSegment: song.songId },
       ]}
     />
   );
@@ -62,7 +62,7 @@ function TitlePage({ song, mix }: TitlePageProps) {
             {song.charts.map((chart, index) => {
               return (
                 <li key={chart.difficulty}>
-                  <a href={buildTypeUrl(mix.id, song.id, chart.difficulty)}>
+                  <a href={buildTypeUrl(mix.mixId, song.songId, chart.difficulty)}>
                     <StepchartTypePageItem
                         chart={chart}
                         isLast={index === song.charts.length - 1}

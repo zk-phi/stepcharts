@@ -1,5 +1,5 @@
 type MixMeta = {
-  id: string;
+  mixId: string;
   name: string;
   shortName: string;
   year: number;
@@ -7,7 +7,7 @@ type MixMeta = {
 };
 
 type SongMeta = {
-  id: string;
+  songId: string;
   title: string;
   titleTranslit: string | null;
   artist: string;

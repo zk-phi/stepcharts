@@ -98,11 +98,11 @@ function StepchartPage({ mix, song, chart }: StepchartPageProps) {
           crumbs={[
             {
               display: mix.name,
-              pathSegment: mix.id,
+              pathSegment: mix.mixId,
             },
             {
               display: normalizedTitle,
-              pathSegment: song.id,
+              pathSegment: song.songId,
             },
             {
               display: chart.meta.difficulty,

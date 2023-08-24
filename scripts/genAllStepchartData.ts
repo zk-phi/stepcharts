@@ -84,7 +84,7 @@ fs.writeFileSync(
 );
 
 const legacyMixToMixMeta = (mix: EntireMix) => ({
-  id: mix.mixDir,
+  mixId: mix.mixDir,
   name: mix.mixName,
   shortName: mix.shortMixName,
   year: mix.yearReleased,
@@ -93,7 +93,7 @@ const legacyMixToMixMeta = (mix: EntireMix) => ({
 });
 
 const legacySongToSongMeta = (song: Simfile) => ({
-  id: song.title.titleDir,
+  songId: song.title.titleDir,
   title: song.title.titleName,
   titleTranslit: song.title.translitTitleName,
   artist: song.artist,

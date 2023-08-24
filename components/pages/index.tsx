@@ -19,7 +19,7 @@ function IndexPage({ mixes }: IndexPageProps) {
             rowGap: "2rem",
           }}
       >
-        { mixes.map((mix) => <CompactMixCard key={mix.id} mix={mix} />) }
+        { mixes.map((mix) => <CompactMixCard key={mix.mixId} mix={mix} />) }
       </ul>
     </Root>
   );
