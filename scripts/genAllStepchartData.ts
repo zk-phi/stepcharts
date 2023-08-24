@@ -78,11 +78,6 @@ function getAllStepchartDataAndCopyBanners(): EntireMix[] {
 
 const data = getAllStepchartDataAndCopyBanners();
 
-fs.writeFileSync(
-  `resources/stepchartData.json`,
-  JSON.stringify(data),
-);
-
 const legacyMixToMixMeta = (mix: EntireMix) => ({
   mixId: mix.mixDir,
   name: mix.mixName,
