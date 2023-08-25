@@ -21,7 +21,7 @@ const ARROW_ROTATION = {
 };
 
 const judgePos = (offset: number, speed: number) => (
-  (offset + 0.25) * 4 * HEIGHT_PER_BEAT * speed
+  offset * 4 * HEIGHT_PER_BEAT * speed
 );
 
 const Spacer = ({ offset, speed }: {
