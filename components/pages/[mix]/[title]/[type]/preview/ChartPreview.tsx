@@ -1,7 +1,8 @@
 import React from "react";
 
 const ARROW_HEIGHT = 13.5; /* vh */
-const HEIGHT_PER_BEAT = 16; /* vh */
+const LANE_HEIGHT = 100; /* vh */
+const HEIGHT_PER_BEAT = (LANE_HEIGHT / 6.25); /* vh */
 
 const ARROW_IMG = {
   4: "/arrow4.svg",
@@ -135,7 +136,7 @@ const ChartBodyRaw = ({ chart, speed = 1 }: {
   return (
     <>
       {[...Array((lastMeasure + 1) * 4)].map((_, i) => (
-        <Bar key={`b${i}`} offset={i / 4} speed={speed} color={i % 4 === 0 ? "#666" : "#444"} />
+        <Bar key={`b${i}`} offset={i / 4} speed={speed} color={i % 4 === 0 ? "#888" : "#444"} />
       ))}
       {chart.bpm.map((b, i, bs) => (
         i === 0 ? (
@@ -220,55 +221,15 @@ const ChartContainer = ({ offset = 0, speed = 1, children }: {
   );
 };
 
-export const ChartPreview = ({ chart, speed = 1, time = 0 }: {
+export const ChartPreview = ({ chart, speed = 1, offset = 0 }: {
   chart: Stepchart,
   speed: number,
-  time: number,
+  offset: number,
 }) => {
-  const secToOffset = React.useMemo(() => {
-    const bpmEvents = [
-      ...chart.bpm.map((b) => (
-        { offset: b.startOffset, bpm: b.bpm }
-      )),
-      ...chart.stops.map((s) => (
-        { offset: s.offset, stop: s.duration }
-      )),
-    ].sort((a, b) => (
-      a.offset - b.offset
-    ));
-
-    const timeline = [{
-      time: 0,
-      offset: 0,
-      // @ts-ignore `bpm` can be undefined in type-level but it must be defined actually
-      bpm: bpmEvents.shift().bpm,
-    }];
-
-    bpmEvents.forEach((e) => {
-      const lastBpm = timeline[0].bpm;
-      const dt = (e.offset - timeline[0].offset) * 4 / lastBpm * 60;
-      const time = timeline[0].time + dt;
-      if ('bpm' in e) {
-        timeline.unshift({ time, offset: e.offset, bpm: e.bpm });
-      } else {
-        timeline.unshift({ time,                offset: e.offset, bpm: 0 });
-        timeline.unshift({ time: time + e.stop, offset: e.offset, bpm: lastBpm });
-      }
-    });
-
-    return (sec: number) => {
-      const section = timeline.find((e) => sec >= e.time)!;
-      return (sec - section.time) * section.bpm / 60 / 4 + section.offset;
-    };
-  }, [chart]);
-
   return (
-    <div>
-      <ChartContainer offset={secToOffset(time)} speed={speed}>
-        <ChartBody chart={chart} speed={speed} />
-      </ChartContainer>
-      {JSON.stringify(chart)}
-    </div>
+    <ChartContainer offset={offset} speed={speed}>
+      <ChartBody chart={chart} speed={speed} />
+    </ChartContainer>
   );
 };
 

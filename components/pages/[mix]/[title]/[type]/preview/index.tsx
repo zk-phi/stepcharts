@@ -1,35 +1,62 @@
 import React from "react";
 import ChartPreview from "./ChartPreview";
+import PreviewSound from "./PreviewSound";
+import { extractTimelineEvents, TimelineBpmEvent } from "../../../../../../lib/computeChartTimeline";
 
 const useAnimationFrame = (callback = () => {}) => {
   const reqIdRef = React.useRef<number>();
-  const loop = () => {
-    reqIdRef.current = requestAnimationFrame(loop);
-    callback();
-  };
 
   React.useEffect(() => {
+    const loop = () => {
+      reqIdRef.current = requestAnimationFrame(loop);
+      callback();
+    };
     reqIdRef.current = requestAnimationFrame(loop);
     return () => {
       if (reqIdRef.current) {
         cancelAnimationFrame(reqIdRef.current);
       }
     }
-  }, []);
+  }, [callback]);
 };
 
 const PreviewPage = ({ chart }: {
   chart: Stepchart,
 }) => {
-  const startTime = React.useMemo(() => (new Date()).getTime(), []);
+  const [startTime, setStartTime] = React.useState<number>();
   const [sec, setSec] = React.useState(0);
+  const [audioContext, setAudioContext] = React.useState<AudioContext>();
 
-  useAnimationFrame(() => {
-    setSec(((new Date()).getTime() - startTime) / 1000);
-  });
+  const secToOffset = React.useMemo(() => {
+    const timeline = extractTimelineEvents(chart);
+    return (sec: number) => {
+      const section = timeline.find((e) => sec >= e.time)!;
+      return (sec - section.time) * section.bpm / 60 / 4 + section.offset;
+    };
+  }, [chart]);
+
+  const play = React.useCallback(() => {
+    if (!audioContext) {
+      setAudioContext(new AudioContext());
+    }
+    setStartTime((new Date()).getTime(), []);
+  }, [audioContext, setAudioContext, setStartTime]);
+
+  const tick = React.useCallback(() => {
+    if (startTime) {
+      setSec(((new Date()).getTime() - startTime) / 1000);
+    } else {
+      setSec(0);
+    }
+  }, [setSec, startTime]);
+  useAnimationFrame(tick);
 
   return (
-    <ChartPreview chart={chart} speed={2.5} time={sec} />
+    <div style={{ display: "flex" }}>
+      <ChartPreview chart={chart} speed={2} offset={secToOffset(sec)} />
+      <PreviewSound audioContext={audioContext} chart={chart} offset={secToOffset(sec)} />
+      <button onClick={play}>Play</button>
+    </div>
   );
 };
 
