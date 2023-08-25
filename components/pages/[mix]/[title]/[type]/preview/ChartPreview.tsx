@@ -175,6 +175,14 @@ const ChartBodyRaw = ({ chart, speed = 1 }: {
             <Arrow key={`a${i}u`} beat="freeze" direction={2} offset={a.offset} speed={speed} /> }
           { a.direction.match(/^...2/) &&
             <Arrow key={`a${i}r`} beat="freeze" direction={3} offset={a.offset} speed={speed} /> }
+          { a.direction.match(/^M.../) &&
+            <Arrow key={`a${i}l`} beat="shock" direction={0} offset={a.offset} speed={speed} /> }
+          { a.direction.match(/^.M../) &&
+            <Arrow key={`a${i}d`} beat="shock" direction={1} offset={a.offset} speed={speed} /> }
+          { a.direction.match(/^..M./) &&
+            <Arrow key={`a${i}u`} beat="shock" direction={2} offset={a.offset} speed={speed} /> }
+          { a.direction.match(/^...M/) &&
+            <Arrow key={`a${i}r`} beat="shock" direction={3} offset={a.offset} speed={speed} /> }
         </>
       ))}
       <Spacer offset={lastMeasure + 4} speed={speed} />
