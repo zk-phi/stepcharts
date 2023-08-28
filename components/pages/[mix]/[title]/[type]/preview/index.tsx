@@ -51,10 +51,14 @@ const PreviewPage = ({ chart }: {
   }, [setSec, startTime]);
   useAnimationFrame(tick);
 
+  const offset = React.useMemo(() => (
+    secToOffset(sec)
+  ), [sec]);
+
   return (
     <div style={{ display: "flex" }}>
-      <ChartPreview chart={chart} speed={2} offset={secToOffset(sec)} />
-      <PreviewSound audioContext={audioContext} chart={chart} offset={secToOffset(sec)} />
+      <ChartPreview chart={chart} speed={2} offset={offset} />
+      <PreviewSound audioContext={audioContext} chart={chart} offset={offset} />
       <button onClick={play}>Play</button>
     </div>
   );
