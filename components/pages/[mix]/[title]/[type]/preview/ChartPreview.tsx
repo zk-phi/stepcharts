@@ -125,7 +125,7 @@ const Bar = ({ offset, speed, color }: {
   );
 };
 
-const ChartBodyRaw = ({ chart, speed = 1 }: {
+const ChartObjectsRaw = ({ chart, speed = 1 }: {
   chart: Stepchart,
   speed: number,
 }) => {
@@ -191,7 +191,7 @@ const ChartBodyRaw = ({ chart, speed = 1 }: {
   );
 };
 
-const ChartBody = React.memo(ChartBodyRaw);
+const ChartObjects = React.memo(ChartObjectsRaw);
 
 const ChartContainer = ({ offset = 0, speed = 1, children }: {
   offset: number,
@@ -228,7 +228,7 @@ export const ChartPreview = ({ chart, speed = 1, offset = 0 }: {
 }) => {
   return (
     <ChartContainer offset={offset} speed={speed}>
-      <ChartBody chart={chart} speed={speed} />
+      <ChartObjects chart={chart} speed={speed} />
     </ChartContainer>
   );
 };
