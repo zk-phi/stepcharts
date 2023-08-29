@@ -13,6 +13,8 @@ type RawSimfile = Omit<Simfile, "title"> & {
 };
 type Parser = (simfileSource: string, titleDir: string) => RawSimfile;
 
+const INTRO_OFFSET = 2;
+
 const parsers: Record<string, Parser> = {
   ".sm": parseSm,
   ".dwi": parseDwi,
@@ -38,6 +40,13 @@ function getBpms(sm: RawSimfile): number[] {
 
   return chart.bpm.map((b) => b.bpm);
 }
+
+const mapObject = <K extends string | number | symbol, V, W>(
+  obj: Record<K, V>,
+  fn: (arg: V) => W,
+): Record<K, W> => (
+  Object.fromEntries((Object.keys(obj) as K[]).map((k) => [k, fn(obj[k])])) as Record<K, W>
+);
 
 function parseSimfileAndCopyBanners(
   rootDir: string,
@@ -87,15 +96,34 @@ function parseSimfileAndCopyBanners(
       titleDir,
       banner: rawStepchart.banner,
     },
+    artist: rawStepchart.artist,
+    availableTypes: rawStepchart.availableTypes,
     // the default type definition of .fromEntries in typescript is too weak
     // to make this type-safe.
-    stats: Object.fromEntries(rawStepchart.availableTypes.map((dif) => ([
-      dif.difficulty,
-      calculateStats(rawStepchart.charts[dif.difficulty]),
-    ]))) as Record<Difficulty, Stats>,
+    stats: mapObject(rawStepchart.charts, calculateStats),
     topDifficulty: rawStepchart.availableTypes.reduce((l, r) => (
       r.feet < l.feet ? l : r
     ), { feet: 0, difficulty: "beginner" }).difficulty,
+    charts: mapObject(rawStepchart.charts, (chart) => ({
+      arrows: chart.arrows.map((arrow) => ({
+        ...arrow,
+        offset: arrow.offset + INTRO_OFFSET,
+      })),
+      freezes: chart.freezes.map((freeze) => ({
+        ...freeze,
+        startOffset: freeze.startOffset + INTRO_OFFSET,
+        endOffset: freeze.endOffset + INTRO_OFFSET,
+      })),
+      bpm: chart.bpm.map((bpm, ix) => (ix === 0 ? bpm : {
+        ...bpm,
+        startOffset: bpm.startOffset + INTRO_OFFSET,
+        endOffset: bpm.endOffset != null ? bpm.endOffset + INTRO_OFFSET : null,
+      })),
+      stops: chart.stops.map((stop) => ({
+        ...stop,
+        offset: stop.offset + INTRO_OFFSET,
+      })),
+    })),
     minBpm,
     maxBpm,
     displayBpm,
