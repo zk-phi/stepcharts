@@ -186,7 +186,7 @@ const ChartObjectsRaw = ({ chart, speed = 1 }: {
             <Arrow key={`a${i}r`} beat="shock" direction={3} offset={a.offset} speed={speed} /> }
         </>
       ))}
-      <Spacer offset={lastMeasure + 4} speed={speed} />
+      <Spacer offset={lastMeasure + 2} speed={speed} />
     </>
   );
 };
