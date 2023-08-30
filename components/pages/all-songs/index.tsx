@@ -61,10 +61,6 @@ function buildStepchartUrl(t: AllMeta): string {
   return `/${t.mixId}/${t.songId}/${t.difficulty}`;
 }
 
-function buildSongUrl(t: AllMeta): string {
-  return `/${t.mixId}/${t.songId}`;
-}
-
 function buildMixUrl(t: AllMeta): string {
   return `/${t.mixId}`;
 }
@@ -83,7 +79,7 @@ const columns = [
   {
     Header: "Title",
     accessor: (t: AllMeta) => (
-      <a className="hover:underline" href={buildSongUrl(t)}>
+      <a className="hover:underline" href={buildStepchartUrl(t)}>
         {t.title}
       </a>
     ),
