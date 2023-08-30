@@ -78,16 +78,6 @@ const PreviewSound = ({ audioContext, chart, offset }: {
     }
   }, [offset, bpmIndex, setBpmIndex]);
 
-  /* test */
-  React.useEffect(() => {
-    if (audioContext && tickBuffer) {
-      const player = new AudioBufferSourceNode(audioContext);
-      player.buffer = tickBuffer;
-      player.connect(audioContext.destination);
-      player.start();
-    }
-  }, [audioContext, tickBuffer]);
-
   return null;
 };
 
