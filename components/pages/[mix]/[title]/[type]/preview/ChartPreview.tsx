@@ -158,34 +158,38 @@ const ChartObjectsRaw = ({ chart, speed = 1 }: {
             endOffset={f.endOffset}
             speed={speed} />
       ))}
-      {reversedArrows.map((a, i) => (
-        <>
-          { a.direction.match(/^1.../) &&
-            <Arrow key={`a${i}l`} beat={a.beat} direction={0} offset={a.offset} speed={speed} /> }
-          { a.direction.match(/^.1../) &&
-            <Arrow key={`a${i}d`} beat={a.beat} direction={1} offset={a.offset} speed={speed} /> }
-          { a.direction.match(/^..1./) &&
-            <Arrow key={`a${i}u`} beat={a.beat} direction={2} offset={a.offset} speed={speed} /> }
-          { a.direction.match(/^...1/) &&
-            <Arrow key={`a${i}r`} beat={a.beat} direction={3} offset={a.offset} speed={speed} /> }
-          { a.direction.match(/^2.../) &&
-            <Arrow key={`a${i}l`} beat="freeze" direction={0} offset={a.offset} speed={speed} /> }
-          { a.direction.match(/^.2../) &&
-            <Arrow key={`a${i}d`} beat="freeze" direction={1} offset={a.offset} speed={speed} /> }
-          { a.direction.match(/^..2./) &&
-            <Arrow key={`a${i}u`} beat="freeze" direction={2} offset={a.offset} speed={speed} /> }
-          { a.direction.match(/^...2/) &&
-            <Arrow key={`a${i}r`} beat="freeze" direction={3} offset={a.offset} speed={speed} /> }
-          { a.direction.match(/^M.../) &&
-            <Arrow key={`a${i}l`} beat="shock" direction={0} offset={a.offset} speed={speed} /> }
-          { a.direction.match(/^.M../) &&
-            <Arrow key={`a${i}d`} beat="shock" direction={1} offset={a.offset} speed={speed} /> }
-          { a.direction.match(/^..M./) &&
-            <Arrow key={`a${i}u`} beat="shock" direction={2} offset={a.offset} speed={speed} /> }
-          { a.direction.match(/^...M/) &&
-            <Arrow key={`a${i}r`} beat="shock" direction={3} offset={a.offset} speed={speed} /> }
-        </>
-      ))}
+      {reversedArrows.map((a, i) => {
+        const isFreeze = a.direction.match(/2/);
+        const beat = isFreeze ? "freeze" : a.beat;
+        return (
+          <>
+            { a.direction.match(/^1.../) &&
+              <Arrow key={`a${i}l`} beat={beat} direction={0} offset={a.offset} speed={speed} /> }
+            { a.direction.match(/^.1../) &&
+              <Arrow key={`a${i}d`} beat={beat} direction={1} offset={a.offset} speed={speed} /> }
+            { a.direction.match(/^..1./) &&
+              <Arrow key={`a${i}u`} beat={beat} direction={2} offset={a.offset} speed={speed} /> }
+            { a.direction.match(/^...1/) &&
+              <Arrow key={`a${i}r`} beat={beat} direction={3} offset={a.offset} speed={speed} /> }
+            { a.direction.match(/^2.../) &&
+              <Arrow key={`a${i}l`} beat="freeze" direction={0} offset={a.offset} speed={speed} /> }
+            { a.direction.match(/^.2../) &&
+              <Arrow key={`a${i}d`} beat="freeze" direction={1} offset={a.offset} speed={speed} /> }
+            { a.direction.match(/^..2./) &&
+              <Arrow key={`a${i}u`} beat="freeze" direction={2} offset={a.offset} speed={speed} /> }
+            { a.direction.match(/^...2/) &&
+              <Arrow key={`a${i}r`} beat="freeze" direction={3} offset={a.offset} speed={speed} /> }
+            { a.direction.match(/^M.../) &&
+              <Arrow key={`a${i}l`} beat="shock" direction={0} offset={a.offset} speed={speed} /> }
+            { a.direction.match(/^.M../) &&
+              <Arrow key={`a${i}d`} beat="shock" direction={1} offset={a.offset} speed={speed} /> }
+            { a.direction.match(/^..M./) &&
+              <Arrow key={`a${i}u`} beat="shock" direction={2} offset={a.offset} speed={speed} /> }
+            { a.direction.match(/^...M/) &&
+              <Arrow key={`a${i}r`} beat="shock" direction={3} offset={a.offset} speed={speed} /> }
+          </>
+        );
+      })}
       <Spacer offset={lastMeasure + 2} speed={speed} />
     </>
   );
