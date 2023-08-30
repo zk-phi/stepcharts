@@ -60,18 +60,30 @@ function buildStepchartUrl(t: AllMeta): string {
   return `/${t.mixId}/${t.songId}/${t.difficulty}`;
 }
 
+function buildSongUrl(t: AllMeta): string {
+  return `/${t.mixId}/${t.songId}`;
+}
+
 function buildMixUrl(t: AllMeta): string {
   return `/${t.mixId}`;
 }
 
 const columns = [
   {
+    Header: "Level",
+    accessor: (t: AllMeta) => (
+      <a
+          className={clsx("px-1 py-0.5 text-sm text-white", difficultyBgStyles[t.difficulty])}
+          href={buildStepchartUrl(t)}>
+        {t.difficulty.substring(0, 3).toUpperCase()} {t.level}
+      </a>
+    ),
+  },
+  {
     Header: "Title",
     accessor: (t: AllMeta) => (
-      <a className="hover:underline" href={buildStepchartUrl(t)}>
-        {t.titleTranslit || t.title}
-        {" "}
-        ({ t.difficulty })
+      <a className="hover:underline" href={buildSongUrl(t)}>
+        {t.title}
       </a>
     ),
   },
@@ -144,10 +156,7 @@ function StatLink({
   stat: keyof Stats;
 }) {
   return (
-    <a
-      className={clsx(className, difficultyBgStyles[title.difficulty])}
-      href={buildStepchartUrl(title)}
-    >
+    <a className={className} href={buildStepchartUrl(title)}>
       {title[stat]} {depluralize(stat, title[stat])}
     </a>
   );
@@ -168,7 +177,7 @@ function AllSongsPageCell({
         <div className="flex flex-row items-center justify-between pr-2">
           <div>{cell.render("Cell")}</div>
           <StatLink
-            className="whitespace-nowrap px-1 py-0.5 text-xs text-white"
+            className="whitespace-nowrap px-1 py-0.5 text-xs border rounded-md border-gray-400"
             title={row.original}
             stat={sortedBy as keyof Stats}
           />
