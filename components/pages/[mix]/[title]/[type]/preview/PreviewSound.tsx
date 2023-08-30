@@ -8,6 +8,7 @@ const PreviewSound = ({ audioContext, chart, offset }: {
   const [tickBuffer, setTickBuffer] = React.useState<AudioBuffer>(null);
   const [stopBuffer, setStopBuffer] = React.useState<AudioBuffer>(null);
   const [bpmBuffer, setBpmBuffer] = React.useState<AudioBuffer>(null);
+  const [shockBuffer, setShockBuffer] = React.useState<AudioBuffer>(null);
   const [arrowIndex, setArrowIndex] = React.useState(0);
   const [stopIndex, setStopIndex] = React.useState(0);
   const [bpmIndex, setBpmIndex] = React.useState(1);
@@ -18,12 +19,15 @@ const PreviewSound = ({ audioContext, chart, offset }: {
         const tickFile = await fetch("/cursor12.mp3");
         const stopFile = await fetch("/cursor4.mp3");
         const bpmFile = await fetch("/cancel1.mp3");
+        const shockFile = await fetch("/cursor9.mp3");
         const tickArray = await tickFile.arrayBuffer();
         const stopArray = await stopFile.arrayBuffer();
         const bpmArray = await bpmFile.arrayBuffer();
+        const shockArray = await shockFile.arrayBuffer();
         setTickBuffer(await audioContext.decodeAudioData(tickArray));
         setStopBuffer(await audioContext.decodeAudioData(stopArray))
         setBpmBuffer(await audioContext.decodeAudioData(bpmArray));
+        setShockBuffer(await audioContext.decodeAudioData(shockArray));
       }
     }
     maybeDecodeBuffer();
@@ -33,7 +37,7 @@ const PreviewSound = ({ audioContext, chart, offset }: {
     if (audioContext && tickBuffer && chart.arrows[arrowIndex]
         && chart.arrows[arrowIndex].offset <= offset) {
       const player = new AudioBufferSourceNode(audioContext);
-      player.buffer = tickBuffer;
+      player.buffer = chart.arrows[arrowIndex].direction.match(/M/) ? shockBuffer : tickBuffer;
       player.connect(audioContext.destination);
       player.start();
       let i;
