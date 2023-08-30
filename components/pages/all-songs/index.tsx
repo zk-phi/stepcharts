@@ -30,6 +30,7 @@ const STAT_KEYS = [
 
 const SORT_KEYS = [
   "title",
+  "level",
   "bpm",
   "arrows",
   "jumps",
