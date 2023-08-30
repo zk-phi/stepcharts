@@ -70,12 +70,14 @@ function calculateStats(chart: Stepchart): Stats {
     isGallop(a, array[i - 1], array[i - 2])
   );
   const jacks = chart.arrows.filter((a, i, array) => isJack(a, array[i - 1]));
+  const shocks = chart.arrows.filter((a) => a.direction.match(/M/)).length;
 
   return {
     jumps: jumps.length,
     jacks: jacks.length,
     freezes: freezes.length,
     gallops: gallops.length,
+    shocks,
   };
 }
 

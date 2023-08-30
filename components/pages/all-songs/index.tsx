@@ -17,7 +17,29 @@ import styles from "./index.module.css";
 import difficultyBgStyles from "../../difficultyBackgroundColors.module.css";
 import { ImageFrame } from "../../ImageFrame";
 
-const STAT_KEYS = ["jumps", "jacks", "freezes", "gallops"];
+const STAT_KEYS = [
+  "arrows",
+  "stops",
+  "jumps",
+  "jacks",
+  "freezes",
+  "gallops",
+  "bpmShifts",
+  "shocks",
+];
+
+const SORT_KEYS = [
+  "title",
+  "bpm",
+  "arrows",
+  "jumps",
+  "jacks",
+  "freezes",
+  "gallops",
+  "stops",
+  "bpmShifts",
+  "shocks",
+];
 
 type AllSongsPageProps = {
   titles: AllMeta[];
@@ -69,36 +91,12 @@ const columns = [
     Header: "bpm",
     accessor: (t: AllMeta) => t.displayBpm,
   },
-  {
-    Header: "arrows",
-    accessor: (t: AllMeta) => t.arrows,
-  },
-  {
-    Header: "tempo shifts",
-    accessor: (t: AllMeta) => t.bpmShifts || "-",
-  },
-  {
-    Header: "stops",
-    accessor: (t: AllMeta) => t.stops || "-",
-  },
 ];
 
 function getMaxBpmForAllTitles(charts: AllMeta[]): number {
   const bpms = charts.map((t) => t.maxBpm);
   return Math.round(Math.max(...bpms));
 }
-
-const SORT_KEYS = [
-  "title",
-  "bpm",
-  "arrows",
-  "jumps",
-  "jacks",
-  "freezes",
-  "gallops",
-  "stops",
-  "t.shifts",
-];
 
 function getSortFunction(key: string) {
   switch (key) {
@@ -113,10 +111,6 @@ function getSortFunction(key: string) {
     case "bpm":
       return (a: AllMeta, b: AllMeta) => {
         return b.maxBpm - a.maxBpm;
-      };
-    case "t.shifts":
-      return (a: AllMeta, b: AllMeta) => {
-        return b.bpmShifts - a.bpmShifts;
       };
     default:
       return (a: AllMeta, b: AllMeta) => {

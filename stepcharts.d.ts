@@ -35,4 +35,5 @@ type Stats = {
   jacks: number;
   freezes: number;
   gallops: number;
+  shocks: number;
 };
