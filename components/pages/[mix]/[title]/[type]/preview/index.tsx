@@ -23,8 +23,8 @@ const useAnimationFrame = (callback = () => {}) => {
 const PreviewPage = ({ chart }: {
   chart: Stepchart,
 }) => {
-  const [startTime, setStartTime] = React.useState<number>();
-  const [sec, setSec] = React.useState(0);
+  const startTime = React.useRef<number>();
+  const [offset, setOffset] = React.useState(0);
   const [audioContext, setAudioContext] = React.useState<AudioContext>();
 
   const secToOffset = React.useMemo(() => {
@@ -39,21 +39,17 @@ const PreviewPage = ({ chart }: {
     if (!audioContext) {
       setAudioContext(new AudioContext());
     }
-    setStartTime((new Date()).getTime(), []);
-  }, [audioContext, setAudioContext, setStartTime]);
+    startTime.current = (new Date()).getTime();
+  }, [audioContext, setAudioContext]);
 
   const tick = React.useCallback(() => {
-    if (startTime) {
-      setSec(((new Date()).getTime() - startTime) / 1000);
+    if (startTime.current) {
+      setOffset(secToOffset(((new Date()).getTime() - startTime.current) / 1000));
     } else {
-      setSec(0);
+      setOffset(0);
     }
-  }, [setSec, startTime]);
+  }, [setOffset]);
   useAnimationFrame(tick);
-
-  const offset = React.useMemo(() => (
-    secToOffset(sec)
-  ), [sec]);
 
   return (
     <div style={{ display: "flex" }}>

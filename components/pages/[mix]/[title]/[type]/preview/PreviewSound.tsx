@@ -5,81 +5,82 @@ const PreviewSound = ({ audioContext, chart, offset }: {
   chart: Stepchart,
   offset: number,
 }) => {
-  const [tickBuffer, setTickBuffer] = React.useState<AudioBuffer>(null);
-  const [stopBuffer, setStopBuffer] = React.useState<AudioBuffer>(null);
-  const [bpmBuffer, setBpmBuffer] = React.useState<AudioBuffer>(null);
-  const [shockBuffer, setShockBuffer] = React.useState<AudioBuffer>(null);
-  const [arrowIndex, setArrowIndex] = React.useState(0);
-  const [stopIndex, setStopIndex] = React.useState(0);
-  const [bpmIndex, setBpmIndex] = React.useState(1);
-
+  const tickBuffer  = React.useRef<AudioBuffer>(null);
+  const stopBuffer  = React.useRef<AudioBuffer>(null);
+  const bpmBuffer   = React.useRef<AudioBuffer>(null);
+  const shockBuffer = React.useRef<AudioBuffer>(null);
   React.useEffect(() => {
     const maybeDecodeBuffer = async () => {
       if (audioContext) {
-        const tickFile = await fetch("/cursor12.mp3");
-        const stopFile = await fetch("/cursor4.mp3");
-        const bpmFile = await fetch("/cancel1.mp3");
+        const tickFile  = await fetch("/cursor12.mp3");
+        const stopFile  = await fetch("/cursor4.mp3");
+        const bpmFile   = await fetch("/cancel1.mp3");
         const shockFile = await fetch("/cursor6.mp3");
-        const tickArray = await tickFile.arrayBuffer();
-        const stopArray = await stopFile.arrayBuffer();
-        const bpmArray = await bpmFile.arrayBuffer();
+        const tickArray  = await tickFile.arrayBuffer();
+        const stopArray  = await stopFile.arrayBuffer();
+        const bpmArray   = await bpmFile.arrayBuffer();
         const shockArray = await shockFile.arrayBuffer();
-        setTickBuffer(await audioContext.decodeAudioData(tickArray));
-        setStopBuffer(await audioContext.decodeAudioData(stopArray))
-        setBpmBuffer(await audioContext.decodeAudioData(bpmArray));
-        setShockBuffer(await audioContext.decodeAudioData(shockArray));
+        tickBuffer.current  = await audioContext.decodeAudioData(tickArray);
+        stopBuffer.current  = await audioContext.decodeAudioData(stopArray)
+        bpmBuffer.current   = await audioContext.decodeAudioData(bpmArray);
+        shockBuffer.current = await audioContext.decodeAudioData(shockArray);
       }
     }
     maybeDecodeBuffer();
-  }, [audioContext, setTickBuffer, setStopBuffer]);
+  }, [audioContext]);
 
   /* arrow ticks */
+  const arrowIndex = React.useRef(0);
   React.useEffect(() => {
-    if (audioContext && tickBuffer && chart.arrows[arrowIndex]
-        && chart.arrows[arrowIndex].offset <= offset) {
+    if (audioContext
+        && tickBuffer.current
+        && shockBuffer.current
+        && chart.arrows[arrowIndex.current]
+        && chart.arrows[arrowIndex.current].offset <= offset) {
       const player = new AudioBufferSourceNode(audioContext);
-      player.buffer = chart.arrows[arrowIndex].direction.match(/M/) ? shockBuffer : tickBuffer;
+      const isShock = chart.arrows[arrowIndex.current].direction.match(/M/);
+      player.buffer = isShock ? shockBuffer.current : tickBuffer.current;
       player.connect(audioContext.destination);
       player.start();
       let i;
-      for (i = arrowIndex + 1;
-        chart.arrows[i] && chart.arrows[i].offset <= offset;
-        i++);
-      setArrowIndex(i);
+      for (i = arrowIndex.current + 1; chart.arrows[i] && chart.arrows[i].offset <= offset; i++);
+      arrowIndex.current = i;
     }
-  }, [offset, arrowIndex, setArrowIndex]);
+  }, [offset]);
 
   /* stop ticks */
+  const stopIndex = React.useRef(0);
   React.useEffect(() => {
-    if (audioContext && tickBuffer && chart.stops[stopIndex]
-        && chart.stops[stopIndex].offset <= offset) {
+    if (audioContext
+        && tickBuffer.current
+        && chart.stops[stopIndex.current]
+        && chart.stops[stopIndex.current].offset <= offset) {
       const player = new AudioBufferSourceNode(audioContext);
-      player.buffer = stopBuffer;
+      player.buffer = stopBuffer.current;
       player.connect(audioContext.destination);
       player.start();
       let i;
-      for (i = stopIndex + 1;
-        chart.stops[i] && chart.stops[i].offset <= offset;
-        i++);
-      setStopIndex(i);
+      for (i = stopIndex.current + 1; chart.stops[i] && chart.stops[i].offset <= offset; i++);
+      stopIndex.current = i;
     }
-  }, [offset, stopIndex, setStopIndex]);
+  }, [offset]);
 
   /* bpm-shift ticks */
+  const bpmIndex = React.useRef(1);
   React.useEffect(() => {
-    if (audioContext && tickBuffer && chart.bpm[bpmIndex]
-        && chart.bpm[bpmIndex].startOffset <= offset) {
+    if (audioContext
+        && bpmBuffer.current
+        && chart.bpm[bpmIndex.current]
+        && chart.bpm[bpmIndex.current].startOffset <= offset) {
       const player = new AudioBufferSourceNode(audioContext);
-      player.buffer = bpmBuffer;
+      player.buffer = bpmBuffer.current;
       player.connect(audioContext.destination);
       player.start();
       let i;
-      for (i = bpmIndex + 1;
-        chart.bpm[i] && chart.bpm[i].startOffset <= offset;
-        i++);
-      setBpmIndex(i);
+      for (i = bpmIndex.current + 1; chart.bpm[i] && chart.bpm[i].startOffset <= offset; i++);
+      bpmIndex.current = i;
     }
-  }, [offset, bpmIndex, setBpmIndex]);
+  }, [offset]);
 
   /* rewind support */
   const lastOffset = React.useRef(0);
