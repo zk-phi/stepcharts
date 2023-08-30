@@ -33,6 +33,7 @@ const PreviewSound = ({ audioContext, chart, offset }: {
     maybeDecodeBuffer();
   }, [audioContext, setTickBuffer, setStopBuffer]);
 
+  /* arrow ticks */
   React.useEffect(() => {
     if (audioContext && tickBuffer && chart.arrows[arrowIndex]
         && chart.arrows[arrowIndex].offset <= offset) {
@@ -48,6 +49,7 @@ const PreviewSound = ({ audioContext, chart, offset }: {
     }
   }, [offset, arrowIndex, setArrowIndex]);
 
+  /* stop ticks */
   React.useEffect(() => {
     if (audioContext && tickBuffer && chart.stops[stopIndex]
         && chart.stops[stopIndex].offset <= offset) {
@@ -63,6 +65,7 @@ const PreviewSound = ({ audioContext, chart, offset }: {
     }
   }, [offset, stopIndex, setStopIndex]);
 
+  /* bpm-shift ticks */
   React.useEffect(() => {
     if (audioContext && tickBuffer && chart.bpm[bpmIndex]
         && chart.bpm[bpmIndex].startOffset <= offset) {
@@ -77,6 +80,17 @@ const PreviewSound = ({ audioContext, chart, offset }: {
       setBpmIndex(i);
     }
   }, [offset, bpmIndex, setBpmIndex]);
+
+  /* rewind support */
+  const lastOffset = React.useRef(0);
+  React.useEffect(() => {
+    if (offset < lastOffset.current) {
+      setArrowIndex(chart.arrows.findIndex((a) => offset < a.offset));
+      setStopIndex(chart.stops.findIndex((s) => offset < s.offset));
+      setBpmIndex(chart.bpm.findIndex((b) => offset < b.startOffset));
+    }
+    lastOffset.current = offset;
+  }, [offset, chart]);
 
   return null;
 };
