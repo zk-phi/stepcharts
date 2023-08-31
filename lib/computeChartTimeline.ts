@@ -35,5 +35,5 @@ export const extractTimelineEvents = (chart: Stepchart) => {
     }
   });
 
-  return timeline;
+  return timeline.reverse();
 };

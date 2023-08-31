@@ -27,11 +27,14 @@ const PreviewPage = ({ chart }: {
   const [offset, setOffset] = React.useState(0);
   const [audioContext, setAudioContext] = React.useState<AudioContext>();
 
+  const timelineIndex = React.useRef(0);
   const secToOffset = React.useMemo(() => {
     const timeline = extractTimelineEvents(chart);
     return (sec: number) => {
-      const section = timeline.find((e) => sec >= e.time)!;
-      return (sec - section.time) * section.bpm / 60 / 4 + section.offset;
+      let i;
+      for (i = timelineIndex.current; timeline[i + 1] && timeline[i + 1].time < sec; i++);
+      timelineIndex.current = i;
+      return (sec - timeline[i].time) * timeline[i].bpm / 60 / 4 + timeline[i].offset;
     };
   }, [chart]);
 
@@ -40,6 +43,7 @@ const PreviewPage = ({ chart }: {
       setAudioContext(new AudioContext());
     }
     startTime.current = (new Date()).getTime();
+    timelineIndex.current = 0;
   }, [audioContext, setAudioContext]);
 
   const tick = React.useCallback(() => {
