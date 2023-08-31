@@ -129,7 +129,7 @@ const ChartObjectsRaw = ({ chart, speed = 1 }: {
   chart: Stepchart,
   speed: number,
 }) => {
-  const lastMeasure = Math.floor(chart.arrows.slice(-1)[0].offset);
+  const lastMeasure = Math.floor(chart.arrows[chart.arrows.length - 1].offset);
   const reversedArrows = [...chart.arrows].reverse();
   const reversedFreezes = [...chart.freezes].reverse();
 
