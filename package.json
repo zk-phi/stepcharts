@@ -10,7 +10,7 @@
     "start": "next start",
     "type-check": "tsc --noemit",
     "test": "yarn jest",
-    "clean-simfiles": "bash scripts/clean-stepcharts.sh && node scripts/removeSpacesInDirectories.js ./resources/stepcharts"
+    "clean-simfiles": "node scripts/removeSpacesInDirectories.js ./resources/stepcharts"
   },
   "dependencies": {
     "@material-ui/core": "^4.11.3",
