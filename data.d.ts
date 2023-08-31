@@ -22,7 +22,6 @@ type SongMeta = {
   minBpm: number;
   maxBpm: number;
   displayBpm: string;
-  bannerSrc: string | null;
 };
 
 type ChartMeta = Stats & {

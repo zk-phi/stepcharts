@@ -8,7 +8,6 @@ import { TitleDetailsTable, TitleDetailsRow } from "../../../../TitleDetailsTabl
 import { ToggleBar } from "../../../../ToggleBar";
 
 import styles from "./index.module.css";
-import { Banner } from "../../../../Banner";
 import {
   scrollTargetBeatJustUnderHeader,
   StepchartSection,

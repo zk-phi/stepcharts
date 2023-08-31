@@ -58,7 +58,6 @@ const allData: AllData = mixDirs.map((mixDir) => {
           minBpm: simfile.minBpm,
           maxBpm: simfile.maxBpm,
           displayBpm: simfile.displayBpm,
-          bannerSrc: simfile.title.banner,
         },
         charts: simfile.availableTypes.map((chartType: StepchartType) => ({
           meta: {

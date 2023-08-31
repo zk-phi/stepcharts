@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import * as path from "path";
-import { toSafeName } from "./util";
 import { parseDwi } from "./parseDwi";
 import { parseSm } from "./parseSm";
 import { calculateStats } from "./calculateStats";
@@ -8,7 +7,6 @@ import { calculateStats } from "./calculateStats";
 type RawSimfile = Omit<Simfile, "title"> & {
   title: string;
   titletranslit: string | null;
-  banner: string | null;
   displayBpm: string | undefined;
 };
 type Parser = (simfileSource: string, titleDir: string) => RawSimfile;
@@ -48,7 +46,7 @@ const mapObject = <K extends string | number | symbol, V, W>(
   Object.fromEntries((Object.keys(obj) as K[]).map((k) => [k, fn(obj[k])])) as Record<K, W>
 );
 
-function parseSimfileAndCopyBanners(
+function parseSimfile(
   rootDir: string,
   mixDir: string,
   titleDir: string
@@ -66,20 +64,6 @@ function parseSimfileAndCopyBanners(
 
   const fileContents = fs.readFileSync(stepchartPath);
   const rawStepchart = parser(fileContents.toString(), stepchartSongDirPath);
-
-  if (
-    rawStepchart.banner &&
-    fs.existsSync(path.join(stepchartSongDirPath, rawStepchart.banner))
-  ) {
-    const publicName = toSafeName(`${mixDir}-${rawStepchart.banner}`);
-    fs.copyFileSync(
-      path.join(stepchartSongDirPath, rawStepchart.banner),
-      path.join("public/bannerImages", publicName)
-    );
-    rawStepchart.banner = `/bannerImages/${publicName}`;
-  } else {
-    rawStepchart.banner = null;
-  }
 
   const bpms = getBpms(rawStepchart);
   const minBpm = Math.round(Math.min(...bpms));
@@ -131,5 +115,5 @@ function parseSimfileAndCopyBanners(
   };
 }
 
-export { parseSimfileAndCopyBanners };
+export { parseSimfile };
 export type { RawSimfile };
