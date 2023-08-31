@@ -1,4 +1,4 @@
-type TimelineBpmEvent = {
+export type TimelineBpmEvent = {
   time: number,
   offset: number,
   bpm: number,

@@ -5,10 +5,10 @@ const PreviewSound = ({ audioContext, chart, offset }: {
   chart: Stepchart,
   offset: number,
 }) => {
-  const tickBuffer  = React.useRef<AudioBuffer>(null);
-  const stopBuffer  = React.useRef<AudioBuffer>(null);
-  const bpmBuffer   = React.useRef<AudioBuffer>(null);
-  const shockBuffer = React.useRef<AudioBuffer>(null);
+  const tickBuffer  = React.useRef<AudioBuffer>();
+  const stopBuffer  = React.useRef<AudioBuffer>();
+  const bpmBuffer   = React.useRef<AudioBuffer>();
+  const shockBuffer = React.useRef<AudioBuffer>();
   React.useEffect(() => {
     const maybeDecodeBuffer = async () => {
       if (audioContext) {
@@ -52,7 +52,7 @@ const PreviewSound = ({ audioContext, chart, offset }: {
   const stopIndex = React.useRef(0);
   React.useEffect(() => {
     if (audioContext
-        && tickBuffer.current
+        && stopBuffer.current
         && chart.stops[stopIndex.current]
         && chart.stops[stopIndex.current].offset <= offset) {
       const player = new AudioBufferSourceNode(audioContext);
