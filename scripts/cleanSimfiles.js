@@ -9,6 +9,7 @@ const REMOVE_FILE_EXTS = [
   ".lrc",
   ".png",
   ".jpg",
+  ".db",
 ];
 
 function traverse(dirPath) {
