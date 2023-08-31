@@ -1,4 +1,6 @@
 import React from "react";
+import Link from "next/link";
+import Image from "next/image";
 import clsx from "clsx";
 import { Head } from "./Head";
 import { Footer } from "./Footer";
@@ -37,22 +39,27 @@ function Root({
         <div className="bg-heading h-16 flex flex-row items-center justify-between lg:px-4">
           <div className="flex flex-row items-center justify-start space-x-6 max-w-7xl mx-auto w-full">
             <div className="flex flex-row items-center">
-              <a href="/" className={clsx(styles.logo, "block lg:-ml-4")}>
-                <img
-                  className="w-full h-full"
-                  src="/logoArrow.svg"
-                  alt="Stepcharts logo"
-                  width={52}
-                  height={52}
-                />
-              </a>
+              <Link href="/">
+                <a className={clsx(styles.logo, "block lg:-ml-4")}>
+                  <Image
+                      className="w-full h-full"
+                      src="/logoArrow.svg"
+                      alt="Stepcharts logo"
+                      width={52}
+                      height={52} />
+                </a>
+              </Link>
               <div className="hidden sm:block text-2xl text-focal font-light text-center pl-4">
-                <a href="/">Stepcharts</a>
+                <Link href="/">
+                  <a>Stepcharts</a>
+                </Link>
               </div>
             </div>
-            <a className="className text-link cursor-pointer" href="/all-songs">
-              all songs
-            </a>
+            <Link href="/all-songs">
+              <a className="className text-link cursor-pointer">
+                all songs
+              </a>
+            </Link>
           </div>
         </div>
         {subheading && (

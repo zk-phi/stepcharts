@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import clsx from "clsx";
 import { useTable, useExpanded, usePagination, Cell, Row } from "react-table";
 import Slider from "@material-ui/core/Slider";
@@ -58,39 +59,35 @@ function RotateYourPhone() {
   );
 }
 
-function buildStepchartUrl(t: AllMeta): string {
-  return `/${t.mixId}/${t.songId}/${t.difficulty}`;
-}
-
-function buildMixUrl(t: AllMeta): string {
-  return `/${t.mixId}`;
-}
-
 const columns = [
   {
     Header: "Level",
     accessor: (t: AllMeta) => (
-      <a
-          className={clsx("px-1 py-0.5 text-sm text-white", difficultyBgStyles[t.difficulty])}
-          href={buildStepchartUrl(t)}>
-        {t.difficulty.substring(0, 3).toUpperCase()} {t.level}
-      </a>
+      <Link href={`/${t.mixId}/${t.songId}/${t.difficulty}`}>
+        <a className={clsx("px-1 py-0.5 text-sm text-white", difficultyBgStyles[t.difficulty])}>
+          {t.difficulty.substring(0, 3).toUpperCase()} {t.level}
+        </a>
+      </Link>
     ),
   },
   {
     Header: "Title",
     accessor: (t: AllMeta) => (
-      <a className="hover:underline" href={buildStepchartUrl(t)}>
-        {t.title}
-      </a>
+      <Link href={`/${t.mixId}/${t.songId}/${t.difficulty}`}>
+        <a className="hover:underline">
+          {t.title}
+        </a>
+      </Link>
     ),
   },
   {
     Header: "Mix",
     accessor: (t: AllMeta) => (
-      <a className="hover:underline" href={buildMixUrl(t)}>
-        {t.shortName}
-      </a>
+      <Link href={`/${t.mixId}`}>
+        <a className="hover:underline">
+          {t.shortName}
+        </a>
+      </Link>
     ),
   },
   {
@@ -154,9 +151,11 @@ function StatLink({
   stat: keyof Stats;
 }) {
   return (
-    <a className={className} href={buildStepchartUrl(title)}>
-      {title[stat]} {depluralize(stat, title[stat])}
-    </a>
+    <Link href={`/${title.mixId}/${title.songId}/${title.difficulty}`}>
+      <a className={className}>
+        {title[stat]} {depluralize(stat, title[stat])}
+      </a>
+    </Link>
   );
 }
 

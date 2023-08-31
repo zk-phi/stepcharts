@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import style from "./CompactMixCart.module.css";
 
 type CompactMixCardProps = {
@@ -13,20 +14,18 @@ function pluralize(str: string, count: number): string {
   return str + "s";
 }
 
-function buildMixUrl(mix: MixMeta): string {
-  return `/${mix.mixId}`;
-}
-
 function CompactMixCard({ mix }: CompactMixCardProps) {
   return (
-    <a href={buildMixUrl(mix)} className={style.card}>
-      <div>
-        <b>{mix.name}</b> <small>{mix.year}</small>
-      </div>
-      <div className={style.songCount}>
-        <small>{mix.songs} {pluralize("song", mix.songs)}</small>
-      </div>
-    </a>
+    <Link href={`/${mix.mixId}`}>
+      <a className={style.card}>
+        <div>
+          <b>{mix.name}</b> <small>{mix.year}</small>
+        </div>
+        <div className={style.songCount}>
+          <small>{mix.songs} {pluralize("song", mix.songs)}</small>
+        </div>
+      </a>
+    </Link>
   );
 }
 

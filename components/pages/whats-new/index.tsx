@@ -1,4 +1,6 @@
 import React, { ReactNode } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { Root } from "../../layout/Root";
 
 function dateToHumanString(input: string): string {
@@ -66,23 +68,22 @@ function WhatsNewPage() {
             beat in a chart. When you run your mouse over the chart, you will
             see a small link button
           </p>
-          <img
-            className="block w-1/2 shadow-lg"
-            style={{ margin: "3rem auto" }}
-            src="/linkToBarScreenshot.png"
-            alt="print preview of a step chart"
-            width={288}
-            height={213}
+          <Image
+              className="block w-1/2 shadow-lg"
+              style={{ margin: "3rem auto" }}
+              src="/linkToBarScreenshot.png"
+              alt="print preview of a step chart"
+              width={288}
+              height={213}
           />
           <p>
             clicking it will create a url that goes directly to that beat. For
             example,{" "}
-            <a
-              className="text-link cursor-pointer"
-              href="/3rdMix/AFRONOVA/expert/#beat-50"
-            >
-              here are the famous "Afronova steps"
-            </a>{" "}
+            <Link href="/3rdMix/AFRONOVA/expert/#beat-50">
+              <a className="text-link cursor-pointer">
+                here are the famous "Afronova steps"
+              </a>
+            </Link>{" "}
             in Afronova.
           </p>
         </NewEntry>
@@ -96,13 +97,13 @@ function WhatsNewPage() {
             Most songs can fit on two pages, with really fast songs taking four
             or more pages. The print out should look something like this:
           </p>
-          <img
-            className="block w-1/2 shadow-lg"
-            style={{ margin: "3rem auto" }}
-            src="/printPreview.png"
-            alt="print preview of a step chart"
-            width={495}
-            height={654}
+          <Image
+              className="block w-1/2 shadow-lg"
+              style={{ margin: "3rem auto" }}
+              src="/printPreview.png"
+              alt="print preview of a step chart"
+              width={495}
+              height={654}
           />
           <p>
             If you see something weird, please let me know by clicking "report

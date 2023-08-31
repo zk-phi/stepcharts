@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import clsx from "clsx";
 
 import styles from "./Footer.module.css";
@@ -33,9 +34,11 @@ function Footer({ className }: FooterProps) {
             GitHub repo
           </a>
           <span className="mx-2">&#124;</span>
-          <a className="text-link hover:underline" href="/whats-new">
-            What's New
-          </a>
+          <Link href="/whats-new">
+            <a className="text-link hover:underline">
+              What's New
+            </a>
+          </Link>
         </div>
       </div>
     </footer>
