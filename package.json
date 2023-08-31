@@ -3,16 +3,14 @@
   "version": "1.0.0",
   "scripts": {
     "develop": "next",
-    "prepare:filename": "node scripts/removeSpacesInDirectories.js ./resources/stepcharts",
-    "prepare:data": "ts-node --files --compilerOptions '{\"module\":\"commonjs\"}' scripts/genAllStepchartData.ts",
-    "prepare": "yarn run prepare:filename && yarn run prepare:data",
+    "gen-data": "ts-node --files --compilerOptions '{\"module\":\"commonjs\"}' scripts/genAllStepchartData.ts",
     "build:app": "next build",
-    "build": "yarn run prepare && yarn run build:app",
+    "build": "yarn run gen-data && yarn run build:app",
     "export": "next export",
     "start": "next start",
     "type-check": "tsc --noemit",
     "test": "yarn jest",
-    "clean-stepcharts": "bash scripts/clean-stepcharts.sh"
+    "clean-simfiles": "bash scripts/clean-stepcharts.sh && node scripts/removeSpacesInDirectories.js ./resources/stepcharts"
   },
   "dependencies": {
     "@material-ui/core": "^4.11.3",
