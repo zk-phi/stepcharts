@@ -78,7 +78,6 @@ function parseSimfile(
       titleName: rawStepchart.title,
       translitTitleName: rawStepchart.titletranslit ?? null,
       titleDir,
-      banner: rawStepchart.banner,
     },
     artist: rawStepchart.artist,
     availableTypes: rawStepchart.availableTypes,
