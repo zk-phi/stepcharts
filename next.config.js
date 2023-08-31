@@ -14,6 +14,7 @@ module.exports = withPlugins(
   ],
   {
     pageExtensions: ["tsx"],
+    basePath: "/stepcharts",
     trailingSlash: true,
     serverRuntimeConfig: {
       PROJECT_ROOT: __dirname,
