@@ -31,7 +31,8 @@ const STAT_KEYS = [
 const SORT_KEYS = [
   "title",
   "level",
-  "bpm",
+  "minBpm",
+  "maxBpm",
   "arrows",
   "jumps",
   "jacks",
@@ -117,9 +118,9 @@ function getSortFunction(key: string) {
             (b.titleTranslit || b.title).toLowerCase()
           );
       };
-    case "bpm":
+    case "minBpm":
       return (a: AllMeta, b: AllMeta) => {
-        return b.maxBpm - a.maxBpm;
+        return a.minBpm - b.minBpm;
       };
     default:
       return (a: AllMeta, b: AllMeta) => {
