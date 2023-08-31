@@ -63,11 +63,4 @@ function mergeSimilarBpmRanges(bpm: Bpm[]): Bpm[] {
   }, []);
 }
 
-function toSafeName(name: string): string {
-  name = name.replace(".png", "");
-  name = name.replace(/\s/g, "-").replace(/[^\w]/g, "_");
-
-  return `${name}.png`;
-}
-
-export { determineBeat, normalizedDifficultyMap, mergeSimilarBpmRanges, toSafeName };
+export { determineBeat, normalizedDifficultyMap, mergeSimilarBpmRanges };
