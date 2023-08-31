@@ -71,7 +71,7 @@ function WhatsNewPage() {
           <Image
               className="block w-1/2 shadow-lg"
               style={{ margin: "3rem auto" }}
-              src="/linkToBarScreenshot.png"
+              src="/stepcharts/linkToBarScreenshot.png"
               alt="print preview of a step chart"
               width={288}
               height={213}
@@ -100,7 +100,7 @@ function WhatsNewPage() {
           <Image
               className="block w-1/2 shadow-lg"
               style={{ margin: "3rem auto" }}
-              src="/printPreview.png"
+              src="/stepcharts/printPreview.png"
               alt="print preview of a step chart"
               width={495}
               height={654}

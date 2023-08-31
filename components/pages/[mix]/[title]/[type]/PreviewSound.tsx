@@ -12,10 +12,10 @@ const PreviewSound = ({ audioContext, chart, offset }: {
   React.useEffect(() => {
     const maybeDecodeBuffer = async () => {
       if (audioContext) {
-        const tickFile  = await fetch("/cursor12.mp3");
-        const stopFile  = await fetch("/cursor4.mp3");
-        const bpmFile   = await fetch("/cancel1.mp3");
-        const shockFile = await fetch("/cursor6.mp3");
+        const tickFile  = await fetch("/stepcharts/cursor12.mp3");
+        const stopFile  = await fetch("/stepcharts/cursor4.mp3");
+        const bpmFile   = await fetch("/stepcharts/cancel1.mp3");
+        const shockFile = await fetch("/stepcharts/cursor6.mp3");
         const tickArray  = await tickFile.arrayBuffer();
         const stopArray  = await stopFile.arrayBuffer();
         const bpmArray   = await bpmFile.arrayBuffer();

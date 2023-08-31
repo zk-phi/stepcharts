@@ -5,13 +5,13 @@ const LANE_HEIGHT = 100; /* vh */
 const HEIGHT_PER_BEAT = (LANE_HEIGHT / 6.25); /* vh */
 
 const ARROW_IMG = {
-  4: "/arrow4.svg",
-  6: "/arrow6.svg",
-  8: "/arrow8.svg",
-  12: "/arrow6.svg",
-  16: "/arrow16.svg",
-  shock: "/arrowShock.svg",
-  freeze: "/arrowFreeze.svg",
+  4: "/stepcharts/arrow4.svg",
+  6: "/stepcharts/arrow6.svg",
+  8: "/stepcharts/arrow8.svg",
+  12: "/stepcharts/arrow6.svg",
+  16: "/stepcharts/arrow16.svg",
+  shock: "/stepcharts/arrowShock.svg",
+  freeze: "/stepcharts/arrowFreeze.svg",
 };
 
 const ARROW_ROTATION = {

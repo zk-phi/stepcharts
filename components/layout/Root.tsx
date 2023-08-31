@@ -43,7 +43,7 @@ function Root({
                 <a className={clsx(styles.logo, "block lg:-ml-4")}>
                   <Image
                       className="w-full h-full"
-                      src="/logoArrow.svg"
+                      src="/stepcharts/logoArrow.svg"
                       alt="Stepcharts logo"
                       width={52}
                       height={52} />
