@@ -1,0 +1,14 @@
+.card {
+  display: block;
+  border: 1px solid;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.card:hover {
+  background: #0001;
+}
+
+.songCount {
+  text-align: right;
+}

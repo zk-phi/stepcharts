@@ -11,7 +11,6 @@ type MixMeta = {
   name: string;
   shortName: string;
   year: number;
-  bannerSrc: string | null;
   songs: number;
 };
 

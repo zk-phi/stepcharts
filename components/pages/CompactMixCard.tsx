@@ -1,6 +1,5 @@
 import React from "react";
-import clsx from "clsx";
-import { ImageFrame } from "../ImageFrame";
+import style from "./CompactMixCart.module.css";
 
 type CompactMixCardProps = {
   className?: string;
@@ -18,56 +17,16 @@ function buildMixUrl(mix: MixMeta): string {
   return `/${mix.mixId}`;
 }
 
-function CompactMixCard({ className, mix }: CompactMixCardProps) {
+function CompactMixCard({ mix }: CompactMixCardProps) {
   return (
-    <ImageFrame
-      className={clsx(
-        className,
-        clsx(
-          "flex flex-col bg-gray-900 overflow-hidden rounded-tl-2xl rounded-br-2xl"
-        )
-      )}
-    >
-      <div
-        className={clsx("grid bg-gray-600 items-center pl-3")}
-        style={{ gridTemplateColumns: "1fr max-content" }}
-      >
-        <div>
-          <a
-            href={buildMixUrl(mix)}
-            className="inline-block xfont-bold text-white px-1"
-          >
-            {mix.name}
-          </a>
-        </div>
-      </div>
-
+    <a href={buildMixUrl(mix)} className={style.card}>
       <div>
-        <a href={buildMixUrl(mix)}>
-          <div
-            className="relative bg-cover border-b border-t border-white"
-            style={{
-              paddingTop: "calc(80 / 256 * 100%)",
-            }}
-          >
-            <img
-              className="absolute top-0 left-0 w-full h-full"
-              src={mix.bannerSrc || ""}
-              alt={`${mix.name} banner`}
-              loading="lazy"
-            />
-          </div>
-        </a>
+        <b>{mix.name}</b> <small>{mix.year}</small>
       </div>
-
-      <div className="text-gray-100 bg-gray-400 text-sm px-3 py-1 text-center flex flex-row justify-between">
-        <div>{mix.year}</div>
-        <div>
-          <span className="font-bold">{mix.songs}</span>{" "}
-          {pluralize("song", mix.songs)}
-        </div>
+      <div className={style.songCount}>
+        <small>{mix.songs} {pluralize("song", mix.songs)}</small>
       </div>
-    </ImageFrame>
+    </a>
   );
 }
 
