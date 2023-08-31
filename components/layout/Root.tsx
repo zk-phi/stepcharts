@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import clsx from "clsx";
 import { Head } from "./Head";
 import { Footer } from "./Footer";
@@ -31,7 +30,7 @@ function Root({
             <div className="flex flex-row items-center">
               <Link href="/">
                 <a className={clsx(styles.logo, "block lg:-ml-4")}>
-                  <Image
+                  <img
                       className="w-full h-full"
                       src="/stepcharts/logoArrow.svg"
                       alt="Stepcharts logo"
