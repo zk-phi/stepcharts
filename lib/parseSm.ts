@@ -6,7 +6,7 @@ import {
   normalizedDifficultyMap,
 } from "./util";
 
-const metaTagsToConsume = ["title", "titletranslit", "artist", "banner"];
+const metaTagsToConsume = ["title", "titletranslit", "artist"];
 
 function concludesANoteTag(line: string | undefined): boolean {
   if (line === undefined) {
@@ -79,7 +79,6 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
   const sc: Partial<RawSimfile> = {
     charts: {},
     availableTypes: [],
-    banner: null,
   };
 
   function parseStops(

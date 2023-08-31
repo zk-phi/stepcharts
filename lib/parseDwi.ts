@@ -219,16 +219,6 @@ function parseArrowStream(
   return { arrows, freezes };
 }
 
-function findBanner(titlePath: string): string | null {
-  const files = fs.readdirSync(titlePath);
-
-  const bannerFile = files.find(
-    (f) => f.endsWith(".png") && f.indexOf("-bg.png") === -1
-  );
-
-  return bannerFile ?? null;
-}
-
 function parseDwi(dwi: string, titlePath?: string): RawSimfile {
   let bpm: string | null = null;
   let changebpm: string | null = null;
@@ -242,7 +232,6 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
   const sc: Partial<RawSimfile> = {
     charts: {},
     availableTypes: [],
-    banner: titlePath ? findBanner(titlePath) : null,
   };
 
   function parseNotes(rawNotes: string) {
