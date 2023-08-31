@@ -23,18 +23,8 @@ function Root({
   children,
 }: RootProps) {
   return (
-    <div
-      className={clsx(
-        className,
-        styles.background,
-        "flex flex-col items-stretch",
-        {}
-      )}
-    >
-      <Head
-        title={title}
-        metaDescription={metaDescription}
-      />
+    <div>
+      <Head title={title} metaDescription={metaDescription} />
       <header className="shadow">
         <div className="bg-heading h-16 flex flex-row items-center justify-between lg:px-4">
           <div className="flex flex-row items-center justify-start space-x-6 max-w-7xl mx-auto w-full">
