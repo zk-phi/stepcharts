@@ -1,167 +1,67 @@
-import React, { useEffect, useState } from "react";
-import clsx from "clsx";
+import React from "react";
+import ChartPreview from "./ChartPreview";
+import PreviewSound from "./PreviewSound";
+import { extractTimelineEvents, TimelineBpmEvent } from "../../../../../lib/computeChartTimeline";
 
-import { Root } from "../../../../layout/Root";
-import { ImageFrame } from "../../../../ImageFrame";
-import { Breadcrumbs } from "../../../../Breadcrumbs";
-import { TitleDetailsTable, TitleDetailsRow } from "../../../../TitleDetailsTable";
-import { ToggleBar } from "../../../../ToggleBar";
+const useAnimationFrame = (callback = () => {}) => {
+  const reqIdRef = React.useRef<number>();
 
-import styles from "./index.module.css";
-import {
-  scrollTargetBeatJustUnderHeader,
-  StepchartSection,
-} from "./StepchartSection";
-
-type StepchartPageProps = {
-  chart: ChartData,
-};
-
-const speedmods = [1, 1.5, 2, 3];
-const sectionSizesInMeasures: Record<typeof speedmods[number], number> = {
-  1: 1,
-  1.5: 5,
-  2: 4,
-  3: 3,
-};
-
-const HEADER_ID = "stepchart-page-header";
-
-function StepchartPage({ chart }: StepchartPageProps) {
-  useEffect(() => {
-    // this is needed because :target is not very robust (tested in both chrome and ff)
-    // when just using :target, if the user changes the speedmod, :target gets wiped out
-    const hash = (window.location.hash ?? "").replace("#", "");
-    if (hash) {
-      scrollTargetBeatJustUnderHeader(hash, HEADER_ID);
+  React.useEffect(() => {
+    const loop = () => {
+      reqIdRef.current = requestAnimationFrame(loop);
+      callback();
+    };
+    reqIdRef.current = requestAnimationFrame(loop);
+    return () => {
+      if (reqIdRef.current) {
+        cancelAnimationFrame(reqIdRef.current);
+      }
     }
-  }, []);
+  }, [callback]);
+};
 
-  const [currentUrl, setCurrentUrl] = useState<string | null>(null);
+const PreviewPage = ({ chart }: {
+  chart: Stepchart,
+}) => {
+  const startTime = React.useRef<number>();
+  const [offset, setOffset] = React.useState(0);
+  const [audioContext, setAudioContext] = React.useState<AudioContext>();
 
-  useEffect(() => {
-    setCurrentUrl(window.location.toString());
-  }, []);
+  const timelineIndex = React.useRef(0);
+  const secToOffset = React.useMemo(() => {
+    const timeline = extractTimelineEvents(chart);
+    return (sec: number) => {
+      let i;
+      for (i = timelineIndex.current; timeline[i + 1] && timeline[i + 1].time < sec; i++);
+      timelineIndex.current = i;
+      return (sec - timeline[i].time) * timeline[i].bpm / 60 / 4 + timeline[i].offset;
+    };
+  }, [chart]);
 
-  const [speedmod, setSpeedmod] = useState(speedmods[0]);
-  const sectionSizeInMeasures = sectionSizesInMeasures[speedmod];
+  const play = React.useCallback(() => {
+    if (!audioContext) {
+      setAudioContext(new AudioContext());
+    }
+    startTime.current = (new Date()).getTime();
+    timelineIndex.current = 0;
+  }, [audioContext, setAudioContext]);
 
-  const { arrows, freezes } = chart;
-
-  const lastArrowOffset = (arrows[arrows.length - 1]?.offset ?? 0) + 0.25;
-  const lastFreezeOffset = freezes[freezes.length - 1]?.endOffset ?? 0;
-  const totalSongHeight = Math.max(lastArrowOffset, lastFreezeOffset);
-
-  const sections = [];
-
-  for (let i = 0; i < totalSongHeight; i += sectionSizeInMeasures) {
-    sections.push(
-      <StepchartSection
-        key={i}
-        chart={chart}
-        speedMod={speedmod}
-        startOffset={i}
-        endOffset={Math.min(totalSongHeight, i + sectionSizeInMeasures)}
-        style={{ zIndex: Math.round(totalSongHeight) - i }}
-        headerId={HEADER_ID}
-      />
-    );
-  }
-
-  const sectionGroups = [];
-
-  while (sections.length) {
-    const sectionChunk = sections.splice(0, 7);
-    sectionGroups.push(
-      <div
-        key={sectionGroups.length}
-        className={styles.stepchartSectionGroup}
-        style={{ zIndex: 99999 - sectionGroups.length }}
-      >
-        {sectionChunk}
-      </div>
-    );
-  }
-
-  const normalizedTitle = chart.meta.titleTranslit || chart.meta.title;
-  const title = `${normalizedTitle} - ${chart.meta.difficulty} (${chart.meta.level})`;
+  const tick = React.useCallback(() => {
+    if (startTime.current) {
+      setOffset(secToOffset(((new Date()).getTime() - startTime.current) / 1000));
+    } else {
+      setOffset(0);
+    }
+  }, [setOffset]);
+  useAnimationFrame(tick);
 
   return (
-    <Root
-      className={styles.rootPrint}
-      title={title}
-      subheading={
-        <Breadcrumbs
-          crumbs={[
-            {
-              display: chart.meta.name,
-              pathSegment: chart.meta.mixId,
-            },
-            {
-              display: normalizedTitle,
-              pathSegment: chart.meta.songId,
-            },
-            {
-              display: chart.meta.difficulty,
-              pathSegment: chart.meta.difficulty,
-            },
-          ]}
-        />
-      }
-      metaDescription={`${chart.meta.difficulty} stepchart for ${normalizedTitle}`}
-    >
-      <ImageFrame
-        id={HEADER_ID}
-        className={clsx(
-          styles.hideForPrint,
-          styles.aboveStepChart,
-          "mt-0 w-screen sm:w-auto border-none sm:border-solid sm:border-1 -mx-4 sm:mx-auto sm:mt-8 mb-8 sm:sticky sm:top-0 sm:z-10 w-full p-4 bg-focal-300 sm:rounded-tl-xl sm:rounded-br-xl flex flex-col sm:flex-row items-center sm:justify-start sm:space-x-4"
-        )}
-      >
-        <div className="flex-1 flex flex-col sm:grid sm:grid-cols-2 space-y-2 sm:space-y-0">
-          <TitleDetailsTable>
-            {chart.meta.titleTranslit && (
-              <TitleDetailsRow
-                name="Native title"
-                value={chart.meta.title}
-              />
-            ) || null}
-            <TitleDetailsRow name="BPM" value={chart.meta.displayBpm} />
-            <TitleDetailsRow
-              name="Artist"
-              value={chart.meta.artist ?? "unknown"}
-            />
-            <TitleDetailsRow name="Mix" value={chart.meta.name} />
-            <TitleDetailsRow
-              name="difficulty"
-              value={`${chart.meta.difficulty} (${chart.meta.level})`}
-            />
-          </TitleDetailsTable>
-        </div>
-        <div className="sm:flex sm:flex-col mt-2 sm:mt-0 sm:flex-1 w-full max-w-xl justify-center">
-          <div className="hidden sm:block text-sm ml-2 mb-1">speedmod</div>
-          <ToggleBar
-            namespace="speedmod"
-            entries={speedmods.map((sm) => (
-              <div key={sm}>{sm}</div>
-            ))}
-            onToggle={(i) => setSpeedmod(speedmods[i])}
-            checkedIndex={speedmods.indexOf(speedmod)}
-          />
-        </div>
-      </ImageFrame>
-      <div className={styles.printTitle}>
-        <div>
-          {chart.meta.name}: {title}
-        </div>
-        {currentUrl && (
-          <div className="text-xs text-gray-400">{currentUrl}</div>
-        )}
-      </div>
-      {sectionGroups}
-    </Root>
+    <div style={{ display: "flex" }}>
+      <ChartPreview chart={chart} speed={2} offset={offset} />
+      <PreviewSound audioContext={audioContext} chart={chart} offset={offset} />
+      <button onClick={play}>Play</button>
+    </div>
   );
-}
+};
 
-export { StepchartPage };
-export type { StepchartPageProps };
+export default PreviewPage;
