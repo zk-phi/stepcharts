@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { parseSimfileAndCopyBanners } from "../lib/parseSimfile";
+import { parseSimfile } from "../lib/parseSimfile";
 import { dateReleased, shortMixNames } from "../lib/meta";
 
 const ROOT = "resources/stepcharts";
@@ -48,7 +48,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
       songs: mixSongDirs.length,
     },
     songs: mixSongDirs.map((songDir) => {
-      const simfile = parseSimfileAndCopyBanners(ROOT, mixDir, songDir);
+      const simfile = parseSimfile(ROOT, mixDir, songDir);
       return {
         meta: {
           songId: simfile.title.titleDir,
