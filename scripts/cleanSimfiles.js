@@ -11,7 +11,7 @@ const REMOVE_FILE_EXTS = [
   ".jpg",
 ];
 
-function removeSpaces(dirPath) {
+function traverse(dirPath) {
   const stat = fs.statSync(dirPath);
 
   if (stat.isDirectory()) {
@@ -19,7 +19,7 @@ function removeSpaces(dirPath) {
 
     children.forEach((child) => {
       const childPath = path.join(dirPath, child);
-      removeSpaces(childPath);
+      traverse(childPath);
     });
 
     const filename = path.basename(dirPath);
@@ -40,11 +40,11 @@ function removeSpaces(dirPath) {
 
 function main() {
   if (!process.argv[2]) {
-    console.log("usage: node removeSpacesInDirectories.js [root-dir]");
+    console.log("usage: node cleanSimfiles.js [root-dir]");
     process.exit(1);
   }
 
-  removeSpaces(path.join(process.cwd(), process.argv[2]));
+  traverse(path.join(process.cwd(), process.argv[2]));
 }
 
 main();
