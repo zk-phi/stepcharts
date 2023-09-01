@@ -1,0 +1,32 @@
+.header {
+  border-bottom: 1px solid #0003;
+  box-shadow: 0 5px 5px #0001;
+}
+
+.outer {
+  padding: 0.5rem 0;
+  background: #ea0;
+  color: white;
+}
+
+.subheadingOuter {
+  background: #0001;
+  padding: 0.25rem 0;
+}
+
+.inner {
+  width: 100%;
+  max-width: min(calc(100vw - 4rem), 80rem);
+  margin: auto;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  vertical-align: middle;
+}
+
+.link {
+  vertical-align: middle;
+}

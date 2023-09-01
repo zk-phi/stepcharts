@@ -1,3 +1,21 @@
 .footer {
-    box-shadow: 0 -0.5px 3px 0 rgba(0, 0, 0, 0.25), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  font-size: 0.75rem;
+  padding: 1rem;
+  background-color: #0001;
+  border-top: 1px solid #0003;
+  box-shadow: 0 -5px 5px #0001;
+  text-align: center;
+}
+
+.paragraph {
+  margin-bottom: 0.5rem;
+}
+
+.link {
+  text-decoration: underline dotted;
+}
+
+.link:hover {
+  color: #ea0;
+  text-decoration-color: #ea0;
 }
