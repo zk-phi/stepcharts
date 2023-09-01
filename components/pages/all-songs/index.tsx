@@ -3,8 +3,6 @@ import Link from "next/link";
 import clsx from "clsx";
 import { useTable, useExpanded, usePagination, Cell, Row } from "react-table";
 import Slider from "@material-ui/core/Slider";
-import { MdExpandMore, MdExpandLess } from "react-icons/md";
-import { IoIosPhoneLandscape } from "react-icons/io";
 import debounce from "lodash.debounce";
 
 import { Root } from "../../layout/Root";
@@ -48,16 +46,6 @@ type AllSongsPageProps = {
   titles: AllMeta[];
   crumbs?: { display: string, pathSegment: string }[],
 };
-
-function RotateYourPhone() {
-  return (
-    <div className="sm:hidden flex flex-col items-center mt-16">
-      <IoIosPhoneLandscape className="text-9xl w-full" />
-      <h1 className="text-lg font-bold mb-4">Please rotate your phone</h1>
-      <p>This page just barely fits in landscape mode</p>
-    </div>
-  );
-}
 
 const columns = [
   {
@@ -385,8 +373,7 @@ function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
       )}
       metaDescription={`All ${titles.length} songs available at stepcharts.com`}
     >
-      <RotateYourPhone />
-      <ImageFrame className="hidden sm:grid grid-cols-1 sm:grid-cols-3 mt-0 gap-y-4 sm:gap-x-6 w-screen sm:w-auto border-none sm:border-solid sm:border-1 -mx-4 sm:mx-auto sm:mt-8 w-full p-4 bg-focal-300 sm:rounded-tl-xl sm:rounded-br-xl">
+      <ImageFrame className="sm:grid grid-cols-1 sm:grid-cols-3 mt-0 gap-y-4 sm:gap-x-6 w-screen sm:w-auto border-none sm:border-solid sm:border-1 -mx-4 sm:mx-auto sm:mt-8 w-full p-4 bg-focal-300 sm:rounded-tl-xl sm:rounded-br-xl">
         <div className="sm:col-span-1">
           <div className="text-xs ml-2">Filter</div>
           <FilterInput
@@ -421,7 +408,7 @@ function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
         </div>
       </ImageFrame>
       <AllSongsTable
-        className="hidden sm:block"
+        className="sm:block"
         titles={sortedTitles}
         totalTitleCount={titles.length}
         filter={currentFilter}
