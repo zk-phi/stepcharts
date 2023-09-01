@@ -69,20 +69,6 @@ const columns = [
     ),
   },
   {
-    Header: "Mix",
-    accessor: (t: AllMeta) => (
-      <Link href={`/${t.mixId}`}>
-        <a className="hover:underline">
-          {t.shortName}
-        </a>
-      </Link>
-    ),
-  },
-  {
-    Header: "Artist",
-    accessor: (t: AllMeta) => t.artist,
-  },
-  {
     Header: "bpm",
     accessor: (t: AllMeta) => t.displayBpm,
   },
