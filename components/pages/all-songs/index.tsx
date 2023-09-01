@@ -52,7 +52,7 @@ const columns = [
     Header: "Level",
     accessor: (t: AllMeta) => (
       <Link href={`/${t.mixId}/${t.songId}/${t.difficulty}`}>
-        <a className={clsx("px-1 py-0.5 text-sm text-white", difficultyBgStyles[t.difficulty])}>
+        <a className={clsx(styles.level, difficultyBgStyles[t.difficulty])}>
           {t.difficulty.substring(0, 3).toUpperCase()} {t.level}
         </a>
       </Link>
@@ -62,7 +62,7 @@ const columns = [
     Header: "Title",
     accessor: (t: AllMeta) => (
       <Link href={`/${t.mixId}/${t.songId}/${t.difficulty}`}>
-        <a className="hover:underline">
+        <a className={styles.link}>
           {t.title}
         </a>
       </Link>
@@ -129,24 +129,6 @@ function depluralize(s: string, count: number): string {
   return s;
 }
 
-function StatLink({
-  className,
-  title,
-  stat,
-}: {
-  className?: string;
-  title: AllMeta;
-  stat: keyof Stats;
-}) {
-  return (
-    <Link href={`/${title.mixId}/${title.songId}/${title.difficulty}`}>
-      <a className={className}>
-        {title[stat]} {depluralize(stat, title[stat])}
-      </a>
-    </Link>
-  );
-}
-
 function AllSongsPageCell({
   row,
   cell,
@@ -157,15 +139,16 @@ function AllSongsPageCell({
   sortedBy: string;
 }) {
   if (cell.column.id === "Title" && isSortingOnStats(sortedBy)) {
+    const chart = row.original;
     return (
       <td {...cell.getCellProps()}>
-        <div className="flex flex-row items-center justify-between pr-2">
+        <div className={styles.titleCell}>
           <div>{cell.render("Cell")}</div>
-          <StatLink
-            className="whitespace-nowrap px-1 py-0.5 text-xs border rounded-md border-gray-400"
-            title={row.original}
-            stat={sortedBy as keyof Stats}
-          />
+          <Link href={`/${chart.mixId}/${chart.songId}/${chart.difficulty}`}>
+            <a className={styles.stat}>
+              {chart[sortedBy]} {depluralize(sortedBy, chart[sortedBy])}
+            </a>
+          </Link>
         </div>
       </td>
     );
