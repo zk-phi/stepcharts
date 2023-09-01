@@ -126,13 +126,14 @@ function AllSongsPageCell({
 }) {
   if (cell.column.id === "Title" && isSortingOnStats(sortedBy)) {
     const chart = row.original;
+    const value = chart[sortedBy as keyof Stats];
     return (
       <td {...cell.getCellProps()}>
         <div className={styles.titleCell}>
           <div>{cell.render("Cell")}</div>
           <Link href={`/${chart.mixId}/${chart.songId}/${chart.difficulty}`}>
             <a className={styles.stat}>
-              {chart[sortedBy]} {depluralize(sortedBy, chart[sortedBy])}
+              {value} {depluralize(sortedBy, value)}
             </a>
           </Link>
         </div>
