@@ -1,0 +1,11 @@
+.h2 {
+  margin-bottom: 2rem;
+  color: #0006;
+}
+
+.grid {
+  display: grid;
+  align-items: flex-start;
+  grid-template-columns: repeat(auto-fill, minmax(276px, 1fr));
+  gap: 2rem;
+}

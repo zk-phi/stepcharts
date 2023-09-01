@@ -6,7 +6,9 @@
 }
 
 .card:hover {
-  background: #0001;
+  box-shadow: 0 0 5px #0001;
+  border-color: #ea0;
+  background: #ea02;
 }
 
 .songCount {
