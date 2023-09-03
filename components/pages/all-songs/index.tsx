@@ -142,10 +142,6 @@ function AllSongsPageCell({
   return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
 }
 
-type Filter = {
-  text: string;
-};
-
 const AllSongsTable = React.memo(function AllSongsTable({
   className,
   titles,
@@ -156,14 +152,14 @@ const AllSongsTable = React.memo(function AllSongsTable({
   className?: string;
   titles: AllMeta[];
   totalTitleCount: number;
-  filter: Filter;
+  filter: string;
   sortedBy: string;
 }) {
   const currentTitles = useMemo(() => {
     let currentTitles = titles;
 
-    if (filter.text.trim()) {
-      const compare = filter.text.trim().toLowerCase().split(" ");
+    if (filter.trim()) {
+      const compare = filter.trim().toLowerCase().split(" ");
 
       currentTitles = currentTitles.filter((t) => {
         return compare.every((c) => t.filterString.includes(c));
@@ -267,7 +263,7 @@ const AllSongsTable = React.memo(function AllSongsTable({
 
 const ListConfig = ({ filter, sortedBy, onChangeFilter, onChangeSortedBy }: {
   titles: AllMeta[],
-  filter: Filter,
+  filter: string,
   sortedBy: string,
   onChangeFilter: (f: Filter) => void,
   onChangeSortedBy: (s: string) => void,
@@ -280,8 +276,8 @@ const ListConfig = ({ filter, sortedBy, onChangeFilter, onChangeSortedBy }: {
 
   const setTextFilter = useCallback((newText: string) => {
     _setTextFilter(newText);
-    updateFilter({ ...filter, text: newText });
-  }, [_setTextFilter, updateFilter, filter]);
+    updateFilter(newText);
+  }, [_setTextFilter, updateFilter]);
 
   return (
     <ImageFrame className="sm:grid grid-cols-1 sm:grid-cols-3 mt-0 gap-y-4 sm:gap-x-6 w-screen sm:w-auto border-none sm:border-solid sm:border-1 -mx-4 sm:mx-auto sm:mt-8 w-full p-4 bg-focal-300 sm:rounded-tl-xl sm:rounded-br-xl">
@@ -312,7 +308,7 @@ const ListConfig = ({ filter, sortedBy, onChangeFilter, onChangeSortedBy }: {
 
 function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
   const [sortedBy, setSortBy] = useState(SORT_KEYS[0].value);
-  const [filter, setFilter] = useState({ text: "" });
+  const [filter, setFilter] = useState("");
 
   const sortedTitles = useMemo(() => (
     [...titles].sort(getSortFunction(sortedBy))
