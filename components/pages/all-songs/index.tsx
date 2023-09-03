@@ -143,13 +143,11 @@ function AllSongsPageCell({
 }
 
 const AllSongsTable = React.memo(function AllSongsTable({
-  className,
   titles,
   totalTitleCount,
   filter,
   sortedBy,
 }: {
-  className?: string;
   titles: AllMeta[];
   totalTitleCount: number;
   filter: string;
@@ -191,7 +189,7 @@ const AllSongsTable = React.memo(function AllSongsTable({
   );
 
   return (
-    <div className={className}>
+    <div className="sm:block">
       <div className="my-6 ml-8">
         {currentTitles.length === totalTitleCount ? (
           <span>{currentTitles.length} total songs</span>
@@ -327,7 +325,6 @@ function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
         onChangeSortedBy={setSortBy}
       />
       <AllSongsTable
-        className="sm:block"
         titles={sortedTitles}
         totalTitleCount={titles.length}
         filter={filter}
