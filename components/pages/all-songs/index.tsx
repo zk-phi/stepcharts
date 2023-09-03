@@ -9,7 +9,6 @@ import { Root } from "../../layout/Root";
 
 import { Breadcrumbs } from "../../Breadcrumbs";
 import { FilterInput } from "../../FilterInput";
-import { SortBar } from "../../SortBar";
 import { PageBar } from "./PageBar";
 
 import styles from "./index.module.css";
@@ -28,18 +27,18 @@ const STAT_KEYS = [
 ];
 
 const SORT_KEYS = [
-  "title",
-  "level",
-  "minBpm",
-  "maxBpm",
-  "arrows",
-  "jumps",
-  "jacks",
-  "freezes",
-  "gallops",
-  "stops",
-  "bpmShifts",
-  "shocks",
+  { value: "title", label: "曲名" },
+  { value: "level", label: "難易度値" },
+  { value: "minBpm", label: "最小BPM" },
+  { value: "maxBpm", label: "最大BPM" },
+  { value: "arrows", label: "ステップ数" },
+  { value: "jumps", label: "ジャンプ" },
+  { value: "jacks", label: "縦連" },
+  { value: "freezes", label: "フリーズ" },
+  { value: "gallops", label: "スキップ" },
+  { value: "stops", label: "停止回数" },
+  { value: "bpmShifts", label: "変速回数" },
+  { value: "shocks", label: "ショック" },
 ];
 
 type AllSongsPageProps = {
@@ -326,7 +325,13 @@ const ListConfig = ({ maxBpm, filter, sortedBy, onChangeFilter, onChangeSortedBy
       </div>
       <div className="sm:col-span-1 sm:justify-self-stretch">
         <div className="text-xs ml-2">Sort</div>
-        <SortBar sorts={SORT_KEYS} sortedBy={sortedBy} onSortChange={onChangeSortedBy} />
+        <select value={sortedBy} onChange={(e) => onChangeSortedBy(e.target.value)}>
+          {SORT_KEYS.map((k) => (
+            <option key={k} value={k.value}>
+              {k.label}
+            </option>
+          ))}
+        </select>
       </div>
       <div className="sm:col-span-1">
         <div className="text-xs ml-2">BPM</div>
@@ -358,7 +363,7 @@ function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
     getMaxBpmForAllTitles(titles)
   ), [titles]);
 
-  const [sortedBy, setSortBy] = useState(SORT_KEYS[0]);
+  const [sortedBy, setSortBy] = useState(SORT_KEYS[0].value);
   const [filter, setFilter] = useState({ bpm: [0, maxBpm], text: "" });
 
   const sortedTitles = useMemo(() => (
