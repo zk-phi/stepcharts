@@ -7,7 +7,6 @@ import debounce from "lodash.debounce";
 import { Root } from "../../layout/Root";
 
 import { Breadcrumbs } from "../../Breadcrumbs";
-import { FilterInput } from "../../FilterInput";
 import { PageBar } from "./PageBar";
 
 import styles from "./index.module.css";
