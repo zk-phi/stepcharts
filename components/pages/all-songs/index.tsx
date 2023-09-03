@@ -320,12 +320,19 @@ const ListConfig = ({ maxBpm, filter, sortedBy, onChangeFilter, onChangeSortedBy
   return (
     <ImageFrame className="sm:grid grid-cols-1 sm:grid-cols-3 mt-0 gap-y-4 sm:gap-x-6 w-screen sm:w-auto border-none sm:border-solid sm:border-1 -mx-4 sm:mx-auto sm:mt-8 w-full p-4 bg-focal-300 sm:rounded-tl-xl sm:rounded-br-xl">
       <div className="sm:col-span-1">
-        <div className="text-xs ml-2">Filter</div>
-        <FilterInput value={textFilter} onChange={setTextFilter} />
+        <div className="text-xs ml-2 mb-2">Filter</div>
+        <input
+            type="text"
+            className={styles.input}
+            value={textFilter}
+            onChange={(e) => setTextFilter(e.target.value)} />
       </div>
       <div className="sm:col-span-1 sm:justify-self-stretch">
-        <div className="text-xs ml-2">Sort</div>
-        <select value={sortedBy} onChange={(e) => onChangeSortedBy(e.target.value)}>
+        <div className="text-xs ml-2 mb-2">Sort</div>
+        <select
+            className={styles.input}
+            value={sortedBy}
+            onChange={(e) => onChangeSortedBy(e.target.value)}>
           {SORT_KEYS.map((k) => (
             <option key={k} value={k.value}>
               {k.label}

@@ -29,6 +29,11 @@
   border-radius: 0.5rem;
 }
 
+.input {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
 .sliderContainer {
     @apply h-8 pr-8 bg-focal-400 rounded-lg overflow-hidden border border-focal-500;
 }
