@@ -2,7 +2,6 @@ import React, { useMemo, useRef, useState, useEffect, useCallback } from "react"
 import Link from "next/link";
 import clsx from "clsx";
 import { useTable, useExpanded, usePagination, Cell, Row } from "react-table";
-import Slider from "@material-ui/core/Slider";
 import debounce from "lodash.debounce";
 
 import { Root } from "../../layout/Root";
@@ -73,11 +72,6 @@ const columns = [
   },
 ];
 
-function getMaxBpmForAllTitles(charts: AllMeta[]): number {
-  const bpms = charts.map((t) => t.maxBpm);
-  return Math.round(Math.max(...bpms));
-}
-
 function getSortFunction(key: string) {
   switch (key) {
     case "title":
@@ -143,19 +137,7 @@ function AllSongsPageCell({
   return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
 }
 
-function ThumbComponent(props: any) {
-  return (
-    <div
-      {...props}
-      className="absolute top-0 w-8 h-8 inline-block outline-none bg-focal-50 text-focal-500 text-xs grid place-items-center"
-    >
-      {props["aria-valuenow"]}
-    </div>
-  );
-}
-
 type Filter = {
-  bpm: [number, number];
   text: string;
 };
 
@@ -172,8 +154,6 @@ const AllSongsTable = React.memo(function AllSongsTable({
   filter: Filter;
   sortedBy: string;
 }) {
-  const maxBpm = useRef(filter.bpm[1]);
-
   const currentTitles = useMemo(() => {
     let currentTitles = titles;
 
@@ -182,19 +162,6 @@ const AllSongsTable = React.memo(function AllSongsTable({
 
       currentTitles = currentTitles.filter((t) => {
         return compare.every((c) => t.filterString.includes(c));
-      });
-    }
-
-    if (filter.bpm[0] > 0 || filter.bpm[1] < maxBpm.current) {
-      currentTitles = currentTitles.filter((t) => {
-        if (t.minBpm === t.maxBpm) {
-          return filter.bpm[0] <= t.minBpm && filter.bpm[1] >= t.minBpm;
-        } else {
-          return (
-            (filter.bpm[0] <= t.minBpm && filter.bpm[1] >= t.minBpm) ||
-            (filter.bpm[0] <= t.maxBpm && filter.bpm[1] >= t.maxBpm)
-          );
-        }
       });
     }
 
@@ -293,7 +260,7 @@ const AllSongsTable = React.memo(function AllSongsTable({
   );
 });
 
-const ListConfig = ({ maxBpm, filter, sortedBy, onChangeFilter, onChangeSortedBy }: {
+const ListConfig = ({ filter, sortedBy, onChangeFilter, onChangeSortedBy }: {
   titles: AllMeta[],
   filter: Filter,
   sortedBy: string,
@@ -301,16 +268,10 @@ const ListConfig = ({ maxBpm, filter, sortedBy, onChangeFilter, onChangeSortedBy
   onChangeSortedBy: (s: string) => void,
 }) => {
   const [textFilter, _setTextFilter] = useState(filter.text);
-  const [curBpmRange, _setCurBpmRange] = useState(filter.bpm);
 
   const updateFilter = useMemo(() => (
     debounce(onChangeFilter, 200)
   ), [onChangeFilter]);
-
-  const setCurBpmRange = useCallback((newRange: [number, number]) => {
-    _setCurBpmRange(newRange);
-    updateFilter({ ...filter, bpm: newRange });
-  }, [_setCurBpmRange, updateFilter, filter]);
 
   const setTextFilter = useCallback((newText: string) => {
     _setTextFilter(newText);
@@ -340,38 +301,13 @@ const ListConfig = ({ maxBpm, filter, sortedBy, onChangeFilter, onChangeSortedBy
           ))}
         </select>
       </div>
-      <div className="sm:col-span-1">
-        <div className="text-xs ml-2">BPM</div>
-        <div className={styles.sliderContainer}>
-          <Slider
-              classes={{
-                root: styles.sliderRoot,
-                rail: styles.sliderRail,
-                track: styles.sliderTrack,
-              }}
-              value={curBpmRange}
-              max={maxBpm}
-              min={0}
-              step={10}
-              onChange={(_e, r) => setCurBpmRange(r as [number, number])}
-              valueLabelDisplay="off"
-              ThumbComponent={ThumbComponent}
-              aria-labelledby="range-slider"
-              getAriaValueText={(v) => `${v}bpm`}
-          />
-        </div>
-      </div>
     </ImageFrame>
   );
 };
 
 function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
-  const maxBpm = useMemo(() => (
-    getMaxBpmForAllTitles(titles)
-  ), [titles]);
-
   const [sortedBy, setSortBy] = useState(SORT_KEYS[0].value);
-  const [filter, setFilter] = useState({ bpm: [0, maxBpm], text: "" });
+  const [filter, setFilter] = useState({ text: "" });
 
   const sortedTitles = useMemo(() => (
     [...titles].sort(getSortFunction(sortedBy))
@@ -386,7 +322,6 @@ function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
       metaDescription={`All ${titles.length} songs available at stepcharts.com`}
     >
       <ListConfig
-        maxBpm={maxBpm}
         filter={filter}
         sortedBy={sortedBy}
         onChangeFilter={setFilter}
