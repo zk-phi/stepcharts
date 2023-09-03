@@ -32,6 +32,7 @@
 .input {
   padding: 0.5rem;
   border-radius: 0.5rem;
+  border: 1px solid #0005;
 }
 
 .sliderContainer {
