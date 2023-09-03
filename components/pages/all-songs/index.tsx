@@ -334,7 +334,7 @@ const ListConfig = ({ maxBpm, filter, sortedBy, onChangeFilter, onChangeSortedBy
             value={sortedBy}
             onChange={(e) => onChangeSortedBy(e.target.value)}>
           {SORT_KEYS.map((k) => (
-            <option key={k} value={k.value}>
+            <option key={k.value} value={k.value}>
               {k.label}
             </option>
           ))}
