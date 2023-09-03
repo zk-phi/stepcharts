@@ -178,10 +178,10 @@ const AllSongsTable = React.memo(function AllSongsTable({
     let currentTitles = titles;
 
     if (filter.text.trim()) {
-      const compare = filter.text.trim().toLowerCase();
+      const compare = filter.text.trim().toLowerCase().split(" ");
 
       currentTitles = currentTitles.filter((t) => {
-        return t.filterString.includes(compare);
+        return compare.every((c) => t.filterString.includes(c));
       });
     }
 
