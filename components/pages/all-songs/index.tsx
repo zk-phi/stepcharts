@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import { useTable, useExpanded, usePagination, Cell, Row } from "react-table";
@@ -294,71 +294,44 @@ const AllSongsTable = React.memo(function AllSongsTable({
   );
 });
 
-function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
-  const maxBpm = getMaxBpmForAllTitles(titles);
-  const [textFilter, _setTextFilter] = useState("");
-  const [curBpmRange, _setCurBpmRange] = useState<[number, number]>([
-    0,
-    maxBpm,
-  ]);
-  const [sortedBy, setSortBy] = useState(SORT_KEYS[0]);
-  const sortedTitles = useMemo(() => (
-    [...titles].sort(getSortFunction(sortedBy))
-  ), [titles, sortedBy]);
+const ListConfig = ({ maxBpm, filter, sortedBy, onChangeFilter, onChangeSortedBy }: {
+  titles: AllMeta[],
+  filter: Filter,
+  sortedBy: string,
+  onChangeFilter: (f: Filter) => void,
+  onChangeSortedBy: (s: string) => void,
+}) => {
+  const [textFilter, _setTextFilter] = useState(filter.text);
+  const [curBpmRange, _setCurBpmRange] = useState(filter.bpm);
 
-  const [currentFilter, setCurrentFilter] = useState<Filter>({
-    bpm: curBpmRange,
-    text: textFilter,
-  });
+  const updateFilter = useMemo(() => (
+    debounce(onChangeFilter, 200)
+  ), [onChangeFilter]);
 
-  const debouncedSetCurrentFilter = useMemo(() => {
-    return debounce(setCurrentFilter, 200);
-  }, [setCurrentFilter]);
-
-  function setCurBpmRange(newRange: [number, number]) {
+  const setCurBpmRange = useCallback((newRange: [number, number]) => {
     _setCurBpmRange(newRange);
-    debouncedSetCurrentFilter((f) => {
-      return {
-        ...f,
-        bpm: newRange,
-      };
-    });
-  }
+    updateFilter({ ...filter, bpm: newRange });
+  }, [_setCurBpmRange, updateFilter, filter]);
 
-  function setTextFilter(newText: string) {
+  const setTextFilter = useCallback((newText: string) => {
     _setTextFilter(newText);
-    debouncedSetCurrentFilter((f) => {
-      return {
-        ...f,
-        text: newText,
-      };
-    });
-  }
+    updateFilter({ ...filter, text: newText });
+  }, [_setTextFilter, updateFilter, filter]);
 
   return (
-    <Root
-      title="All Songs"
-      subheading={crumbs && (
-        <Breadcrumbs crumbs={crumbs} />
-      )}
-      metaDescription={`All ${titles.length} songs available at stepcharts.com`}
-    >
-      <ImageFrame className="sm:grid grid-cols-1 sm:grid-cols-3 mt-0 gap-y-4 sm:gap-x-6 w-screen sm:w-auto border-none sm:border-solid sm:border-1 -mx-4 sm:mx-auto sm:mt-8 w-full p-4 bg-focal-300 sm:rounded-tl-xl sm:rounded-br-xl">
-        <div className="sm:col-span-1">
-          <div className="text-xs ml-2">Filter</div>
-          <FilterInput
-            value={textFilter}
-            onChange={(newValue) => setTextFilter(newValue)}
-          />
-        </div>
-        <div className="sm:col-span-1 sm:justify-self-stretch">
-          <div className="text-xs ml-2">Sort</div>
-          <SortBar sorts={SORT_KEYS} sortedBy={sortedBy} onSortChange={setSortBy} />
-        </div>
-        <div className="sm:col-span-1">
-          <div className="text-xs ml-2">BPM</div>
-          <div className={styles.sliderContainer}>
-            <Slider
+    <ImageFrame className="sm:grid grid-cols-1 sm:grid-cols-3 mt-0 gap-y-4 sm:gap-x-6 w-screen sm:w-auto border-none sm:border-solid sm:border-1 -mx-4 sm:mx-auto sm:mt-8 w-full p-4 bg-focal-300 sm:rounded-tl-xl sm:rounded-br-xl">
+      <div className="sm:col-span-1">
+        <div className="text-xs ml-2">Filter</div>
+        <FilterInput value={textFilter} onChange={setTextFilter} />
+      </div>
+      <div className="sm:col-span-1 sm:justify-self-stretch">
+        <div className="text-xs ml-2">Sort</div>
+        <SortBar sorts={SORT_KEYS} sortedBy={sortedBy} onSortChange={onChangeSortedBy} />
+      </div>
+      <div className="sm:col-span-1">
+        <div className="text-xs ml-2">BPM</div>
+        <div className={styles.sliderContainer}>
+          <Slider
               classes={{
                 root: styles.sliderRoot,
                 rail: styles.sliderRail,
@@ -373,15 +346,45 @@ function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
               ThumbComponent={ThumbComponent}
               aria-labelledby="range-slider"
               getAriaValueText={(v) => `${v}bpm`}
-            />
-          </div>
+          />
         </div>
-      </ImageFrame>
+      </div>
+    </ImageFrame>
+  );
+};
+
+function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
+  const maxBpm = useMemo(() => (
+    getMaxBpmForAllTitles(titles)
+  ), [titles]);
+
+  const [sortedBy, setSortBy] = useState(SORT_KEYS[0]);
+  const [filter, setFilter] = useState({ bpm: [0, maxBpm], text: "" });
+
+  const sortedTitles = useMemo(() => (
+    [...titles].sort(getSortFunction(sortedBy))
+  ), [titles, sortedBy]);
+
+  return (
+    <Root
+      title="All Songs"
+      subheading={crumbs && (
+        <Breadcrumbs crumbs={crumbs} />
+      )}
+      metaDescription={`All ${titles.length} songs available at stepcharts.com`}
+    >
+      <ListConfig
+        maxBpm={maxBpm}
+        filter={filter}
+        sortedBy={sortedBy}
+        onChangeFilter={setFilter}
+        onChangeSortedBy={setSortBy}
+      />
       <AllSongsTable
         className="sm:block"
         titles={sortedTitles}
         totalTitleCount={titles.length}
-        filter={currentFilter}
+        filter={filter}
         sortedBy={sortedBy}
       />
     </Root>
