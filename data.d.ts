@@ -30,6 +30,7 @@ type ChartMeta = Stats & {
   arrows: number;
   stops: number;
   bpmShifts: number;
+  mainBpm: number;
 };
 
 type AllMeta = MixMeta & SongMeta & ChartMeta & { filterString: string };

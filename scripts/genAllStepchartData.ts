@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { parseSimfile } from "../lib/parseSimfile";
 import { dateReleased, shortMixNames } from "../lib/meta";
+import { findMainBpm } from "../lib/analyzeRhythmComplexity";
 
 const ROOT = "resources/stepcharts";
 
@@ -66,6 +67,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
             arrows: simfile.charts[chartType.difficulty].arrows.length,
             stops: simfile.charts[chartType.difficulty].stops.length,
             bpmShifts: simfile.charts[chartType.difficulty].bpm.length - 1,
+            mainBpm: Math.round(findMainBpm(simfile.charts[chartType.difficulty])),
             ...simfile.stats[chartType.difficulty],
           },
           chart: simfile.charts[chartType.difficulty],

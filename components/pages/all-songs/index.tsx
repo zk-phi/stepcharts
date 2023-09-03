@@ -68,7 +68,13 @@ const columns = [
   },
   {
     Header: "bpm",
-    accessor: (t: AllMeta) => t.displayBpm,
+    accessor: (t: AllMeta) => (
+      <>
+        {t.minBpm < t.mainBpm && `(${t.minBpm}-)`}
+        {t.mainBpm}
+        {t.mainBpm < t.maxBpm && `(-${t.maxBpm})`}
+      </>
+    ),
   },
 ];
 
