@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import { useTable, useExpanded, usePagination, Cell, Row } from "react-table";
+import { useTable, usePagination, Cell, Row } from "react-table";
 import debounce from "lodash.debounce";
 
 import { Root } from "../../layout/Root";
@@ -184,11 +184,9 @@ const AllSongsTable = React.memo(function AllSongsTable({
       data: currentTitles,
       initialState: {
         pageSize: 200,
-        expanded: {},
       },
       getRowId: (row) => row.filterString,
     },
-    useExpanded,
     usePagination
   );
 
