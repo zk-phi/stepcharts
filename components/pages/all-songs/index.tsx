@@ -2,46 +2,16 @@ import React, { useMemo, useRef, useState, useEffect, useCallback } from "react"
 import Link from "next/link";
 import clsx from "clsx";
 import { useTable, usePagination, Cell, Row } from "react-table";
-import debounce from "lodash.debounce";
 
 import { Root } from "../../layout/Root";
 
 import { Breadcrumbs } from "../../Breadcrumbs";
 import { PageBar } from "./PageBar";
+import ListConfig, { SORT_KEYS, LEVELS, getSortFunction, getSortValueFunction } from "./ListConfig";
 
 import styles from "./index.module.css";
 import difficultyBgStyles from "../../difficultyBackgroundColors.module.css";
 import { ImageFrame } from "../../ImageFrame";
-
-const STAT_KEYS = [
-  "arrows",
-  "stops",
-  "jumps",
-  "jacks",
-  "freezes",
-  "gallops",
-  "bpmShifts",
-  "shocks",
-];
-
-const SORT_KEYS = [
-  { value: "title", label: "曲名" },
-  { value: "level", label: "難易度値" },
-  { value: "minBpm", label: "最小BPM" },
-  { value: "maxBpm", label: "最大BPM" },
-  { value: "arrows", label: "ステップ数" },
-  { value: "jumps", label: "ジャンプ" },
-  { value: "jacks", label: "縦連" },
-  { value: "freezes", label: "フリーズ" },
-  { value: "gallops", label: "スキップ" },
-  { value: "stops", label: "停止回数" },
-  { value: "bpmShifts", label: "変速回数" },
-  { value: "shocks", label: "ショック" },
-];
-
-const LEVELS = [
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-];
 
 type AllSongsPageProps = {
   titles: AllMeta[];
@@ -81,61 +51,24 @@ const columns = [
   },
 ];
 
-function getSortFunction(key: string) {
-  switch (key) {
-    case "title":
-      return (a: AllMeta, b: AllMeta) => {
-        return (a.titleTranslit || a.title)
-          .toLowerCase()
-          .localeCompare(
-            (b.titleTranslit || b.title).toLowerCase()
-          );
-      };
-    case "minBpm":
-      return (a: AllMeta, b: AllMeta) => {
-        return a.minBpm - b.minBpm;
-      };
-    default:
-      return (a: AllMeta, b: AllMeta) => {
-        const aStats = a[key as keyof Stats];
-        const bStats = b[key as keyof Stats];
-
-        return bStats - aStats;
-      };
-  }
-}
-
-function isSortingOnStats(sortKey: string): boolean {
-  return STAT_KEYS.findIndex((k) => k === sortKey) !== -1;
-}
-
-function depluralize(s: string, count: number): string {
-  if (count === 1) {
-    return s.substring(0, s.length - 1);
-  }
-
-  return s;
-}
-
 function AllSongsPageCell({
   row,
   cell,
-  sortedBy,
+  sortValue,
 }: {
   row: Row<AllMeta>;
   cell: Cell<AllMeta>;
-  sortedBy: string;
+  sortValue: string | null;
 }) {
-  if (cell.column.id === "Title" && isSortingOnStats(sortedBy)) {
+  if (cell.column.id === "Title" && sortValue) {
     const chart = row.original;
-    const value = chart[sortedBy as keyof Stats];
     return (
       <td {...cell.getCellProps()}>
         <div className={styles.titleCell}>
           <div>{cell.render("Cell")}</div>
           <Link href={`/${chart.mixId}/${chart.songId}/${chart.difficulty}`}>
             <a className={styles.stat}>
-              {value} {depluralize(sortedBy, value)}
+              {sortValue}
             </a>
           </Link>
         </div>
@@ -149,11 +82,11 @@ function AllSongsPageCell({
 const AllSongsTable = React.memo(function AllSongsTable({
   titles,
   totalTitleCount,
-  sortedBy,
+  getSortValueFunction,
 }: {
   titles: AllMeta[];
   totalTitleCount: number;
-  sortedBy: string,
+  getSortValueFunction: (a: AllMeta) => string | null;
 }) {
   const {
     getTableProps,
@@ -220,7 +153,7 @@ const AllSongsTable = React.memo(function AllSongsTable({
                         key={cell.getCellProps().key}
                         row={row}
                         cell={cell}
-                        sortedBy={sortedBy}
+                        sortValue={getSortValueFunction(row.original)}
                     />
                   );
                 })}
@@ -243,88 +176,6 @@ const AllSongsTable = React.memo(function AllSongsTable({
     </div>
   );
 });
-
-const ListConfig = ({
-  filter,
-  sortedBy,
-  levelRange,
-  hardestOnly,
-  onChangeFilter,
-  onChangeLevelRange,
-  onChangeSortedBy,
-  onChangeHardestOnly,
-}: {
-  filter: string,
-  sortedBy: string,
-  levelRange: [number, number],
-  onChangeFilter: (f: Filter) => void,
-  onChangeLevelRange: (r: [number, number]) => void,
-  onChangeSortedBy: (s: string) => void,
-}) => {
-  const [textFilter, _setTextFilter] = useState(filter.text);
-
-  const updateFilter = useMemo(() => (
-    debounce(onChangeFilter, 200)
-  ), [onChangeFilter]);
-
-  const setTextFilter = useCallback((newText: string) => {
-    _setTextFilter(newText);
-    updateFilter(newText);
-  }, [_setTextFilter, updateFilter]);
-
-  return (
-    <div className={styles.filterContainer}>
-      <div>
-        絞り込み：
-        <input
-            type="text"
-            className={styles.input}
-            value={textFilter}
-            onChange={(e) => setTextFilter(e.target.value)} />
-      </div>
-      <div>
-        並べ替え：
-        <select
-            className={styles.input}
-            value={sortedBy}
-            onChange={(e) => onChangeSortedBy(e.target.value)}>
-          {SORT_KEYS.map((k) => (
-            <option key={k.value} value={k.value}>
-              {k.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        レベル：
-        <select
-            className={styles.input}
-            value={levelRange[0]}
-            onChange={(e) => onChangeLevelRange([Number(e.target.value), levelRange[1]])}>
-          {LEVELS.map((v) => (
-            v <= levelRange[1] && (<option key={v} value={v}>{v}</option>)
-          ))}
-        </select>
-        {" 〜 "}
-        <select
-            className={styles.input}
-            value={levelRange[1]}
-            onChange={(e) => onChangeLevelRange([levelRange[0], Number(e.target.value)])}>
-          {LEVELS.map((v) => (
-            levelRange[0] <= v && (<option key={v} value={v}>{v}</option>)
-          ))}
-        </select>
-      </div>
-      <div>
-        激鬼のみ：
-        <input
-            type="checkbox"
-            checked={hardestOnly}
-            onChange={(e) => onChangeHardestOnly(!!e.target.checked)} />
-      </div>
-    </div>
-  );
-};
 
 function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
   const [sortedBy, setSortBy] = useState(SORT_KEYS[0].value);
@@ -358,6 +209,10 @@ function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
     [...filteredTitles].sort(getSortFunction(sortedBy))
   ), [filteredTitles, sortedBy]);
 
+  const getSortValue = useMemo(() => (
+    getSortValueFunction(sortedBy)
+  ), [sortedBy]);
+
   return (
     <Root
       title="All Songs"
@@ -379,7 +234,7 @@ function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
       <AllSongsTable
         titles={sortedTitles}
         totalTitleCount={titles.length}
-        sortedBy={sortedBy}
+        getSortValueFunction={getSortValue}
       />
     </Root>
   );

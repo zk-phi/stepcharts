@@ -29,24 +29,6 @@
   border-radius: 0.5rem;
 }
 
-.filterContainer {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  padding: 1rem;
-  border-radius: 1rem;
-  gap: 1rem 2rem;
-  border: 1px solid;
-  background: #0001;
-  box-shadow: 0 5px 5px #0001;
-}
-
-.input {
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid #0005;
-}
-
 .sliderContainer {
     @apply h-8 pr-8 bg-focal-400 rounded-lg overflow-hidden border border-focal-500;
 }
