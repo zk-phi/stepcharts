@@ -69,9 +69,9 @@ const columns = [
     Header: "bpm",
     accessor: (t: AllMeta) => (
       <>
-        {t.minBpm < t.mainBpm && `(${t.minBpm}-)`}
+        {t.minBpm < t.mainBpm && `(${t.minBpm})-`}
         {t.mainBpm}
-        {t.mainBpm < t.maxBpm && `(-${t.maxBpm})`}
+        {t.mainBpm < t.maxBpm && `-(${t.maxBpm})`}
       </>
     ),
   },
@@ -276,17 +276,17 @@ const ListConfig = ({ filter, sortedBy, onChangeFilter, onChangeSortedBy }: {
   }, [_setTextFilter, updateFilter]);
 
   return (
-    <ImageFrame className="sm:grid grid-cols-1 sm:grid-cols-3 mt-0 gap-y-4 sm:gap-x-6 w-screen sm:w-auto border-none sm:border-solid sm:border-1 -mx-4 sm:mx-auto sm:mt-8 w-full p-4 bg-focal-300 sm:rounded-tl-xl sm:rounded-br-xl">
-      <div className="sm:col-span-1">
-        <div className="text-xs ml-2 mb-2">Filter</div>
+    <div className={styles.filterContainer}>
+      <div>
+        絞り込み：
         <input
             type="text"
             className={styles.input}
             value={textFilter}
             onChange={(e) => setTextFilter(e.target.value)} />
       </div>
-      <div className="sm:col-span-1 sm:justify-self-stretch">
-        <div className="text-xs ml-2 mb-2">Sort</div>
+      <div>
+        並べ替え：
         <select
             className={styles.input}
             value={sortedBy}
@@ -298,7 +298,7 @@ const ListConfig = ({ filter, sortedBy, onChangeFilter, onChangeSortedBy }: {
           ))}
         </select>
       </div>
-    </ImageFrame>
+    </div>
   );
 };
 
