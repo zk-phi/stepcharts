@@ -39,6 +39,10 @@ const SORT_KEYS = [
   { value: "shocks", label: "ショック" },
 ];
 
+const LEVELS = [
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+];
+
 type AllSongsPageProps = {
   titles: AllMeta[];
   crumbs?: { display: string, pathSegment: string }[],
@@ -145,28 +149,12 @@ function AllSongsPageCell({
 const AllSongsTable = React.memo(function AllSongsTable({
   titles,
   totalTitleCount,
-  filter,
   sortedBy,
 }: {
   titles: AllMeta[];
   totalTitleCount: number;
-  filter: string;
-  sortedBy: string;
+  sortedBy: string,
 }) {
-  const currentTitles = useMemo(() => {
-    let currentTitles = titles;
-
-    if (filter.trim()) {
-      const compare = filter.trim().toLowerCase().split(" ");
-
-      currentTitles = currentTitles.filter((t) => {
-        return compare.every((c) => t.filterString.includes(c));
-      });
-    }
-
-    return currentTitles;
-  }, [titles, filter, sortedBy]);
-
   const {
     getTableProps,
     getTableBodyProps,
@@ -179,7 +167,7 @@ const AllSongsTable = React.memo(function AllSongsTable({
   } = useTable(
     {
       columns,
-      data: currentTitles,
+      data: titles,
       initialState: {
         pageSize: 200,
       },
@@ -191,12 +179,12 @@ const AllSongsTable = React.memo(function AllSongsTable({
   return (
     <div className="sm:block">
       <div className="my-6 ml-8">
-        {currentTitles.length === totalTitleCount ? (
-          <span>{currentTitles.length} total songs</span>
+        {titles.length === totalTitleCount ? (
+          <span>{titles.length} total songs</span>
         ) : (
           <span>
-            <span className="font-bold">{currentTitles.length}</span> song
-            {currentTitles.length === 1 ? " " : "s "}
+            <span className="font-bold">{titles.length}</span> song
+            {titles.length === 1 ? " " : "s "}
             matching{" "}
             <span className="text-focal-400">
               (out of {totalTitleCount} total)
@@ -257,11 +245,21 @@ const AllSongsTable = React.memo(function AllSongsTable({
   );
 });
 
-const ListConfig = ({ filter, sortedBy, onChangeFilter, onChangeSortedBy }: {
-  titles: AllMeta[],
+const ListConfig = ({
+  filter,
+  sortedBy,
+  levelRange,
+  hardestOnly,
+  onChangeFilter,
+  onChangeLevelRange,
+  onChangeSortedBy,
+  onChangeHardestOnly,
+}: {
   filter: string,
   sortedBy: string,
+  levelRange: [number, number],
   onChangeFilter: (f: Filter) => void,
+  onChangeLevelRange: (r: [number, number]) => void,
   onChangeSortedBy: (s: string) => void,
 }) => {
   const [textFilter, _setTextFilter] = useState(filter.text);
@@ -298,6 +296,33 @@ const ListConfig = ({ filter, sortedBy, onChangeFilter, onChangeSortedBy }: {
           ))}
         </select>
       </div>
+      <div>
+        レベル：
+        <select
+            className={styles.input}
+            value={levelRange[0]}
+            onChange={(e) => onChangeLevelRange([Number(e.target.value), levelRange[1]])}>
+          {LEVELS.map((v) => (
+            v <= levelRange[1] && (<option key={v} value={v}>{v}</option>)
+          ))}
+        </select>
+        {" 〜 "}
+        <select
+            className={styles.input}
+            value={levelRange[1]}
+            onChange={(e) => onChangeLevelRange([levelRange[0], Number(e.target.value)])}>
+          {LEVELS.map((v) => (
+            levelRange[0] <= v && (<option key={v} value={v}>{v}</option>)
+          ))}
+        </select>
+      </div>
+      <div>
+        激鬼のみ：
+        <input
+            type="checkbox"
+            checked={hardestOnly}
+            onChange={(e) => onChangeHardestOnly(!!e.target.checked)} />
+      </div>
     </div>
   );
 };
@@ -305,10 +330,34 @@ const ListConfig = ({ filter, sortedBy, onChangeFilter, onChangeSortedBy }: {
 function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
   const [sortedBy, setSortBy] = useState(SORT_KEYS[0].value);
   const [filter, setFilter] = useState("");
+  const [levelRange, setLevelRange] = useState([LEVELS[0], LEVELS[LEVELS.length - 1]]);
+  const [hardestOnly, setHardestOnly] = useState(true);
+
+  const filteredTitles = useMemo(() => {
+    const compare = filter.trim().toLowerCase().split(" ");
+
+    let filteredTitles = titles.filter((t) => (
+      levelRange[0] <= t.level && t.level <= levelRange[1]
+    ));
+
+    if (hardestOnly) {
+      filteredTitles = filteredTitles.filter((t) => (
+        t.difficulty === "expert" || t.difficulty === "challenge"
+      ));
+    }
+
+    if (filter.trim()) {
+      filteredTitles = filteredTitles.filter((t) => (
+        compare.every((c) => t.filterString.includes(c))
+      ));
+    }
+
+    return filteredTitles;
+  }, [titles, filter, levelRange, hardestOnly]);
 
   const sortedTitles = useMemo(() => (
-    [...titles].sort(getSortFunction(sortedBy))
-  ), [titles, sortedBy]);
+    [...filteredTitles].sort(getSortFunction(sortedBy))
+  ), [filteredTitles, sortedBy]);
 
   return (
     <Root
@@ -321,13 +370,16 @@ function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
       <ListConfig
         filter={filter}
         sortedBy={sortedBy}
+        levelRange={levelRange}
+        hardestOnly={hardestOnly}
         onChangeFilter={setFilter}
+        onChangeLevelRange={setLevelRange}
         onChangeSortedBy={setSortBy}
+        onChangeHardestOnly={setHardestOnly}
       />
       <AllSongsTable
         titles={sortedTitles}
         totalTitleCount={titles.length}
-        filter={filter}
         sortedBy={sortedBy}
       />
     </Root>
