@@ -180,14 +180,13 @@ const AllSongsTable = React.memo(function AllSongsTable({
     <div className="sm:block">
       <div className="my-6 ml-8">
         {titles.length === totalTitleCount ? (
-          <span>{titles.length} total songs</span>
+          <span>全 {titles.length} 譜面</span>
         ) : (
           <span>
-            <span className="font-bold">{titles.length}</span> song
-            {titles.length === 1 ? " " : "s "}
-            matching{" "}
+            <span className="font-bold">{titles.length}</span>
+            {" 譜面がマッチ "}
             <span className="text-focal-400">
-              (out of {totalTitleCount} total)
+              ({totalTitleCount} 譜面中)
             </span>
           </span>
         )}
