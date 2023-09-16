@@ -9,23 +9,31 @@ const PreviewSound = ({ audioContext, chart, offset }: {
   const stopBuffer     = React.useRef<AudioBuffer>();
   const bpmBuffer      = React.useRef<AudioBuffer>();
   const shockBuffer    = React.useRef<AudioBuffer>();
+  // const measureBuffer  = React.useRef<AudioBuffer>();
+  const beatBuffer     = React.useRef<AudioBuffer>();
   const gainNode       = React.useRef<GainNode>();
   const suppressorNode = React.useRef<GainNode>();
   React.useEffect(() => {
     const maybeDecodeBuffer = async () => {
       if (audioContext) {
-        const tickFile  = await fetch("/stepcharts/cursor12.mp3");
-        const stopFile  = await fetch("/stepcharts/cursor4.mp3");
-        const bpmFile   = await fetch("/stepcharts/cancel1.mp3");
-        const shockFile = await fetch("/stepcharts/cursor6.mp3");
-        const tickArray  = await tickFile.arrayBuffer();
-        const stopArray  = await stopFile.arrayBuffer();
-        const bpmArray   = await bpmFile.arrayBuffer();
-        const shockArray = await shockFile.arrayBuffer();
-        tickBuffer.current  = await audioContext.decodeAudioData(tickArray);
-        stopBuffer.current  = await audioContext.decodeAudioData(stopArray)
-        bpmBuffer.current   = await audioContext.decodeAudioData(bpmArray);
-        shockBuffer.current = await audioContext.decodeAudioData(shockArray);
+        const tickFile    = await fetch("/stepcharts/cursor12.mp3");
+        const stopFile    = await fetch("/stepcharts/cursor4.mp3");
+        const bpmFile     = await fetch("/stepcharts/cancel1.mp3");
+        const shockFile   = await fetch("/stepcharts/cursor7.mp3");
+        // const measureFile = await fetch("/stepcharts/cursor1.mp3");
+        const beatFile    = await fetch("/stepcharts/cursor6.mp3");
+        const tickArray    = await tickFile.arrayBuffer();
+        const stopArray    = await stopFile.arrayBuffer();
+        const bpmArray     = await bpmFile.arrayBuffer();
+        const shockArray   = await shockFile.arrayBuffer();
+        // const measureArray = await measureFile.arrayBuffer();
+        const beatArray    = await beatFile.arrayBuffer();
+        tickBuffer.current    = await audioContext.decodeAudioData(tickArray);
+        stopBuffer.current    = await audioContext.decodeAudioData(stopArray)
+        bpmBuffer.current     = await audioContext.decodeAudioData(bpmArray);
+        shockBuffer.current   = await audioContext.decodeAudioData(shockArray);
+        // measureBuffer.current = await audioContext.decodeAudioData(measureArray);
+        beatBuffer.current    = await audioContext.decodeAudioData(beatArray);
         gainNode.current = new GainNode(audioContext);
         gainNode.current.gain.value = 2;
         gainNode.current.connect(audioContext.destination);
@@ -36,6 +44,26 @@ const PreviewSound = ({ audioContext, chart, offset }: {
     }
     maybeDecodeBuffer();
   }, [audioContext]);
+
+  /* beat ticks */
+  const nextBeat = React.useRef(0);
+  const lastMeasure = React.useRef(Math.floor(chart.arrows[chart.arrows.length - 1].offset) + 1);
+  React.useEffect(() => {
+    if (audioContext
+      /* && measureBuffer.current */
+        && beatBuffer.current
+        && suppressorNode.current
+        && lastMeasure.current
+        && nextBeat.current <= offset
+        && offset <= lastMeasure.current) {
+      const player = new AudioBufferSourceNode(audioContext);
+      // player.buffer = nextBeat.current % 1 < 0.25 ? measureBuffer.current : beatBuffer.current;
+      player.buffer = beatBuffer.current;
+      player.connect(suppressorNode.current);
+      player.start();
+      nextBeat.current = nextBeat.current + 0.25;
+    }
+  }, [offset]);
 
   /* arrow ticks */
   const arrowIndex = React.useRef(0);
@@ -101,6 +129,7 @@ const PreviewSound = ({ audioContext, chart, offset }: {
   const lastOffset = React.useRef(0);
   React.useEffect(() => {
     if (offset < lastOffset.current) {
+      nextBeat.current = offset - (offset % 0.25) + 0.25;
       arrowIndex.current = chart.arrows.findIndex((a) => offset < a.offset);
       stopIndex.current = chart.stops.findIndex((s) => offset < s.offset);
       bpmIndex.current = chart.bpm.findIndex((b) => offset < b.startOffset);
