@@ -71,6 +71,12 @@ export function getSortValueFunction(key: string) {
       const value = a[key as keyof Stats];
       return `${value} ${depluralize(key, value)}`;
     };
+  } else if (key === "minBpm" || key === "maxBpm") {
+    return (a: AllMeta) => (
+      (a.minBpm !== a.mainBpm ? `(${a.minBpm})-` : '')
+      + `${a.mainBpm}`
+      + (a.maxBpm !== a.mainBpm ? `-(${a.maxBpm})` : '')
+    );
   } else {
     return (a: AllMeta) => (
       null

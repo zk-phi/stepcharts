@@ -1,181 +1,69 @@
 import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import clsx from "clsx";
-import { useTable, usePagination, Cell, Row } from "react-table";
 
 import { Root } from "../../layout/Root";
 
 import { Breadcrumbs } from "../../Breadcrumbs";
-import { PageBar } from "./PageBar";
 import ListConfig, { SORT_KEYS, LEVELS, getSortFunction, getSortValueFunction } from "./ListConfig";
 
 import styles from "./index.module.css";
-import difficultyBgStyles from "../../difficultyBackgroundColors.module.css";
-import { ImageFrame } from "../../ImageFrame";
 
 type AllSongsPageProps = {
   titles: AllMeta[];
   crumbs?: { display: string, pathSegment: string }[],
 };
 
-const columns = [
-  {
-    Header: "Level",
-    accessor: (t: AllMeta) => (
-      <Link href={`/${t.mixId}/${t.songId}/${t.difficulty}`}>
-        <a className={clsx(styles.level, difficultyBgStyles[t.difficulty])}>
-          {t.difficulty.substring(0, 3).toUpperCase()} {t.level}
-        </a>
-      </Link>
-    ),
-  },
-  {
-    Header: "Title",
-    accessor: (t: AllMeta) => (
-      <Link href={`/${t.mixId}/${t.songId}/${t.difficulty}`}>
-        <a className={styles.link}>
-          {t.title}
-        </a>
-      </Link>
-    ),
-  },
-  {
-    Header: "bpm",
-    accessor: (t: AllMeta) => (
-      <>
-        {t.minBpm < t.mainBpm && `(${t.minBpm})-`}
-        {t.mainBpm}
-        {t.mainBpm < t.maxBpm && `-(${t.maxBpm})`}
-      </>
-    ),
-  },
-];
+const DIFFICULTY_KANJI = {
+  beginner: "習",
+  basic: "楽",
+  difficult: "踊",
+  expert: "激",
+  challenge: "鬼",
+};
 
-function AllSongsPageCell({
-  row,
-  cell,
-  sortValue,
-}: {
-  row: Row<AllMeta>;
-  cell: Cell<AllMeta>;
-  sortValue: string | null;
-}) {
-  if (cell.column.id === "Title" && sortValue) {
-    const chart = row.original;
-    return (
-      <td {...cell.getCellProps()}>
-        <div className={styles.titleCell}>
-          <div>{cell.render("Cell")}</div>
-          <Link href={`/${chart.mixId}/${chart.songId}/${chart.difficulty}`}>
-            <a className={styles.stat}>
-              {sortValue}
-            </a>
-          </Link>
-        </div>
-      </td>
-    );
-  }
-
-  return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
-}
-
-const AllSongsTable = React.memo(function AllSongsTable({
+const AllSongsTable = ({
   titles,
   totalTitleCount,
   getSortValueFunction,
 }: {
-  titles: AllMeta[];
-  totalTitleCount: number;
-  getSortValueFunction: (a: AllMeta) => string | null;
-}) {
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    prepareRow,
-    page,
-    pageCount,
-    gotoPage,
-    state: { pageIndex },
-  } = useTable(
-    {
-      columns,
-      data: titles,
-      initialState: {
-        pageSize: 200,
-      },
-      getRowId: (row) => row.filterString,
-    },
-    usePagination
-  );
-
+  titles: AllMeta[],
+  totalTitleCount: number,
+  getSortValueFunction: (a: AllMeta) => string | null,
+}) => {
   return (
-    <div className="sm:block">
-      <div className="my-6 ml-8">
-        {titles.length === totalTitleCount ? (
-          <span>全 {titles.length} 譜面</span>
-        ) : (
-          <span>
-            <span className="font-bold">{titles.length}</span>
-            {" 譜面がマッチ "}
-            <span className="text-focal-400">
-              ({totalTitleCount} 譜面中)
-            </span>
-          </span>
-        )}
-      </div>
-      <table
-        {...getTableProps()}
-        className={clsx(styles.table, "table-fixed")}
-        cellPadding={0}
-      >
+    <div>
+      <table className={styles.newTable}>
         <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()} className={column.id}>
-                  {column.render("Header")}
-                </th>
-              ))}
-            </tr>
-          ))}
+          <tr>
+            <td>譜面</td>
+            <td>楽曲</td>
+          </tr>
         </thead>
-        <tbody {...getTableBodyProps()}>
-          {page.map((row) => {
-            prepareRow(row);
-            const rowProps = row.getRowProps();
-
+        <tbody>
+          {titles.map((title) => {
+            const url = `/${title.mixId}/${title.songId}/${title.difficulty}`;
+            const sortValue = getSortValueFunction(title);
             return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => {
-                  return (
-                    <AllSongsPageCell
-                        key={cell.getCellProps().key}
-                        row={row}
-                        cell={cell}
-                        sortValue={getSortValueFunction(row.original)}
-                    />
-                  );
-                })}
-              </tr>
-            );
+              <Link href={url}>
+                <tr key={url} className={styles.row}>
+                  <td>
+                    <a className={`${styles.difficulty} ${styles[title.difficulty]}`}>
+                      {DIFFICULTY_KANJI[title.difficulty]}{title.level}
+                    </a>
+                  </td>
+                  <td>
+                    <a className={styles.title}>{title.title}</a>
+                    { sortValue && <span className={styles.sortValue}>{sortValue}</span> }
+                  </td>
+                </tr>
+              </Link>
+            )
           })}
         </tbody>
       </table>
-      {pageCount > 1 && (
-        <div className="mt-8 flex flex-row items-center justify-center space-x-2">
-          <div className="text-sm">pages</div>
-          <PageBar
-            className="max-w-lg"
-            pageCount={pageCount}
-            currentPageIndex={pageIndex}
-            onGotoPage={gotoPage}
-          />
-        </div>
-      )}
     </div>
   );
-});
+};
 
 function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
   const [sortedBy, setSortBy] = useState(SORT_KEYS[0].value);
@@ -213,28 +101,45 @@ function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
     getSortValueFunction(sortedBy)
   ), [sortedBy]);
 
+  const titlesCount = (
+    <div className="my-6 ml-8">
+      {titles.length === sortedTitles.length ? (
+        <span>全 {titles.length} 譜面</span>
+      ) : (
+        <span>
+          <span className="font-bold">{sortedTitles.length}</span>
+          {" 譜面がマッチ "}
+          <span className="text-focal-400">
+            ({titles.length} 譜面中)
+          </span>
+        </span>
+      )}
+    </div>
+  );
+
   return (
     <Root
-      title="All Songs"
-      subheading={crumbs && (
-        <Breadcrumbs crumbs={crumbs} />
-      )}
-      metaDescription={`All ${titles.length} songs available at stepcharts.com`}
+        title="All Songs"
+        subheading={crumbs && (
+          <Breadcrumbs crumbs={crumbs} />
+        )}
+        metaDescription={`All ${titles.length} songs available at stepcharts.com`}
     >
       <ListConfig
-        filter={filter}
-        sortedBy={sortedBy}
-        levelRange={levelRange}
-        hardestOnly={hardestOnly}
-        onChangeFilter={setFilter}
-        onChangeLevelRange={setLevelRange}
-        onChangeSortedBy={setSortBy}
-        onChangeHardestOnly={setHardestOnly}
+          filter={filter}
+          sortedBy={sortedBy}
+          levelRange={levelRange}
+          hardestOnly={hardestOnly}
+          onChangeFilter={setFilter}
+          onChangeLevelRange={setLevelRange}
+          onChangeSortedBy={setSortBy}
+          onChangeHardestOnly={setHardestOnly}
       />
+      {titlesCount}
       <AllSongsTable
-        titles={sortedTitles}
-        totalTitleCount={titles.length}
-        getSortValueFunction={getSortValue}
+          titles={sortedTitles}
+          totalTitleCount={titles.length}
+          getSortValueFunction={getSortValue}
       />
     </Root>
   );
