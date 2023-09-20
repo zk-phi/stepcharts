@@ -51,11 +51,11 @@
 }
 
 .newTable > tbody > tr:hover {
-  background-color: #ddd;
+  background-color: #ea06;
 }
 
 .newTable > tbody > tr:active {
-  background-color: #ccc;
+  background-color: #ea08;
 }
 
 .sortValue {
