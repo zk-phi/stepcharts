@@ -97,11 +97,13 @@ const ListConfig = ({
   filter: string,
   sortedBy: string,
   levelRange: [number, number],
-  onChangeFilter: (f: Filter) => void,
+  hardestOnly: boolean,
+  onChangeFilter: (f: string) => void,
   onChangeLevelRange: (r: [number, number]) => void,
   onChangeSortedBy: (s: string) => void,
+  onChangeHardestOnly: (v: boolean) => void,
 }) => {
-  const [textFilter, _setTextFilter] = useState(filter.text);
+  const [textFilter, _setTextFilter] = useState(filter);
 
   const updateFilter = useMemo(() => (
     debounce(onChangeFilter, 200)

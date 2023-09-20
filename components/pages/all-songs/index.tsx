@@ -13,12 +13,13 @@ type AllSongsPageProps = {
   crumbs?: { display: string, pathSegment: string }[],
 };
 
-const DIFFICULTY_KANJI = {
+const DIFFICULTY_KANJI: Record<Difficulty, string> = {
   beginner: "習",
   basic: "楽",
   difficult: "踊",
   expert: "激",
   challenge: "鬼",
+  edit: "　",
 };
 
 const AllSongsTable = ({
@@ -68,7 +69,9 @@ const AllSongsTable = ({
 function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
   const [sortedBy, setSortBy] = useState(SORT_KEYS[0].value);
   const [filter, setFilter] = useState("");
-  const [levelRange, setLevelRange] = useState([LEVELS[0], LEVELS[LEVELS.length - 1]]);
+  const [levelRange, setLevelRange] = useState<[number, number]>(
+    [LEVELS[0], LEVELS[LEVELS.length - 1]]
+  );
   const [hardestOnly, setHardestOnly] = useState(true);
 
   const filteredTitles = useMemo(() => {
