@@ -22,6 +22,7 @@ const dateReleased: Record<string, string> = {
   X: "2008-12-24",
   X2: "2010-07-07",
   "X3-vs-2nd-Mix": "2011-11-16",
+  "LSP": "9999-12-31",
 };
 
 const shortMixNames: Record<keyof typeof dateReleased, string> = {
@@ -48,6 +49,7 @@ const shortMixNames: Record<keyof typeof dateReleased, string> = {
   X: "X",
   X2: "X2",
   "X3-vs-2nd-Mix": "X3",
+  "LSP": "LSP",
 };
 
 export { dateReleased, shortMixNames };

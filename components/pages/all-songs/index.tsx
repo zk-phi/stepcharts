@@ -19,7 +19,7 @@ const DIFFICULTY_KANJI: Record<Difficulty, string> = {
   difficult: "踊",
   expert: "激",
   challenge: "鬼",
-  edit: "　",
+  edit: "？",
 };
 
 const AllSongsTable = ({

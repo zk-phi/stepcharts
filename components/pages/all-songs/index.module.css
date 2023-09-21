@@ -29,6 +29,10 @@
   background-color: #7d72fe;
 }
 
+.edit {
+  background-color: #888;
+}
+
 .newTable > * > tr > td {
   padding: 0.25rem;
 }
