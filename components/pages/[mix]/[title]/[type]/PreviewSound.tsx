@@ -10,7 +10,6 @@ const PreviewSound = ({ audioContext, chart, offset }: {
   const bpmBuffer      = React.useRef<AudioBuffer>();
   const shockBuffer    = React.useRef<AudioBuffer>();
   const beatBuffer     = React.useRef<AudioBuffer>();
-  const gainNode       = React.useRef<GainNode>();
   const suppressorNode = React.useRef<GainNode>();
   React.useEffect(() => {
     const maybeDecodeBuffer = async () => {
@@ -30,9 +29,6 @@ const PreviewSound = ({ audioContext, chart, offset }: {
         bpmBuffer.current     = await audioContext.decodeAudioData(bpmArray);
         shockBuffer.current   = await audioContext.decodeAudioData(shockArray);
         beatBuffer.current    = await audioContext.decodeAudioData(beatArray);
-        gainNode.current = new GainNode(audioContext);
-        gainNode.current.gain.value = 2;
-        gainNode.current.connect(audioContext.destination);
         suppressorNode.current = new GainNode(audioContext);
         suppressorNode.current.gain.value = 0.25;
         suppressorNode.current.connect(audioContext.destination);
@@ -71,14 +67,18 @@ const PreviewSound = ({ audioContext, chart, offset }: {
       const isShock = chart.arrows[arrowIndex.current].direction.match(/M/);
       const isJump = chart.arrows[arrowIndex.current].direction.match(/[12].*[12]/);
       player.buffer = isShock ? shockBuffer.current : tickBuffer.current;
-      if (isJump) {
-        player.detune.value = 50;
-      }
       player.connect(
-        isJump && gainNode.current ? gainNode.current :
         isShock && suppressorNode.current ? suppressorNode.current :
         audioContext.destination
       );
+      if (isJump) {
+        player.detune.value = -50;
+        const anotherPlayer = new AudioBufferSourceNode(audioContext);
+        anotherPlayer.buffer = tickBuffer.current;
+        anotherPlayer.detune.value = 50;
+        anotherPlayer.connect(audioContext.destination);
+        anotherPlayer.start();
+      }
       player.start();
       let i;
       for (i = arrowIndex.current + 1; chart.arrows[i] && chart.arrows[i].offset <= offset; i++);
