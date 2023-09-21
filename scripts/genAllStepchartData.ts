@@ -83,7 +83,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
 console.log(`Writing ...`);
 
 const allMixesData: MixMeta[] = allData.map((mix) => mix.meta);
-fs.writeFileSync(`_data/mixes.json`, JSON.stringify(allMixesData));
+fs.writeFileSync(`public/_data/mixes.json`, JSON.stringify(allMixesData));
 
 const index: Index = allData.map((mix) => ({
   id: mix.meta.mixId,
@@ -94,15 +94,15 @@ const index: Index = allData.map((mix) => ({
     })),
   })),
 }));
-fs.writeFileSync(`_data/index.json`, JSON.stringify(index));
+fs.writeFileSync(`public/_data/index.json`, JSON.stringify(index));
 
 const allMixes: AllMeta[] = allData.flatMap((mix) => {
-  if (!fs.existsSync(`_data/${mix.meta.mixId}`)) {
-    fs.mkdirSync(`_data/${mix.meta.mixId}`);
+  if (!fs.existsSync(`public/_data/${mix.meta.mixId}`)) {
+    fs.mkdirSync(`public/_data/${mix.meta.mixId}`);
   }
   const allSongs = mix.songs.flatMap((song) => {
-    if (!fs.existsSync(`_data/${mix.meta.mixId}/${song.meta.songId}`)) {
-      fs.mkdirSync(`_data/${mix.meta.mixId}/${song.meta.songId}`);
+    if (!fs.existsSync(`public/_data/${mix.meta.mixId}/${song.meta.songId}`)) {
+      fs.mkdirSync(`public/_data/${mix.meta.mixId}/${song.meta.songId}`);
     }
     const allCharts: AllMeta[] = song.charts.map((chart) => {
       const allMeta = {
@@ -122,18 +122,18 @@ const allMixes: AllMeta[] = allData.flatMap((mix) => {
         ...chart.chart,
       };
       fs.writeFileSync(
-        `_data/${mix.meta.mixId}/${song.meta.songId}/${chart.meta.difficulty}.json`,
+        `public/_data/${mix.meta.mixId}/${song.meta.songId}/${chart.meta.difficulty}.json`,
         JSON.stringify(chartData),
       );
       return allMeta;
     });
     fs.writeFileSync(
-      `_data/${mix.meta.mixId}/${song.meta.songId}/all.json`,
+      `public/_data/${mix.meta.mixId}/${song.meta.songId}/all.json`,
       JSON.stringify(allCharts),
     );
     return allCharts;
   });
-  fs.writeFileSync(`_data/${mix.meta.mixId}/all.json`, JSON.stringify(allSongs));
+  fs.writeFileSync(`public/_data/${mix.meta.mixId}/all.json`, JSON.stringify(allSongs));
   return allSongs;
 });
-fs.writeFileSync(`_data/all.json`, JSON.stringify(allMixes));
+fs.writeFileSync(`public/_data/all.json`, JSON.stringify(allMixes));

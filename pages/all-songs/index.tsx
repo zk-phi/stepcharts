@@ -6,7 +6,7 @@ import type { AllSongsPageProps } from "../../components/pages/all-songs";
 
 export async function getStaticProps(): Promise<GetStaticPropsResult<AllSongsPageProps>> {
   const titles = JSON.parse(
-    fs.readFileSync("_data/all.json", "utf-8"),
+    fs.readFileSync("public/_data/all.json", "utf-8"),
   ) as AllMeta[];
 
   return {

@@ -10,7 +10,7 @@ import type { AllSongsPageProps } from "../../../components/pages/all-songs";
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
   const index = JSON.parse(
-    fs.readFileSync("_data/index.json", "utf-8"),
+    fs.readFileSync("public/_data/index.json", "utf-8"),
   ) as Index;
 
   return {
@@ -28,7 +28,7 @@ export async function getStaticProps(
   const songId = context.params!.title as string;
 
   const titles = JSON.parse(
-    fs.readFileSync(`_data/${mixId}/${songId}/all.json`, "utf-8"),
+    fs.readFileSync(`public/_data/${mixId}/${songId}/all.json`, "utf-8"),
   ) as AllMeta[];
 
   const results: GetStaticPropsResult<AllSongsPageProps> = {

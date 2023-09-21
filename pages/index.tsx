@@ -8,7 +8,7 @@ export async function getStaticProps(): Promise<
   GetStaticPropsResult<IndexPageProps>
 > {
   const mixes = JSON.parse(
-    fs.readFileSync("_data/mixes.json", "utf-8")
+    fs.readFileSync("public/_data/mixes.json", "utf-8")
   ) as MixMeta[];
 
   return {
