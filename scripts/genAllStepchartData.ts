@@ -49,6 +49,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
       songs: mixSongDirs.length,
     },
     songs: mixSongDirs.map((songDir) => {
+      console.log(`Parsing ${mixDir}/${songDir} ...`);
       const simfile = parseSimfile(ROOT, mixDir, songDir);
       return {
         meta: {
@@ -78,6 +79,8 @@ const allData: AllData = mixDirs.map((mixDir) => {
 }).sort((a, b) => (
   a.meta.year - b.meta.year
 ));
+
+console.log(`Writing ...`);
 
 const allMixesData: MixMeta[] = allData.map((mix) => mix.meta);
 fs.writeFileSync(`_data/mixes.json`, JSON.stringify(allMixesData));
