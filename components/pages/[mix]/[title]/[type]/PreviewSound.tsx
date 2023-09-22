@@ -91,7 +91,7 @@ const PreviewSound = ({ chart, offset }: {
   const lastOffset = React.useRef(0);
   React.useEffect(() => {
     if (offset < lastOffset.current) {
-      nextBeat.current = offset - (offset % 0.25) + 0.25;
+      nextBeat.current = offset - (offset % 0.25);
       arrowIndex.current = chart.arrows.findIndex((a) => offset < a.offset);
       stopIndex.current = chart.stops.findIndex((s) => offset < s.offset);
       // bpmIndex.current = chart.bpm.findIndex((b) => offset < b.startOffset);
