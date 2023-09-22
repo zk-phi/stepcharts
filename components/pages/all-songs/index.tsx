@@ -5,6 +5,8 @@ import { Root } from "../../layout/Root";
 
 import { Breadcrumbs } from "../../Breadcrumbs";
 import ListConfig, { SORT_KEYS, LEVELS, getSortFunction, getSortValueFunction } from "./ListConfig";
+import { usePreview } from "../../../lib/hooks/usePreview";
+import PreviewSound from "../[mix]/[title]/[type]/PreviewSound";
 
 import styles from "./index.module.css";
 
@@ -22,6 +24,8 @@ const DIFFICULTY_KANJI: Record<Difficulty, string> = {
   edit: "？",
 };
 
+let audioContext = null;
+
 const AllSongsTable = ({
   titles,
   totalTitleCount,
@@ -31,6 +35,25 @@ const AllSongsTable = ({
   totalTitleCount: number,
   getSortValueFunction: (a: AllMeta) => string | null,
 }) => {
+  const [previewChartId, setPreviewChartId] = useState<[string, string, string]>();
+  const [previewChart, setPreviewChart] = useState<Stepchart>();
+  const [offset, playing, start, stop] = usePreview(previewChart);
+
+  const play = React.useCallback(async ([mix, song, difficulty]) => {
+    if (!audioContext) {
+      audioContext = new AudioContext();
+    }
+    const response = await fetch(`/stepcharts/_data/${mix}/${song}/${difficulty}.json`);
+    setPreviewChartId([mix, song, difficulty]);
+    setPreviewChart(await response.json());
+  }, [setPreviewChart]);
+
+  useEffect(() => {
+    if (previewChart) {
+      start();
+    }
+  }, [previewChart]);
+
   return (
     <div>
       <table className={styles.newTable}>
@@ -44,24 +67,45 @@ const AllSongsTable = ({
           {titles.map((title) => {
             const url = `/${title.mixId}/${title.songId}/${title.difficulty}`;
             const sortValue = getSortValueFunction(title);
+            const previewFn = () => play([title.mixId, title.songId, title.difficulty]);
+            const chartIsPlayed = playing && previewChartId && (
+              previewChartId[0] === title.mixId &&
+              previewChartId[1] === title.songId &&
+              previewChartId[2] === title.difficulty
+            );
             return (
-              <Link href={url}>
-                <tr key={url} className={styles.row}>
-                  <td>
+              <tr key={url} className={styles.row}>
+                <td>
+                  <Link href={url}>
                     <a className={`${styles.difficulty} ${styles[title.difficulty]}`}>
                       {DIFFICULTY_KANJI[title.difficulty]}{title.level}
                     </a>
-                  </td>
-                  <td>
+                  </Link>
+                </td>
+                <td>
+                  {chartIsPlayed ? (
+                    <button onClick={stop}>⏹️</button>
+                  ) : (
+                    <button onClick={previewFn}>▶️</button>
+                  )}
+                  {" "}
+                  <Link href={url}>
                     <a className={styles.title}>{title.title}</a>
-                    { sortValue && <span className={styles.sortValue}>{sortValue}</span> }
-                  </td>
-                </tr>
-              </Link>
+                  </Link>
+                  { sortValue && (
+                    <Link href={url}>
+                      <span className={styles.sortValue}>{sortValue}</span>
+                    </Link>
+                  ) }
+                </td>
+              </tr>
             )
           })}
         </tbody>
       </table>
+      {previewChart && (
+        <PreviewSound audioContext={audioContext} chart={previewChart} offset={offset} />
+      )}
     </div>
   );
 };
