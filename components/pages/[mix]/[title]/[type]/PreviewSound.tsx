@@ -74,7 +74,6 @@ const PreviewSound = ({ audioContext, chart, offset }: {
       if (isJump) {
         const anotherPlayer = new AudioBufferSourceNode(audioContext);
         anotherPlayer.buffer = tickBuffer.current;
-        anotherPlayer.detune.value = 50;
         anotherPlayer.connect(audioContext.destination);
         anotherPlayer.start();
       }
