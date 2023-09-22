@@ -19,7 +19,7 @@ const PreviewSound = ({ chart, offset }: {
       player.buffer = audioBuffers.beat;
       player.connect(destinations.suppressed);
       player.start();
-      nextBeat.current = nextBeat.current + 0.25;
+      nextBeat.current = offset - (offset % 0.25) + 0.25;
     }
   }, [offset]);
 
