@@ -7,6 +7,7 @@ import { Breadcrumbs } from "../../Breadcrumbs";
 import ListConfig, { SORT_KEYS, LEVELS, getSortFunction, getSortValueFunction } from "./ListConfig";
 import { usePreview } from "../../../lib/hooks/usePreview";
 import PreviewSound from "../[mix]/[title]/[type]/PreviewSound";
+import { prepareAudioContext } from "../../../lib/audioContext";
 
 import styles from "./index.module.css";
 
@@ -24,8 +25,6 @@ const DIFFICULTY_KANJI: Record<Difficulty, string> = {
   edit: "？",
 };
 
-let audioContext: AudioContext | null = null;
-
 const AllSongsTable = ({
   titles,
   totalTitleCount,
@@ -40,10 +39,8 @@ const AllSongsTable = ({
   const [offset, playing, start, stop] = usePreview(previewChart);
 
   const play = React.useCallback(async ([mix, song, difficulty]) => {
-    if (!audioContext) {
-      audioContext = new AudioContext();
-    }
     const response = await fetch(`/stepcharts/_data/${mix}/${song}/${difficulty}.json`);
+    await prepareAudioContext();
     setPreviewChartId([mix, song, difficulty]);
     setPreviewChart(await response.json());
   }, [setPreviewChart]);
@@ -103,9 +100,7 @@ const AllSongsTable = ({
           })}
         </tbody>
       </table>
-      {previewChart && (
-        <PreviewSound audioContext={audioContext} chart={previewChart} offset={offset} />
-      )}
+      { previewChart && <PreviewSound chart={previewChart} offset={offset} /> }
     </div>
   );
 };

@@ -1,55 +1,23 @@
 import React from "react";
+import { audioContext, audioBuffers, destinations } from "../../../../../lib/audioContext";
 
-const PreviewSound = ({ audioContext, chart, offset }: {
-  audioContext?: AudioContext | null,
+const PreviewSound = ({ chart, offset }: {
   chart: Stepchart,
   offset: number,
 }) => {
-  const tickBuffer     = React.useRef<AudioBuffer>();
-  const stopBuffer     = React.useRef<AudioBuffer>();
-  const bpmBuffer      = React.useRef<AudioBuffer>();
-  const shockBuffer    = React.useRef<AudioBuffer>();
-  const beatBuffer     = React.useRef<AudioBuffer>();
-  const suppressorNode = React.useRef<GainNode>();
-  React.useEffect(() => {
-    const maybeDecodeBuffer = async () => {
-      if (audioContext) {
-        const tickFile    = await fetch("/stepcharts/cursor12.mp3");
-        const stopFile    = await fetch("/stepcharts/cursor4.mp3");
-        const bpmFile     = await fetch("/stepcharts/cancel1.mp3");
-        const shockFile   = await fetch("/stepcharts/cursor7.mp3");
-        const beatFile    = await fetch("/stepcharts/cursor6.mp3");
-        const tickArray    = await tickFile.arrayBuffer();
-        const stopArray    = await stopFile.arrayBuffer();
-        const bpmArray     = await bpmFile.arrayBuffer();
-        const shockArray   = await shockFile.arrayBuffer();
-        const beatArray    = await beatFile.arrayBuffer();
-        tickBuffer.current    = await audioContext.decodeAudioData(tickArray);
-        stopBuffer.current    = await audioContext.decodeAudioData(stopArray)
-        bpmBuffer.current     = await audioContext.decodeAudioData(bpmArray);
-        shockBuffer.current   = await audioContext.decodeAudioData(shockArray);
-        beatBuffer.current    = await audioContext.decodeAudioData(beatArray);
-        suppressorNode.current = new GainNode(audioContext);
-        suppressorNode.current.gain.value = 0.25;
-        suppressorNode.current.connect(audioContext.destination);
-      }
-    }
-    maybeDecodeBuffer();
-  }, [audioContext]);
-
   /* beat ticks */
   const nextBeat = React.useRef(0);
   const lastMeasure = React.useRef(Math.floor(chart.arrows[chart.arrows.length - 1].offset) + 1);
   React.useEffect(() => {
     if (audioContext
-        && beatBuffer.current
-        && suppressorNode.current
+        && audioBuffers.beat
+        && destinations.suppressed
         && lastMeasure.current
         && nextBeat.current <= offset
         && offset <= lastMeasure.current) {
       const player = new AudioBufferSourceNode(audioContext);
-      player.buffer = beatBuffer.current;
-      player.connect(suppressorNode.current);
+      player.buffer = audioBuffers.beat;
+      player.connect(destinations.suppressed);
       player.start();
       nextBeat.current = nextBeat.current + 0.25;
     }
@@ -59,22 +27,21 @@ const PreviewSound = ({ audioContext, chart, offset }: {
   const arrowIndex = React.useRef(0);
   React.useEffect(() => {
     if (audioContext
-        && tickBuffer.current
-        && shockBuffer.current
+        && audioBuffers.tick
+        && audioBuffers.shock
+        && destinations.normal
+        && destinations.suppressed
         && chart.arrows[arrowIndex.current]
         && chart.arrows[arrowIndex.current].offset <= offset) {
       const player = new AudioBufferSourceNode(audioContext);
       const isShock = chart.arrows[arrowIndex.current].direction.match(/M/);
       const isJump = chart.arrows[arrowIndex.current].direction.match(/[12].*[12]/);
-      player.buffer = isShock ? shockBuffer.current : tickBuffer.current;
-      player.connect(
-        isShock && suppressorNode.current ? suppressorNode.current :
-        audioContext.destination
-      );
+      player.buffer = isShock ? audioBuffers.shock : audioBuffers.tick;
+      player.connect(isShock ? destinations.suppressed : destinations.normal);
       if (isJump) {
         const anotherPlayer = new AudioBufferSourceNode(audioContext);
-        anotherPlayer.buffer = tickBuffer.current;
-        anotherPlayer.connect(audioContext.destination);
+        anotherPlayer.buffer = audioBuffers.tick;
+        anotherPlayer.connect(destinations.normal);
         anotherPlayer.start();
       }
       player.start();
@@ -88,13 +55,13 @@ const PreviewSound = ({ audioContext, chart, offset }: {
   const stopIndex = React.useRef(0);
   React.useEffect(() => {
     if (audioContext
-        && stopBuffer.current
-        && suppressorNode.current
+        && audioBuffers.stop
+        && destinations.suppressed
         && chart.stops[stopIndex.current]
         && chart.stops[stopIndex.current].offset <= offset) {
       const player = new AudioBufferSourceNode(audioContext);
-      player.buffer = stopBuffer.current;
-      player.connect(suppressorNode.current);
+      player.buffer = audioBuffers.stop;
+      player.connect(destinations.suppressed);
       player.start();
       let i;
       for (i = stopIndex.current + 1; chart.stops[i] && chart.stops[i].offset <= offset; i++);
@@ -106,13 +73,13 @@ const PreviewSound = ({ audioContext, chart, offset }: {
   // const bpmIndex = React.useRef(1);
   // React.useEffect(() => {
   //   if (audioContext
-  //       && bpmBuffer.current
-  //       && suppressorNode.current
+  //       && audioBuffers.bpm
+  //       && destinations.suppressed
   //       && chart.bpm[bpmIndex.current]
   //       && chart.bpm[bpmIndex.current].startOffset <= offset) {
   //     const player = new AudioBufferSourceNode(audioContext);
-  //     player.buffer = bpmBuffer.current;
-  //     player.connect(suppressorNode.current);
+  //     player.buffer = audioBuffers.bpm;
+  //     player.connect(destinations.suppressed);
   //     player.start();
   //     let i;
   //     for (i = bpmIndex.current + 1; chart.bpm[i] && chart.bpm[i].startOffset <= offset; i++);
