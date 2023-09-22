@@ -4,7 +4,7 @@ import PreviewSound from "./PreviewSound";
 import { extractTimelineEvents, TimelineBpmEvent } from "../../../../../lib/computeChartTimeline";
 import { usePreview } from "../../../../../lib/hooks/usePreview";
 
-let audioContext = null;
+let audioContext: AudioContext | null = null;
 
 const PreviewPage = ({ chart }: {
   chart: Stepchart,

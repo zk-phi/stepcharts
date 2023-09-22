@@ -24,7 +24,7 @@ const DIFFICULTY_KANJI: Record<Difficulty, string> = {
   edit: "？",
 };
 
-let audioContext = null;
+let audioContext: AudioContext | null = null;
 
 const AllSongsTable = ({
   titles,

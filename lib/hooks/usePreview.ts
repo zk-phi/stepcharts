@@ -18,7 +18,7 @@ const useAnimationFrame = (callback = () => {}) => {
   }, [callback]);
 };
 
-export const usePreview = (chart: Stepchart | null) => {
+export const usePreview = (chart?: Stepchart | null): [number, boolean, () => void, () => void] => {
   const startTime = React.useRef<number>();
   const [playing, setPlaying] = React.useState(false);
   const [offset, setOffset] = React.useState(0);

@@ -1,7 +1,7 @@
 import React from "react";
 
 const PreviewSound = ({ audioContext, chart, offset }: {
-  audioContext?: AudioContext,
+  audioContext?: AudioContext | null,
   chart: Stepchart,
   offset: number,
 }) => {
