@@ -11,7 +11,7 @@ type RawSimfile = Omit<Simfile, "title"> & {
 };
 type Parser = (simfileSource: string, titleDir: string) => RawSimfile;
 
-const INTRO_OFFSET = 2;
+const INTRO_OFFSET = 1;
 
 const parsers: Record<string, Parser> = {
   ".sm": parseSm,
