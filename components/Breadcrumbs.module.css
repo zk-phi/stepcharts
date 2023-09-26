@@ -1,3 +1,8 @@
+.breadcrumb {
+  display: flex;
+  flex-direction: row;
+}
+
 .breadcrumbEntry {
     @apply text-focal-700;
 }
@@ -10,6 +15,10 @@
     color: var(--color-focal-400);
 }
 
+.breadcrumbEntryLink:hover {
+  text-decoration: underline;
+}
+
 .breadcrumbEntry:last-child::after {
-    content: ''
+  content: ''
 }

@@ -1,6 +1,5 @@
 import React, { ReactElement } from "react";
 import Link from "next/link";
-import clsx from "clsx";
 
 import styles from "./Breadcrumbs.module.css";
 
@@ -44,7 +43,7 @@ function Breadcrumbs({ className, crumbs }: BreadcrumbsProps) {
     return (
       <li key={crumb.pathSegment} className={styles.breadcrumbEntry}>
         <Link href={buildLink(crumb, array)}>
-          <a className="cursor-pointer border-b-2 border-transparent hover:border-focal">
+          <a className={styles.breadcrumbEntryLink}>
             {crumb.display}
           </a>
         </Link>
@@ -54,7 +53,7 @@ function Breadcrumbs({ className, crumbs }: BreadcrumbsProps) {
 
   return (
     <nav>
-      <ul className={clsx(className, "flex flex-row")}>{entries}</ul>
+      <ul className={styles.breadcrumb}>{entries}</ul>
     </nav>
   );
 }
