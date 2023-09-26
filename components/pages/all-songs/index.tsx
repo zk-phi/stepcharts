@@ -144,16 +144,16 @@ function AllSongsPage({ titles, crumbs }: AllSongsPageProps) {
   ), [sortedBy]);
 
   const titlesCount = (
-    <div className="my-6 ml-8">
+    <div className={styles.chartCount}>
       {titles.length === sortedTitles.length ? (
         <span>全 {titles.length} 譜面</span>
       ) : (
         <span>
-          <span className="font-bold">{sortedTitles.length}</span>
+          <b>{sortedTitles.length}</b>
           {" 譜面がマッチ "}
-          <span className="text-focal-400">
+          <small>
             ({titles.length} 譜面中)
-          </span>
+          </small>
         </span>
       )}
     </div>

@@ -72,3 +72,7 @@
 .title {
   word-break: break-all;
 }
+
+.chartCount {
+  margin: 1.5rem 0;
+}
