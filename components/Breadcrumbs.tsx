@@ -28,7 +28,7 @@ function buildLink(crumb: Crumb, crumbs: Crumb[]): string {
   return path || "/";
 }
 
-const ROOT_CRUMB = { display: "Mixes", pathSegment: "" };
+const ROOT_CRUMB = { display: "Top", pathSegment: "" };
 
 function Breadcrumbs({ className, crumbs }: BreadcrumbsProps) {
   const entries = [ROOT_CRUMB].concat(crumbs).map((crumb, index, array) => {
