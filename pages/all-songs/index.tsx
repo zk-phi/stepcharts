@@ -10,7 +10,10 @@ export async function getStaticProps(): Promise<GetStaticPropsResult<AllSongsPag
   ) as AllMeta[];
 
   return {
-    props: { titles },
+    props: {
+      titles,
+      crumbs: [{ display: "All Songs", pathSegment: "all-songs" }],
+    },
   };
 }
 
