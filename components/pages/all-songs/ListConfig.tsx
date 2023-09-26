@@ -45,7 +45,7 @@ export function getSortFunction(key: string) {
       };
     case "artist":
       return (a: AllMeta, b: AllMeta) => {
-        return a.artist
+        return (a.artist ?? "")
           .toLowerCase()
           .localeCompare(b.artist);
       };
