@@ -9,28 +9,32 @@
   white-space: nowrap;
 }
 
+.difficulty:hover {
+  opacity: 0.8;
+}
+
 .beginner {
-  background-color: #00b0c6;
+  background-color: var(--beginner-bg);
 }
 
 .basic {
-  background-color: #d68b00;
+  background-color: var(--basic-bg);
 }
 
 .difficult {
-  background-color: #ce1a87;
+  background-color: var(--difficult-bg);
 }
 
 .expert {
-  background-color: #58bc10;
+  background-color: var(--expert-bg);
 }
 
 .challenge {
-  background-color: #7d72fe;
+  background-color: var(--challenge-bg);
 }
 
 .edit {
-  background-color: #888;
+  background-color: var(--edit-bg);
 }
 
 .newTable > * > tr > td {
@@ -38,28 +42,16 @@
 }
 
 .newTable > thead > tr {
-  background-color: #666;
+  background-color: var(--inverted-bg);
   color: white;
 }
 
-.newTable > tbody > tr {
-  cursor: pointer;
-}
-
 .newTable > tbody > tr:nth-child(odd) {
-  background-color: white;
+  background-color: var(--inverted-fg);
 }
 
 .newTable > tbody > tr:nth-child(even) {
-  background-color: #eee;
-}
-
-.newTable > tbody > tr:hover {
-  background-color: #ea06;
-}
-
-.newTable > tbody > tr:active {
-  background-color: #ea08;
+  background-color: var(--dark-bg);
 }
 
 .sortValue {
@@ -70,7 +62,12 @@
 }
 
 .title {
+  text-decoration: underline dotted currentColor;
   word-break: break-all;
+}
+
+.title:hover {
+  color: var(--brand);
 }
 
 .chartCount {

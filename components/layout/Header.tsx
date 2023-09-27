@@ -7,23 +7,15 @@ export const Header = ({ subheading }: {
 }) => (
   <header className={styles.header}>
     <div className={styles.outer}>
-      <div className={styles.inner}>
-        <Link href="/">
-          <a className={styles.title}>Stepcharts</a>
-        </Link>
-        <Link href="/all-songs">
-          <a className={styles.link}>
-            all songs
-          </a>
-        </Link>
-      </div>
+      <Link href="/">
+        <a className={styles.title}>Stepcharts</a>
+      </Link>
+      <Link href="/all-songs">
+        <a className={styles.link}>
+          all songs
+        </a>
+      </Link>
     </div>
-    {subheading && (
-      <div className={styles.subheadingOuter}>
-        <div className={styles.inner}>
-          {subheading}
-        </div>
-      </div>
-    )}
+    {subheading}
   </header>
 );

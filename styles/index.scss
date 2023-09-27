@@ -45,8 +45,22 @@ body {
 }
 
 :root {
-  --brand:   #eeaa00;
-  --border:  #00000066;
-  --dark-bg: #0000000a;
+  --brand:         #eeaa00;
+
+  --border:        #00000040;
+
+  --dark-bg:       #0000000a;
+  --inverted-bg:   #00000080;
+  --inverted-fg:   white;
+  --hover-bg:      #eeaa0055;
+  --active-bg:     #eeaa0077;
+
+  --beginner-bg:   #00b0c6;
+  --basic-bg:      #d68b00;
+  --difficult-bg:  #ce1a87;
+  --expert-bg:     #58bc10;
+  --challenge-bg:  #7d72fe;
+  --edit-bg:       #888888;
+
   --page-margin: 4vw;
 }

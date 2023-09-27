@@ -1,6 +1,9 @@
 .breadcrumb {
   display: flex;
   flex-direction: row;
+  padding: 0.25rem var(--page-margin);
+  background: var(--dark-bg);
+  border-bottom: 1px solid var(--border);
 }
 
 .breadcrumbEntry::after {
@@ -9,9 +12,12 @@
     margin: 0 0.5rem;
 }
 
+.breadcrumbEntryLink {
+  text-decoration: underline dotted;
+}
+
 .breadcrumbEntryLink:hover {
   color: var(--brand);
-  text-decoration: underline;
   text-decoration-color: var(--brand);
 }
 

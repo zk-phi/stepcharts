@@ -1,21 +1,7 @@
-.header {
-  border-bottom: 1px solid var(--border);
-}
-
 .outer {
-  padding: 0.5rem 0;
+  padding: 0.5rem var(--page-margin);
   background: var(--brand);
   color: white;
-}
-
-.subheadingOuter {
-  background: var(--dark-bg);
-  padding: 0.25rem 0;
-}
-
-.inner {
-  width: 100%;
-  margin: 0  var(--page-margin);
 }
 
 .title {
@@ -27,4 +13,8 @@
 
 .link {
   vertical-align: middle;
+}
+
+.link:hover {
+  text-decoration: underline;
 }
