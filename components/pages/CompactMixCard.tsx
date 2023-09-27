@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import style from "./CompactMixCart.module.css";
+import style from "./CompactMixCard.module.css";
 
 type CompactMixCardProps = {
   className?: string;
