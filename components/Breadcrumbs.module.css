@@ -3,22 +3,18 @@
   flex-direction: row;
 }
 
-.breadcrumbEntry {
-    @apply text-focal-700;
-}
-
 .breadcrumbEntry::after {
     content: '/';
     display: inline-block;
-    font-weight: bold;
     margin: 0 0.5rem;
-    color: var(--color-focal-400);
 }
 
 .breadcrumbEntryLink:hover {
+  color: var(--brand);
   text-decoration: underline;
+  text-decoration-color: var(--brand);
 }
 
 .breadcrumbEntry:last-child::after {
-  content: ''
+  content: '';
 }

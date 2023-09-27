@@ -1,16 +1,15 @@
 .header {
-  border-bottom: 1px solid #0003;
-  box-shadow: 0 5px 5px #0001;
+  border-bottom: 1px solid var(--border);
 }
 
 .outer {
   padding: 0.5rem 0;
-  background: #ea0;
+  background: var(--brand);
   color: white;
 }
 
 .subheadingOuter {
-  background: #0001;
+  background: var(--dark-bg);
   padding: 0.25rem 0;
 }
 

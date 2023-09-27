@@ -1,9 +1,8 @@
 .footer {
   font-size: 0.75rem;
   padding: 1rem;
-  background-color: #0001;
-  border-top: 1px solid #0003;
-  box-shadow: 0 -5px 5px #0001;
+  background-color: var(--dark-bg);
+  border-top: 1px solid var(--border);
   text-align: center;
 }
 
@@ -16,6 +15,6 @@
 }
 
 .link:hover {
-  color: #ea0;
-  text-decoration-color: #ea0;
+  color: var(--brand);
+  text-decoration-color: var(--brand);
 }
