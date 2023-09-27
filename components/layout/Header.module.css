@@ -16,8 +16,7 @@
 
 .inner {
   width: 100%;
-  max-width: min(calc(100vw - 4rem), 80rem);
-  margin: auto;
+  margin: 0  var(--page-margin);
 }
 
 .title {
