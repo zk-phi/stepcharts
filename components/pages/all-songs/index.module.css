@@ -10,7 +10,7 @@
 }
 
 .difficulty:hover {
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
 .beginner {
@@ -39,6 +39,10 @@
 
 .newTable > * > tr > td {
   padding: 0.25rem;
+}
+
+.newTable > * > tr > td > button:hover {
+  opacity: 0.7;
 }
 
 .newTable > thead > tr {
