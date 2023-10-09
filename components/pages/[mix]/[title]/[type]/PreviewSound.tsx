@@ -2,13 +2,15 @@ import React from "react";
 import { audioContext, audioBuffers, destinations } from "../../../../../lib/audioContext";
 import { useAnimationFrame } from "../../../../../lib/hooks/useAnimationFrame";
 
-const playSound = (destination: AudioDestinationNode, buffer: AudioBuffer) => {
+const playSound = (destination: AudioDestinationNode, buffer: AudioBuffer): boolean => {
   if (audioContext && destination && buffer) {
     const player = new AudioBufferSourceNode(audioContext);
     player.buffer = buffer;
     player.connect(destination);
     player.start();
+    return true;
   }
+  return false;
 };
 
 const PreviewSound = ({ chart, offsetRef }: {
@@ -24,8 +26,9 @@ const PreviewSound = ({ chart, offsetRef }: {
   const beatSounder = React.useCallback(() => {
     if (nextBeat.current <= offsetRef.current
         && offsetRef.current <= lastMeasure) {
-      playSound(destinations.suppressed, audioBuffers.beat);
-      nextBeat.current = offsetRef.current - (offsetRef.current % 0.25) + 0.25;
+      if (playSound(destinations.suppressed, audioBuffers.beat)) {
+        nextBeat.current = offsetRef.current - (offsetRef.current % 0.25) + 0.25;
+      }
     }
   }, [offsetRef, lastMeasure, nextBeat]);
 
