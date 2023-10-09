@@ -100,7 +100,7 @@ const AllSongsTable = ({
           })}
         </tbody>
       </table>
-      { previewChart && <PreviewSound chart={previewChart} offset={offset} /> }
+      { previewChart && <PreviewSound chart={previewChart} offsetRef={offset} /> }
     </div>
   );
 };

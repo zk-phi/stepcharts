@@ -1,4 +1,5 @@
 import React from "react";
+import { useAnimationFrame } from "../../../../../lib/hooks/useAnimationFrame";
 
 const ARROW_HEIGHT = 13.5; /* vh */
 const LANE_HEIGHT = 100; /* vh */
@@ -197,8 +198,8 @@ const ChartObjectsRaw = ({ chart, speed = 1 }: {
 
 const ChartObjects = React.memo(ChartObjectsRaw);
 
-const ChartContainer = ({ offset = 0, speed = 1, children }: {
-  offset: number,
+const ChartContainer = ({ offsetRef, speed = 1, children }: {
+  offsetRef: React.Ref<number>,
   speed: number,
   children: React.ReactNode,
 }) => {
@@ -212,11 +213,13 @@ const ChartContainer = ({ offset = 0, speed = 1, children }: {
     overflow: "scroll",
   };
 
-  React.useEffect(() => {
+  const handler = React.useCallback(() => {
     if (ref.current) {
-      ref.current.scrollTop = judgePos(offset, speed) * window.innerHeight / 100;
+      ref.current.scrollTop = judgePos(offsetRef.current, speed) * window.innerHeight / 100;
     }
-  }, [ref, offset, speed]);
+  }, [ref, offsetRef, speed]);
+
+  useAnimationFrame(handler);
 
   return (
     <div ref={ref} style={style}>
@@ -225,13 +228,13 @@ const ChartContainer = ({ offset = 0, speed = 1, children }: {
   );
 };
 
-export const ChartPreview = ({ chart, speed = 1, offset = 0 }: {
+export const ChartPreview = ({ chart, speed = 1, offsetRef }: {
   chart: Stepchart,
   speed: number,
-  offset: number,
+  offsetRef: React.Ref<number>,
 }) => {
   return (
-    <ChartContainer offset={offset} speed={speed}>
+    <ChartContainer offsetRef={offsetRef} speed={speed}>
       <ChartObjects chart={chart} speed={speed} />
     </ChartContainer>
   );

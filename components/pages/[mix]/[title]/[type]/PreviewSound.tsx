@@ -1,5 +1,6 @@
 import React from "react";
 import { audioContext, audioBuffers, destinations } from "../../../../../lib/audioContext";
+import { useAnimationFrame } from "../../../../../lib/hooks/useAnimationFrame";
 
 const playSound = (destination: AudioDestinationNode, buffer: AudioBuffer) => {
   if (audioContext && destination && buffer) {
@@ -10,9 +11,9 @@ const playSound = (destination: AudioDestinationNode, buffer: AudioBuffer) => {
   }
 };
 
-const PreviewSound = ({ chart, offset }: {
+const PreviewSound = ({ chart, offsetRef }: {
   chart: Stepchart,
-  offset: number,
+  offsetRef: React.Ref<number>,
 }) => {
   const lastMeasure = React.useMemo(() => (
     Math.floor(chart.arrows[chart.arrows.length - 1].offset) + 1
@@ -20,20 +21,19 @@ const PreviewSound = ({ chart, offset }: {
 
   /* beat ticks */
   const nextBeat = React.useRef(0);
-  React.useEffect(() => {
-    if (lastMeasure.current
-        && nextBeat.current <= offset
-        && offset <= lastMeasure.current) {
+  const beatSounder = React.useCallback(() => {
+    if (nextBeat.current <= offsetRef.current
+        && offsetRef.current <= lastMeasure) {
       playSound(destinations.suppressed, audioBuffers.beat);
-      nextBeat.current = offset - (offset % 0.25) + 0.25;
+      nextBeat.current = offsetRef.current - (offsetRef.current % 0.25) + 0.25;
     }
-  }, [offset, lastMeasure, nextBeat]);
+  }, [offsetRef, lastMeasure, nextBeat]);
 
   /* arrow ticks */
   const arrowIndex = React.useRef(0);
-  React.useEffect(() => {
+  const arrowSounder = React.useCallback(() => {
     if (chart.arrows[arrowIndex.current]
-        && chart.arrows[arrowIndex.current].offset <= offset) {
+        && chart.arrows[arrowIndex.current].offset <= offsetRef.current) {
       const isShock = chart.arrows[arrowIndex.current].direction.match(/M/);
       if (isShock) {
         playSound(destinations.suppressed, audioBuffers.shock);
@@ -45,24 +45,44 @@ const PreviewSound = ({ chart, offset }: {
         }
       }
       while (chart.arrows[arrowIndex.current]
-          && chart.arrows[arrowIndex.current].offset <= offset) {
+          && chart.arrows[arrowIndex.current].offset <= offsetRef.current) {
         arrowIndex.current++;
       }
     }
-  }, [offset, arrowIndex, chart]);
+  }, [offsetRef, arrowIndex, chart]);
 
   /* stop ticks */
   const stopIndex = React.useRef(0);
-  React.useEffect(() => {
+  const stopSounder = React.useCallback(() => {
     if (chart.stops[stopIndex.current]
-        && chart.stops[stopIndex.current].offset <= offset) {
+        && chart.stops[stopIndex.current].offset <= offsetRef.current) {
       playSound(destinations.suppressed, audioBuffers.stop);
       while (chart.stops[stopIndex.current]
-          && chart.stops[stopIndex.current].offset <= offset) {
+          && chart.stops[stopIndex.current].offset <= offsetRef.current) {
         stopIndex.current++;
       }
     }
-  }, [offset, stopIndex]);
+  }, [offsetRef, stopIndex]);
+
+  const lastOffset = React.useRef(0);
+  const resetHandler = React.useCallback(() => {
+    if (offsetRef.current < lastOffset.current) {
+      nextBeat.current = offsetRef.current - (offsetRef.current % 0.25);
+      arrowIndex.current = chart.arrows.findIndex((a) => offsetRef.current < a.offset);
+      stopIndex.current = chart.stops.findIndex((s) => offsetRef.current < s.offset);
+      // bpmIndex.current = chart.bpm.findIndex((b) => offset < b.startOffset);
+    }
+    lastOffset.current = offsetRef.current;
+  }, [offsetRef, lastOffset, chart]);
+
+  const handler = React.useCallback(() => {
+    resetHandler();
+    beatSounder();
+    arrowSounder();
+    stopSounder();
+  }, [resetHandler, beatSounder, arrowSounder, stopSounder]);
+
+  useAnimationFrame(handler);
 
   // /* bpm-shift ticks */
   // const bpmIndex = React.useRef(1);
@@ -81,18 +101,6 @@ const PreviewSound = ({ chart, offset }: {
   //     bpmIndex.current = i;
   //   }
   // }, [offset]);
-
-  /* rewind support */
-  const lastOffset = React.useRef(0);
-  React.useEffect(() => {
-    if (offset < lastOffset.current) {
-      nextBeat.current = offset - (offset % 0.25);
-      arrowIndex.current = chart.arrows.findIndex((a) => offset < a.offset);
-      stopIndex.current = chart.stops.findIndex((s) => offset < s.offset);
-      // bpmIndex.current = chart.bpm.findIndex((b) => offset < b.startOffset);
-    }
-    lastOffset.current = offset;
-  }, [offset, chart]);
 
   return null;
 };

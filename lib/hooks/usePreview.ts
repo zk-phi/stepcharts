@@ -1,32 +1,15 @@
 import React from "react";
 import { extractTimelineEvents, TimelineBpmEvent } from "../computeChartTimeline";
-
-const useAnimationFrame = (callback = () => {}) => {
-  const reqIdRef = React.useRef<number>();
-
-  React.useEffect(() => {
-    const loop = () => {
-      reqIdRef.current = requestAnimationFrame(loop);
-      callback();
-    };
-    reqIdRef.current = requestAnimationFrame(loop);
-    return () => {
-      if (reqIdRef.current) {
-        cancelAnimationFrame(reqIdRef.current);
-      }
-    }
-  }, [callback]);
-};
+import { useAnimationFrame } from "./useAnimationFrame";
 
 export const usePreview = (chart?: Stepchart | null): [number, boolean, () => void, () => void] => {
   const startTime = React.useRef<number>();
   const [playing, setPlaying] = React.useState(false);
-  const [offset, setOffset] = React.useState(0);
+  const offsetRef = React.useRef<number>(0);
 
   const timelineIndex = React.useRef(0);
   const secToOffset = React.useMemo(() => {
     if (!chart) return null;
-
     const timeline = extractTimelineEvents(chart);
     return (sec: number) => {
       let i;
@@ -40,14 +23,14 @@ export const usePreview = (chart?: Stepchart | null): [number, boolean, () => vo
     if (chart) {
       startTime.current = (new Date()).getTime();
       timelineIndex.current = 0;
-      setOffset(0);
+      offsetRef.current = 0;
       setPlaying(true);
     }
-  }, [chart, setOffset, setPlaying]);
+  }, [chart, offsetRef, setPlaying]);
 
   const stop = React.useCallback(() => {
     setPlaying(false);
-  }, [setOffset, setPlaying]);
+  }, [setPlaying]);
 
   React.useEffect(() => {
     stop();
@@ -55,10 +38,10 @@ export const usePreview = (chart?: Stepchart | null): [number, boolean, () => vo
 
   const tick = React.useCallback(() => {
     if (playing && secToOffset && startTime.current) {
-      setOffset(secToOffset(((new Date()).getTime() - startTime.current) / 1000));
+      offsetRef.current = secToOffset(((new Date()).getTime() - startTime.current) / 1000);
     }
-  }, [secToOffset, playing, setOffset]);
+  }, [secToOffset, playing, offsetRef]);
   useAnimationFrame(tick);
 
-  return [offset, playing, play, stop];
+  return [offsetRef, playing, play, stop];
 };

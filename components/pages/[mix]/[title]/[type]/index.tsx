@@ -8,7 +8,7 @@ import { prepareAudioContext } from "../.../../../../../../lib/audioContext";
 const PreviewPage = ({ chart }: {
   chart: Stepchart,
 }) => {
-  const [offset, playing, start, stop] = usePreview(chart);
+  const [offsetRef, playing, start, stop] = usePreview(chart);
 
   const play = React.useCallback(async () => {
     await prepareAudioContext();
@@ -17,8 +17,8 @@ const PreviewPage = ({ chart }: {
 
   return (
     <div style={{ display: "flex" }}>
-      <ChartPreview chart={chart} speed={2} offset={offset} />
-      <PreviewSound chart={chart} offset={offset} />
+      <ChartPreview chart={chart} speed={2} offsetRef={offsetRef} />
+      <PreviewSound chart={chart} offsetRef={offsetRef} />
       <button onClick={play}>Play</button>
     </div>
   );
