@@ -14,9 +14,12 @@ const PreviewSound = ({ chart, offset }: {
   chart: Stepchart,
   offset: number,
 }) => {
+  const lastMeasure = React.useMemo(() => (
+    Math.floor(chart.arrows[chart.arrows.length - 1].offset) + 1
+  ), [chart]);
+
   /* beat ticks */
   const nextBeat = React.useRef(0);
-  const lastMeasure = React.useRef(Math.floor(chart.arrows[chart.arrows.length - 1].offset) + 1);
   React.useEffect(() => {
     if (lastMeasure.current
         && nextBeat.current <= offset
@@ -24,7 +27,7 @@ const PreviewSound = ({ chart, offset }: {
       playSound(destinations.suppressed, audioBuffers.beat);
       nextBeat.current = offset - (offset % 0.25) + 0.25;
     }
-  }, [offset]);
+  }, [offset, lastMeasure, nextBeat]);
 
   /* arrow ticks */
   const arrowIndex = React.useRef(0);
@@ -46,7 +49,7 @@ const PreviewSound = ({ chart, offset }: {
         arrowIndex.current++;
       }
     }
-  }, [offset]);
+  }, [offset, arrowIndex, chart]);
 
   /* stop ticks */
   const stopIndex = React.useRef(0);
@@ -59,7 +62,7 @@ const PreviewSound = ({ chart, offset }: {
         stopIndex.current++;
       }
     }
-  }, [offset]);
+  }, [offset, stopIndex]);
 
   // /* bpm-shift ticks */
   // const bpmIndex = React.useRef(1);
