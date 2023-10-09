@@ -3,7 +3,8 @@ import { useAnimationFrame } from "../../../../../lib/hooks/useAnimationFrame";
 
 const ARROW_HEIGHT = 13.5; /* vh */
 const LANE_HEIGHT = 100; /* vh */
-const HEIGHT_PER_BEAT = (LANE_HEIGHT / 6.25); /* vh */
+const JUDGE_LINE_POS = ARROW_HEIGHT * 1.25;
+const HEIGHT_PER_BEAT = ((LANE_HEIGHT - JUDGE_LINE_POS) / 6.25); /* vh */
 
 const ARROW_IMG = {
   4: "/stepcharts/arrow4.svg",
@@ -23,7 +24,7 @@ const ARROW_ROTATION = {
 };
 
 const judgePos = (offset: number, speed: number) => (
-  offset * 4 * HEIGHT_PER_BEAT * speed
+  offset * 4 * HEIGHT_PER_BEAT * speed + JUDGE_LINE_POS
 );
 
 const Spacer = ({ offset, speed }: {
@@ -126,6 +127,21 @@ const Bar = ({ offset, speed, color }: {
   );
 };
 
+const JudgeLine = () => {
+  const style: React.CSSProperties = {
+    position: "absolute",
+    height: 0,
+    width: `${4 * ARROW_HEIGHT}vh`,
+    left: 0,
+    top: `${JUDGE_LINE_POS - ARROW_HEIGHT / 2}vh`,
+    border: `${ARROW_HEIGHT / 2}vh solid #ffffff60`,
+  };
+
+  return (
+    <div style={style} />
+  );
+};
+
 const ChartObjectsRaw = ({ chart, speed = 1 }: {
   chart: Stepchart,
   speed: number,
@@ -216,7 +232,9 @@ const ChartContainer = ({ offsetRef, speed = 1, children }: {
   const lastOffset = React.useRef<number>();
   const handler = React.useCallback(() => {
     if (ref.current && offsetRef.current != lastOffset.current) {
-      ref.current.scrollTop = judgePos(offsetRef.current, speed) * window.innerHeight / 100;
+      ref.current.scrollTop = (
+        (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * window.innerHeight / 100
+      );
       lastOffset.current = offsetRef.current;
     }
   }, [ref, offsetRef, lastOffset, speed]);
@@ -236,9 +254,12 @@ export const ChartPreview = ({ chart, speed = 1, offsetRef }: {
   offsetRef: React.Ref<number>,
 }) => {
   return (
-    <ChartContainer offsetRef={offsetRef} speed={speed}>
-      <ChartObjects chart={chart} speed={speed} />
-    </ChartContainer>
+    <div style={{ position: "relative" }}>
+      <ChartContainer offsetRef={offsetRef} speed={speed}>
+        <ChartObjects chart={chart} speed={speed} />
+      </ChartContainer>
+      <JudgeLine />
+    </div>
   );
 };
 
