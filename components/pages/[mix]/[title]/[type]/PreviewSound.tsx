@@ -24,7 +24,7 @@ const PreviewSound = ({ chart, offsetRef }: {
   /* beat ticks */
   const nextBeat = React.useRef(0);
   const beatSounder = React.useCallback(() => {
-    if (nextBeat.current <= offsetRef.current
+    if (nextBeat.current < offsetRef.current
         && offsetRef.current <= lastMeasure) {
       if (playSound(destinations.suppressed, audioBuffers.beat)) {
         nextBeat.current = offsetRef.current - (offsetRef.current % 0.25) + 0.25;
@@ -36,7 +36,7 @@ const PreviewSound = ({ chart, offsetRef }: {
   const arrowIndex = React.useRef(0);
   const arrowSounder = React.useCallback(() => {
     if (chart.arrows[arrowIndex.current]
-        && chart.arrows[arrowIndex.current].offset <= offsetRef.current) {
+        && chart.arrows[arrowIndex.current].offset < offsetRef.current) {
       const isShock = chart.arrows[arrowIndex.current].direction.match(/M/);
       if (isShock) {
         playSound(destinations.suppressed, audioBuffers.shock);
@@ -58,7 +58,7 @@ const PreviewSound = ({ chart, offsetRef }: {
   const stopIndex = React.useRef(0);
   const stopSounder = React.useCallback(() => {
     if (chart.stops[stopIndex.current]
-        && chart.stops[stopIndex.current].offset <= offsetRef.current) {
+        && chart.stops[stopIndex.current].offset < offsetRef.current) {
       playSound(destinations.suppressed, audioBuffers.stop);
       while (chart.stops[stopIndex.current]
           && chart.stops[stopIndex.current].offset <= offsetRef.current) {
@@ -71,8 +71,8 @@ const PreviewSound = ({ chart, offsetRef }: {
   const resetHandler = React.useCallback(() => {
     if (offsetRef.current < lastOffset.current) {
       nextBeat.current = offsetRef.current - (offsetRef.current % 0.25);
-      arrowIndex.current = chart.arrows.findIndex((a) => offsetRef.current < a.offset);
-      stopIndex.current = chart.stops.findIndex((s) => offsetRef.current < s.offset);
+      arrowIndex.current = chart.arrows.findIndex((a) => offsetRef.current <= a.offset);
+      stopIndex.current = chart.stops.findIndex((s) => offsetRef.current <= s.offset);
       // bpmIndex.current = chart.bpm.findIndex((b) => offset < b.startOffset);
     }
     lastOffset.current = offsetRef.current;
