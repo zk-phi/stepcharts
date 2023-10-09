@@ -213,11 +213,13 @@ const ChartContainer = ({ offsetRef, speed = 1, children }: {
     overflow: "scroll",
   };
 
+  const lastOffset = React.useRef<number>();
   const handler = React.useCallback(() => {
-    if (ref.current) {
+    if (ref.current && offsetRef.current != lastOffset.current) {
       ref.current.scrollTop = judgePos(offsetRef.current, speed) * window.innerHeight / 100;
+      lastOffset.current = offsetRef.current;
     }
-  }, [ref, offsetRef, speed]);
+  }, [ref, offsetRef, lastOffset, speed]);
 
   useAnimationFrame(handler);
 
