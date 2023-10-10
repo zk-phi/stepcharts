@@ -214,9 +214,10 @@ const ChartObjectsRaw = ({ chart, speed = 1 }: {
 
 const ChartObjects = React.memo(ChartObjectsRaw);
 
-const ChartContainer = ({ offsetRef, speed = 1, children }: {
+const ChartContainer = ({ offsetRef, speed = 1, playing, children }: {
   offsetRef: React.MutableRefObject<number>,
   speed: number,
+  playing: boolean,
   children: React.ReactNode,
 }) => {
   const ref = React.useRef<HTMLDivElement>(null);
@@ -229,15 +230,24 @@ const ChartContainer = ({ offsetRef, speed = 1, children }: {
     overflow: "scroll",
   };
 
+  const laneHeight = React.useMemo(() => {
+    if (ref.current && playing) {
+      const rect = ref.current.getBoundingClientRect();
+      return rect.bottom - rect.top;
+    } else {
+      return 0;
+    }
+  }, [ref, playing]);
+
   const lastOffset = React.useRef<number>();
   const handler = React.useCallback(() => {
     if (ref.current && offsetRef.current && offsetRef.current != lastOffset.current) {
       ref.current.scrollTop = (
-        (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * ref.current.clientHeight / 100
+        (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * laneHeight / 100
       );
       lastOffset.current = offsetRef.current;
     }
-  }, [ref, offsetRef, lastOffset, speed]);
+  }, [ref, offsetRef, lastOffset, speed, laneHeight]);
 
   useAnimationFrame(handler);
 
@@ -248,14 +258,15 @@ const ChartContainer = ({ offsetRef, speed = 1, children }: {
   );
 };
 
-export const ChartPreview = ({ chart, speed = 1, offsetRef }: {
+export const ChartPreview = ({ chart, speed = 1, offsetRef, playing }: {
   chart: Stepchart,
   speed: number,
   offsetRef: React.MutableRefObject<number>,
+  playing: boolean,
 }) => {
   return (
     <div style={{ position: "relative" }}>
-      <ChartContainer offsetRef={offsetRef} speed={speed}>
+      <ChartContainer offsetRef={offsetRef} speed={speed} playing={playing}>
         <ChartObjects chart={chart} speed={speed} />
       </ChartContainer>
       <JudgeLine />

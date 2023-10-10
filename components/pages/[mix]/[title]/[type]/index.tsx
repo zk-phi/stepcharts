@@ -17,7 +17,7 @@ const PreviewPage = ({ chart }: {
 
   return (
     <div style={{ display: "flex" }}>
-      <ChartPreview chart={chart} speed={2} offsetRef={offsetRef} />
+      <ChartPreview chart={chart} speed={2} offsetRef={offsetRef} playing={playing} />
       <PreviewSound chart={chart} offsetRef={offsetRef} />
       <button onClick={play}>Play</button>
     </div>
