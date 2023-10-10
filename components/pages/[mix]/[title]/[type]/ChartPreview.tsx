@@ -233,7 +233,7 @@ const ChartContainer = ({ offsetRef, speed = 1, children }: {
   const handler = React.useCallback(() => {
     if (ref.current && offsetRef.current != lastOffset.current) {
       ref.current.scrollTop = (
-        (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * window.innerHeight / 100
+        (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * ref.current.clientHeight / 100
       );
       lastOffset.current = offsetRef.current;
     }
