@@ -2,7 +2,12 @@ import React from "react";
 import { extractTimelineEvents, TimelineBpmEvent } from "../computeChartTimeline";
 import { useAnimationFrame } from "./useAnimationFrame";
 
-export const usePreview = (chart?: Stepchart | null): [number, boolean, () => void, () => void] => {
+export const usePreview = (chart?: Stepchart | null): [
+  React.MutableRefObject<number>,
+  boolean,
+  () => void,
+  () => void,
+] => {
   const startTime = React.useRef<number>();
   const [playing, setPlaying] = React.useState(false);
   const offsetRef = React.useRef<number>(0);

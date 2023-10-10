@@ -2,7 +2,7 @@ import React from "react";
 import { audioContext, audioBuffers, destinations } from "../../../../../lib/audioContext";
 import { useAnimationFrame } from "../../../../../lib/hooks/useAnimationFrame";
 
-const playSound = (destination: AudioDestinationNode, buffer: AudioBuffer): boolean => {
+const playSound = (destination: AudioNode | null, buffer: AudioBuffer | null): boolean => {
   if (audioContext && destination && buffer) {
     const player = new AudioBufferSourceNode(audioContext);
     player.buffer = buffer;
@@ -15,7 +15,7 @@ const playSound = (destination: AudioDestinationNode, buffer: AudioBuffer): bool
 
 const PreviewSound = ({ chart, offsetRef }: {
   chart: Stepchart,
-  offsetRef: React.Ref<number>,
+  offsetRef: React.MutableRefObject<number>,
 }) => {
   const lastMeasure = React.useMemo(() => (
     Math.floor(chart.arrows[chart.arrows.length - 1].offset) + 1

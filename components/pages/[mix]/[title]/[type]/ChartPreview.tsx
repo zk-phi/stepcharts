@@ -215,7 +215,7 @@ const ChartObjectsRaw = ({ chart, speed = 1 }: {
 const ChartObjects = React.memo(ChartObjectsRaw);
 
 const ChartContainer = ({ offsetRef, speed = 1, children }: {
-  offsetRef: React.Ref<number>,
+  offsetRef: React.MutableRefObject<number>,
   speed: number,
   children: React.ReactNode,
 }) => {
@@ -231,7 +231,7 @@ const ChartContainer = ({ offsetRef, speed = 1, children }: {
 
   const lastOffset = React.useRef<number>();
   const handler = React.useCallback(() => {
-    if (ref.current && offsetRef.current != lastOffset.current) {
+    if (ref.current && offsetRef.current && offsetRef.current != lastOffset.current) {
       ref.current.scrollTop = (
         (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * ref.current.clientHeight / 100
       );
@@ -251,7 +251,7 @@ const ChartContainer = ({ offsetRef, speed = 1, children }: {
 export const ChartPreview = ({ chart, speed = 1, offsetRef }: {
   chart: Stepchart,
   speed: number,
-  offsetRef: React.Ref<number>,
+  offsetRef: React.MutableRefObject<number>,
 }) => {
   return (
     <div style={{ position: "relative" }}>
