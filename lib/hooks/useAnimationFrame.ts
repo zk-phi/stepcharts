@@ -1,12 +1,13 @@
 import React from "react";
 
-export const useAnimationFrame = (callback = () => {}) => {
+export const useAnimationFrame = (callback = () => {}, deps) => {
   const reqIdRef = React.useRef<number>();
+  const cb = React.useCallback(callback, deps);
 
   React.useEffect(() => {
     const loop = () => {
       reqIdRef.current = requestAnimationFrame(loop);
-      callback();
+      cb();
     };
     reqIdRef.current = requestAnimationFrame(loop);
     return () => {
@@ -14,5 +15,5 @@ export const useAnimationFrame = (callback = () => {}) => {
         cancelAnimationFrame(reqIdRef.current);
       }
     }
-  }, [callback]);
+  }, [cb]);
 };

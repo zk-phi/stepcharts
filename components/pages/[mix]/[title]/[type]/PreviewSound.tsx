@@ -78,14 +78,12 @@ const PreviewSound = ({ chart, offsetRef }: {
     lastOffset.current = offsetRef.current;
   }, [offsetRef, lastOffset, chart]);
 
-  const handler = React.useCallback(() => {
+  useAnimationFrame(() => {
     resetHandler();
     beatSounder();
     arrowSounder();
     stopSounder();
   }, [resetHandler, beatSounder, arrowSounder, stopSounder]);
-
-  useAnimationFrame(handler);
 
   // /* bpm-shift ticks */
   // const bpmIndex = React.useRef(1);

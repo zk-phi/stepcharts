@@ -240,7 +240,7 @@ const ChartContainer = ({ offsetRef, speed = 1, playing, children }: {
   }, [ref, playing]);
 
   const lastOffset = React.useRef<number>();
-  const handler = React.useCallback(() => {
+  useAnimationFrame(() => {
     if (ref.current && offsetRef.current && offsetRef.current != lastOffset.current) {
       ref.current.scrollTop = (
         (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * laneHeight / 100
@@ -248,8 +248,6 @@ const ChartContainer = ({ offsetRef, speed = 1, playing, children }: {
       lastOffset.current = offsetRef.current;
     }
   }, [ref, offsetRef, lastOffset, speed, laneHeight]);
-
-  useAnimationFrame(handler);
 
   return (
     <div ref={ref} style={style}>

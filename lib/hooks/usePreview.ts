@@ -41,12 +41,11 @@ export const usePreview = (chart?: Stepchart | null): [
     stop();
   }, [chart, stop]);
 
-  const tick = React.useCallback(() => {
+  useAnimationFrame(() => {
     if (playing && secToOffset && startTime.current) {
       offsetRef.current = secToOffset(((new Date()).getTime() - startTime.current) / 1000);
     }
   }, [playing, secToOffset, startTime, offsetRef]);
-  useAnimationFrame(tick);
 
   return [offsetRef, playing, play, stop];
 };
