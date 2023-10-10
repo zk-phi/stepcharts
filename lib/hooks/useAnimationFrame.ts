@@ -1,6 +1,6 @@
 import React from "react";
 
-export const useAnimationFrame = (callback = () => {}, deps) => {
+export const useAnimationFrame = (callback = () => {}, deps: React.DependencyList) => {
   const reqIdRef = React.useRef<number>();
   const cb = React.useCallback(callback, deps);
 
