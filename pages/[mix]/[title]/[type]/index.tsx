@@ -9,7 +9,7 @@ import {
 } from "next";
 
 type PreviewPageProps = {
-  chart: Stepchart,
+  chart: ChartData,
 };
 
 export async function getStaticPaths(): Promise<GetStaticPathsResult> {
@@ -48,7 +48,7 @@ export async function getStaticProps(
 }
 
 const ChartPreviewPage = ({ chart }: {
-  chart: Stepchart,
+  chart: ChartData,
 }) => {
   return (
     <PreviewPage chart={chart} />
