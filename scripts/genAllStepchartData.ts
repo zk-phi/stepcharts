@@ -57,8 +57,6 @@ const allData: AllData = mixDirs.map((mixDir) => {
           title: simfile.title.titleName,
           titleTranslit: simfile.title.translitTitleName,
           artist: simfile.artist,
-          minBpm: simfile.minBpm,
-          maxBpm: simfile.maxBpm,
           displayBpm: simfile.displayBpm,
         },
         charts: simfile.availableTypes.map((chartType: StepchartType) => ({
@@ -68,6 +66,8 @@ const allData: AllData = mixDirs.map((mixDir) => {
             arrows: simfile.charts[chartType.difficulty].arrows.length,
             stops: simfile.charts[chartType.difficulty].stops.length,
             bpmShifts: simfile.charts[chartType.difficulty].bpm.length - 1,
+            minBpm: simfile.minBpm,
+            maxBpm: simfile.maxBpm,
             mainBpm: Math.round(findMainBpm(simfile.charts[chartType.difficulty])),
             ...simfile.stats[chartType.difficulty],
           },

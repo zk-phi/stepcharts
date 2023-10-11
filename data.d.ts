@@ -19,8 +19,6 @@ type SongMeta = {
   title: string;
   titleTranslit: string | null;
   artist: string;
-  minBpm: number;
-  maxBpm: number;
   displayBpm: string;
 };
 
@@ -30,6 +28,8 @@ type ChartMeta = Stats & {
   arrows: number;
   stops: number;
   bpmShifts: number;
+  minBpm: number;
+  maxBpm: number;
   mainBpm: number;
 };
 
