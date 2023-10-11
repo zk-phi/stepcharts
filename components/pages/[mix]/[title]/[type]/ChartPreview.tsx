@@ -23,7 +23,7 @@ const ARROW_ROTATION = {
   3: "90deg",
 };
 
-const DIRECTION_CONVERSION = {
+const DIRECTION_CONVERSION: Record<Turn, [Direction, Direction, Direction, Direction]> = {
   off:    [0, 1, 2, 3],
   mirror: [3, 2, 1, 0],
   left:   [1, 3, 0, 2],
@@ -51,8 +51,8 @@ const Spacer = ({ offset, speed }: {
 }
 
 const Arrow = ({ beat, direction, offset, speed }: {
-  beat: 4 | 6 | 8 | 12 | 16 | "freeze" | "shock",
-  direction: 0 | 1 | 2 | 3,
+  beat: Beat | "freeze" | "shock",
+  direction: Direction,
   offset: number,
   speed: number,
 }) => {
@@ -73,7 +73,7 @@ const Arrow = ({ beat, direction, offset, speed }: {
 };
 
 const Freeze = ({ direction, offset, endOffset, speed }: {
-  direction: 0 | 1 | 2 | 3,
+  direction: Direction,
   offset: number,
   endOffset: number,
   speed: number,
@@ -152,7 +152,7 @@ const JudgeLine = () => {
 const ChartObjectsRaw = ({ chart, speed = 1, turn = "off" }: {
   chart: Stepchart,
   speed: number,
-  turn: "off" | "mirror" | "left" | "right",
+  turn: Turn,
 }) => {
   const lastMeasure = Math.floor(chart.arrows[chart.arrows.length - 1].offset);
   const reversedArrows = [...chart.arrows].reverse();
@@ -327,7 +327,7 @@ const ChartContainer = ({ offsetRef, speed = 1, playing, children }: {
 export const ChartPreview = ({ chart, speed = 1, turn = "off", offsetRef, playing }: {
   chart: Stepchart,
   speed: number,
-  turn: "off" | "mirror" | "left" | "right",
+  turn: Turn,
   offsetRef: React.MutableRefObject<number>,
   playing: boolean,
 }) => {

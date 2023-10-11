@@ -10,7 +10,7 @@ const PreviewPage = ({ chart }: {
 }) => {
   const [offsetRef, playing, start, stop] = usePreview(chart);
   const [speed, setSpeed] = React.useState(2);
-  const [turn, setTurn] = React.useState("off");
+  const [turn, setTurn] = React.useState<Turn>("off");
   const [showModal, setShowModal] = React.useState(false);
 
   const onChangeSpeed = React.useCallback((e) => setSpeed(Number(e.target.value)), [setSpeed]);
