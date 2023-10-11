@@ -23,6 +23,13 @@ const ARROW_ROTATION = {
   3: "90deg",
 };
 
+const DIRECTION_CONVERSION = {
+  off:    [0, 1, 2, 3],
+  mirror: [3, 2, 1, 0],
+  left:   [1, 3, 0, 2],
+  right:  [2, 0, 3, 1],
+};
+
 const judgePos = (offset: number, speed: number) => (
   offset * 4 * HEIGHT_PER_BEAT * speed + JUDGE_LINE_POS
 );
@@ -142,9 +149,10 @@ const JudgeLine = () => {
   );
 };
 
-const ChartObjectsRaw = ({ chart, speed = 1 }: {
+const ChartObjectsRaw = ({ chart, speed = 1, turn = "off" }: {
   chart: Stepchart,
   speed: number,
+  turn: "off" | "mirror" | "left" | "right",
 }) => {
   const lastMeasure = Math.floor(chart.arrows[chart.arrows.length - 1].offset);
   const reversedArrows = [...chart.arrows].reverse();
@@ -170,7 +178,7 @@ const ChartObjectsRaw = ({ chart, speed = 1 }: {
       {reversedFreezes.map((f, i) => (
         <Freeze
             key={`f${i}`}
-            direction={f.direction}
+            direction={DIRECTION_CONVERSION[turn][f.direction]}
             offset={f.startOffset}
             endOffset={f.endOffset}
             speed={speed} />
@@ -181,29 +189,89 @@ const ChartObjectsRaw = ({ chart, speed = 1 }: {
         return (
           <>
             { a.direction.match(/^1.../) &&
-              <Arrow key={`a${i}l`} beat={beat} direction={0} offset={a.offset} speed={speed} /> }
+              <Arrow
+                  key={`a${i}l`}
+                  beat={beat}
+                  direction={DIRECTION_CONVERSION[turn][0]}
+                  offset={a.offset}
+                  speed={speed} /> }
             { a.direction.match(/^.1../) &&
-              <Arrow key={`a${i}d`} beat={beat} direction={1} offset={a.offset} speed={speed} /> }
+              <Arrow
+                  key={`a${i}d`}
+                  beat={beat}
+                  direction={DIRECTION_CONVERSION[turn][1]}
+                  offset={a.offset}
+                  speed={speed} /> }
             { a.direction.match(/^..1./) &&
-              <Arrow key={`a${i}u`} beat={beat} direction={2} offset={a.offset} speed={speed} /> }
+              <Arrow
+                  key={`a${i}u`}
+                  beat={beat}
+                  direction={DIRECTION_CONVERSION[turn][2]}
+                  offset={a.offset}
+                  speed={speed} /> }
             { a.direction.match(/^...1/) &&
-              <Arrow key={`a${i}r`} beat={beat} direction={3} offset={a.offset} speed={speed} /> }
+              <Arrow
+                  key={`a${i}r`}
+                  beat={beat}
+                  direction={DIRECTION_CONVERSION[turn][3]}
+                  offset={a.offset}
+                  speed={speed} /> }
             { a.direction.match(/^2.../) &&
-              <Arrow key={`a${i}l`} beat="freeze" direction={0} offset={a.offset} speed={speed} /> }
+              <Arrow
+                  key={`a${i}l`}
+                  beat="freeze"
+                  direction={DIRECTION_CONVERSION[turn][0]}
+                  offset={a.offset}
+                  speed={speed} /> }
             { a.direction.match(/^.2../) &&
-              <Arrow key={`a${i}d`} beat="freeze" direction={1} offset={a.offset} speed={speed} /> }
+              <Arrow
+                  key={`a${i}d`}
+                  beat="freeze"
+                  direction={DIRECTION_CONVERSION[turn][1]}
+                  offset={a.offset}
+                  speed={speed} /> }
             { a.direction.match(/^..2./) &&
-              <Arrow key={`a${i}u`} beat="freeze" direction={2} offset={a.offset} speed={speed} /> }
+              <Arrow
+                  key={`a${i}u`}
+                  beat="freeze"
+                  direction={DIRECTION_CONVERSION[turn][2]}
+                  offset={a.offset}
+                  speed={speed} /> }
             { a.direction.match(/^...2/) &&
-              <Arrow key={`a${i}r`} beat="freeze" direction={3} offset={a.offset} speed={speed} /> }
+              <Arrow
+                  key={`a${i}r`}
+                  beat="freeze"
+                  direction={DIRECTION_CONVERSION[turn][3]}
+                  offset={a.offset}
+                  speed={speed} /> }
             { a.direction.match(/^M.../) &&
-              <Arrow key={`a${i}l`} beat="shock" direction={0} offset={a.offset} speed={speed} /> }
+              <Arrow
+                  key={`a${i}l`}
+                  beat="shock"
+                  direction={DIRECTION_CONVERSION[turn][0]}
+                  offset={a.offset}
+                  speed={speed} /> }
             { a.direction.match(/^.M../) &&
-              <Arrow key={`a${i}d`} beat="shock" direction={1} offset={a.offset} speed={speed} /> }
+              <Arrow
+                  key={`a${i}d`}
+                  beat="shock"
+                  direction={DIRECTION_CONVERSION[turn][1]}
+                  offset={a.offset}
+                  speed={speed} /> }
             { a.direction.match(/^..M./) &&
-              <Arrow key={`a${i}u`} beat="shock" direction={2} offset={a.offset} speed={speed} /> }
+              <Arrow
+                  key={`a${i}u`}
+                  beat="shock"
+                  direction={DIRECTION_CONVERSION[turn][2]}
+                  offset={a.offset}
+                  speed={speed} /> }
             { a.direction.match(/^...M/) &&
-              <Arrow key={`a${i}r`} beat="shock" direction={3} offset={a.offset} speed={speed} /> }
+              <Arrow
+                  key={`a${i}r`}
+                  beat="shock"
+                  direction={DIRECTION_CONVERSION[turn][3]}
+                  offset={a.offset}
+                  speed={speed} /> }
           </>
         );
       })}
@@ -256,16 +324,17 @@ const ChartContainer = ({ offsetRef, speed = 1, playing, children }: {
   );
 };
 
-export const ChartPreview = ({ chart, speed = 1, offsetRef, playing }: {
+export const ChartPreview = ({ chart, speed = 1, turn = "off", offsetRef, playing }: {
   chart: Stepchart,
   speed: number,
+  turn: "off" | "mirror" | "left" | "right",
   offsetRef: React.MutableRefObject<number>,
   playing: boolean,
 }) => {
   return (
     <div style={{ position: "relative" }}>
       <ChartContainer offsetRef={offsetRef} speed={speed} playing={playing}>
-        <ChartObjects chart={chart} speed={speed} />
+        <ChartObjects chart={chart} speed={speed} turn={turn} />
       </ChartContainer>
       <JudgeLine />
     </div>
