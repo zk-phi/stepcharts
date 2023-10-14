@@ -150,7 +150,7 @@ const JudgeLine = () => {
 };
 
 const ChartObjectsRaw = ({ chart, speed = 1, turn = "off" }: {
-  chart: Stepchart,
+  chart: ChartData,
   speed: number,
   turn: Turn,
 }) => {
@@ -163,17 +163,18 @@ const ChartObjectsRaw = ({ chart, speed = 1, turn = "off" }: {
       {[...Array((lastMeasure + 1) * 4)].map((_, i) => (
         <Bar key={`b${i}`} offset={i / 4} speed={speed} color={i % 4 === 0 ? "#888" : "#444"} />
       ))}
-      {chart.bpm.map((b, i, bs) => (
+      {chart.bpmTimeline.map((e, i, es) => (
         i === 0 ? (
           null
-        ) : bs[i - 1].bpm < b.bpm ? (
-          <Bar key={`ts${i}`} offset={b.startOffset} speed={speed} color={"#fc4"} />
+        ) : e.bpm === 0 ? (
+          <Bar key={`ts${i}`} offset={e.offset} speed={speed} color={"#4f4"} />
+        ) : es[i - 1].bpm === 0 ? (
+          null
+        ) : es[i - 1].bpm < e.bpm ? (
+          <Bar key={`ts${i}`} offset={e.offset} speed={speed} color={"#fc4"} />
         ) : (
-          <Bar key={`ts${i}`} offset={b.startOffset} speed={speed} color={"#4cf"} />
+          <Bar key={`ts${i}`} offset={e.offset} speed={speed} color={"#4cf"} />
         )
-      ))}
-      {chart.stops.map((s, i) => (
-        <Bar key={`s${i}`} offset={s.offset} speed={speed} color={"#4f4"} />
       ))}
       {reversedFreezes.map((f, i) => (
         <Freeze
@@ -325,7 +326,7 @@ const ChartContainer = ({ offsetRef, speed = 1, playing, children }: {
 };
 
 export const ChartPreview = ({ chart, speed = 1, turn = "off", offsetRef, playing }: {
-  chart: Stepchart,
+  chart: ChartData,
   speed: number,
   turn: Turn,
   offsetRef: React.MutableRefObject<number>,
