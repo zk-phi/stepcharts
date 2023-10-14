@@ -2,16 +2,48 @@ import * as fs from "fs";
 import * as path from "path";
 import { parseSimfile } from "../lib/parseSimfile";
 import { dateReleased, shortMixNames } from "../lib/meta";
-import { extractTimelineEvents, TimelineBpmEvent } from "../lib/computeChartTimeline";
 
 const ROOT = "resources/stepcharts";
 
-const findMainBpm = (chart: Stepchart) => {
-  const timeline = extractTimelineEvents(chart);
+const extractTimelineEvents = (chart: Stepchart): BpmEvent[] => {
+  const bpmEvents = [
+    ...chart.bpm.map((b) => (
+      { offset: b.startOffset, bpm: b.bpm }
+    )),
+    ...chart.stops.map((s) => (
+      { offset: s.offset, stop: s.duration }
+    )),
+  ].sort((a, b) => (
+    a.offset - b.offset
+  ));
+
+  const timeline: BpmEvent[] = [{
+    time: 0,
+    offset: 0,
+    // @ts-ignore `bpm` can be undefined in type-level but it must be defined actually
+    bpm: bpmEvents.shift().bpm,
+  }];
+
+  bpmEvents.forEach((e) => {
+    const lastBpm = timeline[0].bpm;
+    const dt = (e.offset - timeline[0].offset) * 4 / lastBpm * 60;
+    const time = timeline[0].time + dt;
+    if ('bpm' in e) {
+      timeline.unshift({ time, offset: e.offset, bpm: e.bpm });
+    } else {
+      timeline.unshift({ time,                offset: e.offset, bpm: 0 });
+      timeline.unshift({ time: time + e.stop, offset: e.offset, bpm: lastBpm });
+    }
+  });
+
+  return timeline.reverse();
+};
+
+const findMainBpm = (chart: Stepchart, bpmTimeline: BpmEvent[]) => {
   const lastOffset = chart.arrows[chart.arrows.length - 1].offset;
 
   const hist: Record<number, number> = {};
-  timeline.forEach((event, i, arr) => {
+  bpmTimeline.forEach((event, i, arr) => {
     hist[event.bpm] = (hist[event.bpm] ?? 0) + (arr[i + 1]?.offset ?? lastOffset) - event.offset;
   });
 
@@ -42,6 +74,7 @@ type AllData = {
     meta: SongMeta,
     charts: {
       meta: ChartMeta,
+      timeline: ChartTimeline,
       chart: Stepchart,
     }[],
   }[],
@@ -71,20 +104,27 @@ const allData: AllData = mixDirs.map((mixDir) => {
           artist: simfile.artist,
           displayBpm: simfile.displayBpm,
         },
-        charts: simfile.availableTypes.map((chartType: StepchartType) => ({
-          meta: {
-            difficulty: chartType.difficulty,
-            level: chartType.feet,
-            arrows: simfile.charts[chartType.difficulty].arrows.length,
-            stops: simfile.charts[chartType.difficulty].stops.length,
-            bpmShifts: simfile.charts[chartType.difficulty].bpm.length - 1,
-            minBpm: simfile.minBpm,
-            maxBpm: simfile.maxBpm,
-            mainBpm: Math.round(findMainBpm(simfile.charts[chartType.difficulty])),
-            ...simfile.stats[chartType.difficulty],
-          },
-          chart: simfile.charts[chartType.difficulty],
-        })),
+        charts: simfile.availableTypes.map((chartType: StepchartType) => {
+          const chart = simfile.charts[chartType.difficulty];
+          const timeline: ChartTimeline = {
+            bpmTimeline: extractTimelineEvents(chart),
+          };
+          return {
+            meta: {
+              difficulty: chartType.difficulty,
+              level: chartType.feet,
+              arrows: chart.arrows.length,
+              stops: chart.stops.length,
+              bpmShifts: chart.bpm.length - 1,
+              minBpm: simfile.minBpm,
+              maxBpm: simfile.maxBpm,
+              mainBpm: Math.round(findMainBpm(chart, timeline.bpmTimeline)),
+              ...simfile.stats[chartType.difficulty],
+            },
+            timeline,
+            chart,
+          };
+        }),
       };
     }),
   };
@@ -132,6 +172,7 @@ const allMixes: AllMeta[] = allData.flatMap((mix) => {
       const chartData: ChartData = {
         meta: allMeta,
         ...chart.chart,
+        ...chart.timeline,
       };
       console.log(
         `Writing _data/${mix.meta.mixId}/${song.meta.songId}/${chart.meta.difficulty}.json ...`

@@ -35,7 +35,7 @@ const AllSongsTable = ({
   getSortValueFunction: (a: AllMeta) => string | null,
 }) => {
   const [previewChartId, setPreviewChartId] = useState<[string, string, string]>();
-  const [previewChart, setPreviewChart] = useState<Stepchart>();
+  const [previewChart, setPreviewChart] = useState<ChartData>();
   const [offset, playing, start, stop] = usePreview(previewChart);
 
   const play = React.useCallback(async ([mix, song, difficulty]) => {

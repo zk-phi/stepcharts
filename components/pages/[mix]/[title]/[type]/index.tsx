@@ -1,7 +1,6 @@
 import React from "react";
 import ChartPreview from "./ChartPreview";
 import PreviewSound from "./PreviewSound";
-import { extractTimelineEvents, TimelineBpmEvent } from "../../../../../lib/computeChartTimeline";
 import { usePreview } from "../../../../../lib/hooks/usePreview";
 import { prepareAudioContext } from "../.../../../../../../lib/audioContext";
 

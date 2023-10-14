@@ -33,8 +33,18 @@ type ChartMeta = Stats & {
   mainBpm: number;
 };
 
+type BpmEvent = {
+  time: number;
+  offset: number;
+  bpm: number;
+};
+
+type ChartTimeline = {
+  bpmTimeline: BpmEvent[];
+};
+
 type AllMeta = MixMeta & SongMeta & ChartMeta & { filterString: string };
-type ChartData = Stepchart & { meta: AllMeta };
+type ChartData = Stepchart & ChartTimeline & { meta: AllMeta };
 
 type Index = {
   id: string,

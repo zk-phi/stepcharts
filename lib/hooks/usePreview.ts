@@ -1,8 +1,7 @@
 import React from "react";
-import { extractTimelineEvents, TimelineBpmEvent } from "../computeChartTimeline";
 import { useAnimationFrame } from "./useAnimationFrame";
 
-export const usePreview = (chart?: Stepchart | null): [
+export const usePreview = (chart?: ChartData | null): [
   React.MutableRefObject<number>,
   boolean,
   () => void,
@@ -15,7 +14,7 @@ export const usePreview = (chart?: Stepchart | null): [
   const timelineIndex = React.useRef(0);
   const secToOffset = React.useMemo(() => {
     if (!chart) return null;
-    const timeline = extractTimelineEvents(chart);
+    const timeline = chart.bpmTimeline;
     return (sec: number) => {
       let i;
       for (i = timelineIndex.current; timeline[i + 1] && timeline[i + 1].time < sec; i++);
