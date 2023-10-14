@@ -14,7 +14,7 @@ const playSound = (destination: AudioNode | null, buffer: AudioBuffer | null): b
 };
 
 const PreviewSound = ({ chart, offsetRef }: {
-  chart: Stepchart,
+  chart: ChartData,
   offsetRef: React.MutableRefObject<number>,
 }) => {
   const lastMeasure = React.useMemo(() => (
@@ -54,14 +54,18 @@ const PreviewSound = ({ chart, offsetRef }: {
     }
   }, [offsetRef, arrowIndex, chart]);
 
-  /* stop ticks */
-  const stopIndex = React.useRef(0);
+  /* bpm ticks */
+  const stopIndex = React.useRef(chart.bpmTimeline.findIndex((e) => (
+    offsetRef.current < e.offset && e.bpm === 0
+  )));
   const stopSounder = React.useCallback(() => {
-    if (chart.stops[stopIndex.current]
-        && chart.stops[stopIndex.current].offset <= offsetRef.current) {
+    if (chart.bpmTimeline[stopIndex.current]
+        && chart.bpmTimeline[stopIndex.current].offset <= offsetRef.current) {
       playSound(destinations.suppressed, audioBuffers.stop);
-      while (chart.stops[stopIndex.current]
-          && chart.stops[stopIndex.current].offset <= offsetRef.current) {
+      while (chart.bpmTimeline[stopIndex.current] && (
+        chart.bpmTimeline[stopIndex.current].bpm !== 0
+        || chart.bpmTimeline[stopIndex.current].offset <= offsetRef.current
+      )) {
         stopIndex.current++;
       }
     }
@@ -72,7 +76,9 @@ const PreviewSound = ({ chart, offsetRef }: {
     if (offsetRef.current < lastOffset.current) {
       nextBeat.current = offsetRef.current - (offsetRef.current % 0.25);
       arrowIndex.current = chart.arrows.findIndex((a) => offsetRef.current < a.offset);
-      stopIndex.current = chart.stops.findIndex((s) => offsetRef.current < s.offset);
+      nextBeat.current = chart.bpmTimeline.findIndex((e) => (
+        offsetRef.current < e.offset && e.bpm === 0
+      ));
       // bpmIndex.current = chart.bpm.findIndex((b) => offset < b.startOffset);
     }
     lastOffset.current = offsetRef.current;
