@@ -161,7 +161,7 @@ const ChartObjectsRaw = ({ chart, speed = 1, turn = "off", showBeat }: {
 
   return (
     <>
-      {[...Array((lastMeasure + 1) * 4)].map((_, i) => (
+      {showBeat && [...Array((lastMeasure + 1) * 4)].map((_, i) => (
         <Bar key={`b${i}`} offset={i / 4} speed={speed} color={i % 4 === 0 ? "#888" : "#444"} />
       ))}
       {chart.bpmTimeline.map((e, i, es) => (
@@ -326,17 +326,18 @@ const ChartContainer = ({ offsetRef, speed = 1, playing, children }: {
   );
 };
 
-export const ChartPreview = ({ chart, speed = 1, turn = "off", offsetRef, playing }: {
+export const ChartPreview = ({ chart, speed = 1, turn = "off", offsetRef, playing, showBeat }: {
   chart: ChartData,
   speed: number,
   turn: Turn,
   offsetRef: React.MutableRefObject<number>,
   playing: boolean,
+  showBeat: boolean,
 }) => {
   return (
     <div style={{ position: "relative" }}>
       <ChartContainer offsetRef={offsetRef} speed={speed} playing={playing}>
-        <ChartObjects chart={chart} speed={speed} turn={turn} />
+        <ChartObjects chart={chart} speed={speed} turn={turn} showBeat={showBeat} />
       </ChartContainer>
       <JudgeLine />
     </div>
