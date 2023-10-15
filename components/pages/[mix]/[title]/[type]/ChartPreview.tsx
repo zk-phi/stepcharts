@@ -149,10 +149,11 @@ const JudgeLine = () => {
   );
 };
 
-const ChartObjectsRaw = ({ chart, speed = 1, turn = "off" }: {
+const ChartObjectsRaw = ({ chart, speed = 1, turn = "off", showBeat }: {
   chart: ChartData,
   speed: number,
   turn: Turn,
+  showBeat: boolean,
 }) => {
   const lastMeasure = Math.floor(chart.arrows[chart.arrows.length - 1].offset);
   const reversedArrows = [...chart.arrows].reverse();
