@@ -276,7 +276,7 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
   }
 
   function parseTag(lines: string[], index: number): number {
-    const line = lines[index];
+    let line = lines[index];
 
     const r = /#([A-Za-z]+):([^;]*)/;
     const result = r.exec(line);
@@ -290,8 +290,16 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
         sc[tag] = value;
       } else if (tag === "bpms") {
         bpmString = value;
+        while (!line.endsWith(";")) {
+          line = lines[++index];
+          bpmString += line.match(/[^;]*/)?.[0] ?? '';
+        }
       } else if (tag === "stops") {
         stopsString = value;
+        while (!line.endsWith(";")) {
+          line = lines[++index];
+          stopsString += line.match(/[^;]*/)?.[0] ?? '';
+        }
       } else if (tag === "notes") {
         if (!bpmString) {
           throw new Error("parseSm: about to parse notes but never got bpm");
