@@ -97,15 +97,15 @@ function parseSimfile(
         startOffset: freeze.startOffset + INTRO_OFFSET,
         endOffset: freeze.endOffset + INTRO_OFFSET,
       })),
-      bpm: chart.bpm.map((bpm, ix) => (ix === 0 ? bpm : {
+      bpm: chart.bpm.map((bpm) => ({
         ...bpm,
-        startOffset: bpm.startOffset + INTRO_OFFSET,
+        startOffset: Math.max(bpm.startOffset + INTRO_OFFSET, 0),
         endOffset: bpm.endOffset != null ? bpm.endOffset + INTRO_OFFSET : null,
-      })),
+      })).filter((bpm, ix) => !chart.bpm[ix + 1] || chart.bpm[ix + 1].startOffset > 0),
       stops: chart.stops.map((stop) => ({
         ...stop,
         offset: stop.offset + INTRO_OFFSET,
-      })),
+      })).filter((stop) => stop.offset >= 0),
     })),
     minBpm,
     maxBpm,
