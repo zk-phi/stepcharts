@@ -74,8 +74,7 @@ type AllData = {
     meta: SongMeta,
     charts: {
       meta: ChartMeta,
-      timeline: ChartTimeline,
-      chart: Stepchart,
+      chart: AnalyzedStepchart,
     }[],
   }[],
 }[];
@@ -106,9 +105,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
         },
         charts: simfile.availableTypes.map((chartType: StepchartType) => {
           const chart = simfile.charts[chartType.difficulty];
-          const timeline: ChartTimeline = {
-            bpmTimeline: extractTimelineEvents(chart),
-          };
+          const bpmTimeline = extractTimelineEvents(chart);
           return {
             meta: {
               difficulty: chartType.difficulty,
@@ -118,11 +115,14 @@ const allData: AllData = mixDirs.map((mixDir) => {
               bpmShifts: chart.bpm.length - 1,
               minBpm: simfile.minBpm,
               maxBpm: simfile.maxBpm,
-              mainBpm: Math.round(findMainBpm(chart, timeline.bpmTimeline)),
+              mainBpm: Math.round(findMainBpm(chart, bpmTimeline)),
               ...simfile.stats[chartType.difficulty],
             },
-            timeline,
-            chart,
+            chart: {
+              arrows: chart.arrows,
+              freezes: chart.freezes,
+              bpmTimeline,
+            },
           };
         }),
       };
@@ -172,7 +172,6 @@ const allMixes: AllMeta[] = allData.flatMap((mix) => {
       const chartData: ChartData = {
         meta: allMeta,
         ...chart.chart,
-        ...chart.timeline,
       };
       console.log(
         `Writing _data/${mix.meta.mixId}/${song.meta.songId}/${chart.meta.difficulty}.json ...`
