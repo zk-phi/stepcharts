@@ -1,17 +1,6 @@
 const path = require("path");
 const fs = require("fs");
 
-const REMOVE_FILE_EXTS = [
-  ".mp3",
-  ".mp4",
-  ".ogg",
-  ".avi",
-  ".lrc",
-  ".png",
-  ".jpg",
-  ".db",
-];
-
 function traverse(dirPath) {
   const stat = fs.statSync(dirPath);
 
@@ -32,7 +21,7 @@ function traverse(dirPath) {
       fs.renameSync(dirPath, newPath);
     }
   } else {
-    if (REMOVE_FILE_EXTS.findIndex((ext) => ext === path.extname(dirPath)) >= 0) {
+    if ([".sm", ".dwi"].findIndex((ext) => ext === path.extname(dirPath)) === -1) {
       console.log(`Delete ${dirPath}`);
       fs.unlinkSync(dirPath);
     }
