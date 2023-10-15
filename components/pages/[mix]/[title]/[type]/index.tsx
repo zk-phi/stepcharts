@@ -8,7 +8,7 @@ const PreviewPage = ({ chart }: {
   chart: ChartData,
 }) => {
   const [offsetRef, playing, start, stop] = usePreview(chart);
-  const [speed, setSpeed] = React.useState(2);
+  const [speed, setSpeed] = React.useState(Math.floor(620 / chart.meta.mainBpm * 4) / 4);
   const [turn, setTurn] = React.useState<Turn>("off");
   const [showModal, setShowModal] = React.useState(false);
 
@@ -60,7 +60,10 @@ const PreviewPage = ({ chart }: {
                 step="0.25"
                 value={speed}
                 onInput={onChangeSpeed} />
-            x{speed} ({chart.meta.minBpm * speed} - {chart.meta.maxBpm * speed})
+            x{speed} (
+            {chart.meta.minBpm !== chart.meta.mainBpm ? `${chart.meta.minBpm * speed}-` : ''}
+            {chart.meta.mainBpm * speed}
+            {chart.meta.mainBpm !== chart.meta.maxBpm ? `-${chart.meta.maxBpm * speed}` : ''})
           </div>
           <div>
             Turn:
