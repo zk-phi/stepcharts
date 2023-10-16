@@ -89,7 +89,6 @@ const PreviewSound = ({ chart, offsetRef, enableBeatTick }: {
       nextBeat.current = chart.bpmTimeline.findIndex((e) => (
         offsetRef.current < e.offset && e.bpm === 0
       ));
-      // bpmIndex.current = chart.bpm.findIndex((b) => offset < b.startOffset);
     }
     lastOffset.current = offsetRef.current;
   }, [offsetRef, lastOffset, chart]);
@@ -100,24 +99,6 @@ const PreviewSound = ({ chart, offsetRef, enableBeatTick }: {
     arrowSounder();
     stopSounder();
   }, [resetHandler, beatSounder, arrowSounder, stopSounder]);
-
-  // /* bpm-shift ticks */
-  // const bpmIndex = React.useRef(1);
-  // React.useEffect(() => {
-  //   if (audioContext
-  //       && audioBuffers.bpm
-  //       && destinations.suppressed
-  //       && chart.bpm[bpmIndex.current]
-  //       && chart.bpm[bpmIndex.current].startOffset <= offset) {
-  //     const player = new AudioBufferSourceNode(audioContext);
-  //     player.buffer = audioBuffers.bpm;
-  //     player.connect(destinations.suppressed);
-  //     player.start();
-  //     let i;
-  //     for (i = bpmIndex.current + 1; chart.bpm[i] && chart.bpm[i].startOffset <= offset; i++);
-  //     bpmIndex.current = i;
-  //   }
-  // }, [offset]);
 
   return null;
 };
