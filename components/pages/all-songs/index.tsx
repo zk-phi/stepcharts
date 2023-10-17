@@ -36,7 +36,7 @@ const AllSongsTable = ({
 }) => {
   const [previewChartId, setPreviewChartId] = useState<[string, string, string]>();
   const [previewChart, setPreviewChart] = useState<ChartData>();
-  const [offset, playing, start, stop] = usePreview(previewChart);
+  const [offset, time, playing, start, stop] = usePreview(previewChart);
 
   const enableBeatTick = React.useMemo(() => !!previewChart && (
     previewChart.arrowTimeline.reduce((l, r) => l + (r.beat === 4 ? 1 : 0), 0)
@@ -109,6 +109,7 @@ const AllSongsTable = ({
         <PreviewSound
             chart={previewChart}
             offsetRef={offset}
+            timeRef={time}
             enableBeatTick={enableBeatTick} />
       ) }
     </div>

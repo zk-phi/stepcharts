@@ -8,7 +8,7 @@ import { TURNS } from "../../../../../constants/turn";
 const PreviewPage = ({ chart }: {
   chart: ChartData,
 }) => {
-  const [offsetRef, playing, start, stop] = usePreview(chart);
+  const [offsetRef, timeRef, playing, start, stop] = usePreview(chart);
   const [speed, setSpeed] = React.useState(() => (
     Math.floor(620 / chart.meta.mainBpm * 4) / 4
   ));
@@ -57,6 +57,7 @@ const PreviewPage = ({ chart }: {
       <PreviewSound
           chart={chart}
           offsetRef={offsetRef}
+          timeRef={timeRef}
           enableBeatTick={tick} />
       { showModal && (
         <div style={controllStyle}>

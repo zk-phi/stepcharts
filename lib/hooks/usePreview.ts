@@ -3,12 +3,14 @@ import { useAnimationFrame } from "./useAnimationFrame";
 
 export const usePreview = (chart?: ChartData | null): [
   React.MutableRefObject<number>,
+  React.MutableRefObject<number>,
   boolean,
   () => void,
   () => void,
 ] => {
   const startTime = React.useRef<number>();
   const [playing, setPlaying] = React.useState(false);
+  const timeRef = React.useRef<number>(0);
   const offsetRef = React.useRef<number>(0);
 
   const lastMeasure = React.useMemo(() => (
@@ -31,10 +33,11 @@ export const usePreview = (chart?: ChartData | null): [
     if (chart) {
       startTime.current = (new Date()).getTime();
       timelineIndex.current = 0;
+      timeRef.current = 0;
       offsetRef.current = 0;
       setPlaying(true);
     }
-  }, [chart, startTime, timelineIndex, offsetRef, setPlaying]);
+  }, [chart, startTime, timelineIndex, timeRef, offsetRef, setPlaying]);
 
   const stop = React.useCallback(() => {
     setPlaying(false);
@@ -46,12 +49,13 @@ export const usePreview = (chart?: ChartData | null): [
 
   useAnimationFrame(() => {
     if (playing && secToOffset && startTime.current) {
-      offsetRef.current = secToOffset(((new Date()).getTime() - startTime.current) / 1000);
+      timeRef.current = ((new Date()).getTime() - startTime.current) / 1000;
+      offsetRef.current = secToOffset(timeRef.current);
       if (offsetRef.current >= lastMeasure) {
         stop();
       }
     }
-  }, [playing, secToOffset, startTime, offsetRef, stop]);
+  }, [playing, secToOffset, startTime, timeRef, offsetRef, stop]);
 
-  return [offsetRef, playing, play, stop];
+  return [offsetRef, timeRef, playing, play, stop];
 };

@@ -20,9 +20,10 @@ const playSound = (
   return false;
 };
 
-const PreviewSound = ({ chart, offsetRef, enableBeatTick }: {
+const PreviewSound = ({ chart, offsetRef, timeRef, enableBeatTick }: {
   chart: ChartData,
   offsetRef: React.MutableRefObject<number>,
+  timeRef: React.MutableRefObject<number>,
   enableBeatTick: boolean,
 }) => {
   /* beat ticks */
@@ -41,7 +42,7 @@ const PreviewSound = ({ chart, offsetRef, enableBeatTick }: {
   const arrowIndex = React.useRef(0);
   const arrowSounder = React.useCallback(() => {
     if (chart.arrowTimeline[arrowIndex.current]
-        && chart.arrowTimeline[arrowIndex.current].offset <= offsetRef.current) {
+        && chart.arrowTimeline[arrowIndex.current].time <= timeRef.current) {
       const isShock = chart.arrowTimeline[arrowIndex.current].direction.match(/M/);
       if (isShock) {
         playSound(destinations.suppressed, audioBuffers.shock);
@@ -53,11 +54,11 @@ const PreviewSound = ({ chart, offsetRef, enableBeatTick }: {
         }
       }
       while (chart.arrowTimeline[arrowIndex.current]
-          && chart.arrowTimeline[arrowIndex.current].offset <= offsetRef.current) {
+          && chart.arrowTimeline[arrowIndex.current].time <= timeRef.current) {
         arrowIndex.current++;
       }
     }
-  }, [offsetRef, arrowIndex, chart]);
+  }, [timeRef, arrowIndex, chart]);
 
   /* bpm ticks */
   const stopIndex = React.useRef(chart.bpmTimeline.findIndex((e) => (
