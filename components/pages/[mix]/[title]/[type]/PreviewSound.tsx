@@ -25,22 +25,17 @@ const PreviewSound = ({ chart, offsetRef, enableBeatTick }: {
   offsetRef: React.MutableRefObject<number>,
   enableBeatTick: boolean,
 }) => {
-  const lastMeasure = React.useMemo(() => (
-    Math.floor(chart.arrows[chart.arrows.length - 1].offset) + 1
-  ), [chart]);
-
   /* beat ticks */
   const nextBeat = React.useRef(0);
   const beatSounder = React.useCallback(() => {
     if (enableBeatTick
-        && nextBeat.current < offsetRef.current
-        && offsetRef.current <= lastMeasure) {
+        && nextBeat.current < offsetRef.current) {
       const detune = nextBeat.current % 1 === 0 ? 400 : 0;
       if (playSound(destinations.suppressed, audioBuffers.beat, detune)) {
         nextBeat.current = offsetRef.current - (offsetRef.current % 0.25) + 0.25;
       }
     }
-  }, [enableBeatTick, offsetRef, lastMeasure, nextBeat]);
+  }, [enableBeatTick, offsetRef, nextBeat]);
 
   /* arrow ticks */
   const arrowIndex = React.useRef(0);

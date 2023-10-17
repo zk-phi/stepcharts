@@ -11,6 +11,10 @@ export const usePreview = (chart?: ChartData | null): [
   const [playing, setPlaying] = React.useState(false);
   const offsetRef = React.useRef<number>(0);
 
+  const lastMeasure = React.useMemo(() => (
+    chart ? Math.floor(chart.arrows[chart.arrows.length - 1].offset) + 1 : 0
+  ), [chart]);
+
   const timelineIndex = React.useRef(0);
   const secToOffset = React.useMemo(() => {
     if (!chart) return null;
@@ -43,8 +47,11 @@ export const usePreview = (chart?: ChartData | null): [
   useAnimationFrame(() => {
     if (playing && secToOffset && startTime.current) {
       offsetRef.current = secToOffset(((new Date()).getTime() - startTime.current) / 1000);
+      if (offsetRef.current >= lastMeasure) {
+        stop();
+      }
     }
-  }, [playing, secToOffset, startTime, offsetRef]);
+  }, [playing, secToOffset, startTime, offsetRef, stop]);
 
   return [offsetRef, playing, play, stop];
 };
