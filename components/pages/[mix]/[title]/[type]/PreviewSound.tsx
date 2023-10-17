@@ -5,14 +5,10 @@ import { useAnimationFrame } from "../../../../../lib/hooks/useAnimationFrame";
 const playSound = (
   destination: AudioNode | null,
   buffer: AudioBuffer | null,
-  detune?: number,
 ): boolean => {
   if (audioContext && destination && buffer) {
     const player = new AudioBufferSourceNode(audioContext);
     player.buffer = buffer;
-    if (detune) {
-      player.detune.value = detune;
-    }
     player.connect(destination);
     player.start();
     return true;
@@ -31,8 +27,7 @@ const PreviewSound = ({ chart, offsetRef, timeRef, enableBeatTick }: {
   const beatSounder = React.useCallback(() => {
     if (enableBeatTick
         && nextBeat.current < offsetRef.current) {
-      const detune = nextBeat.current % 1 === 0 ? 400 : 0;
-      if (playSound(destinations.suppressed, audioBuffers.beat, detune)) {
+      if (playSound(destinations.suppressed, audioBuffers.beat)) {
         nextBeat.current = offsetRef.current - (offsetRef.current % 0.25) + 0.25;
       }
     }
