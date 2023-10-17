@@ -45,7 +45,6 @@ type ArrowEvent = Arrow & {
 
 type AllMeta = MixMeta & SongMeta & ChartMeta & { filterString: string };
 type AnalyzedStepchart = {
-  arrows: Arrow[];
   freezes: FreezeBody[];
   arrowTimeline: ArrowEvent[];
   bpmTimeline: BpmEvent[];

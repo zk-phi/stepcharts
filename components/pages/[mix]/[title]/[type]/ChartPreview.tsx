@@ -149,8 +149,8 @@ const ChartObjectsRaw = ({ chart, speed = 1, turn = "OFF", showBeat }: {
   turn: Turn,
   showBeat: boolean,
 }) => {
-  const lastMeasure = Math.floor(chart.arrows[chart.arrows.length - 1].offset);
-  const reversedArrows = [...chart.arrows].reverse();
+  const lastMeasure = Math.floor(chart.arrowTimeline[chart.arrowTimeline.length - 1].offset);
+  const reversedArrows = [...chart.arrowTimeline].reverse();
   const reversedFreezes = [...chart.freezes].reverse();
 
   return (

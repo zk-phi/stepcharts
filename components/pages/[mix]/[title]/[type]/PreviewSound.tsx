@@ -40,20 +40,20 @@ const PreviewSound = ({ chart, offsetRef, enableBeatTick }: {
   /* arrow ticks */
   const arrowIndex = React.useRef(0);
   const arrowSounder = React.useCallback(() => {
-    if (chart.arrows[arrowIndex.current]
-        && chart.arrows[arrowIndex.current].offset <= offsetRef.current) {
-      const isShock = chart.arrows[arrowIndex.current].direction.match(/M/);
+    if (chart.arrowTimeline[arrowIndex.current]
+        && chart.arrowTimeline[arrowIndex.current].offset <= offsetRef.current) {
+      const isShock = chart.arrowTimeline[arrowIndex.current].direction.match(/M/);
       if (isShock) {
         playSound(destinations.suppressed, audioBuffers.shock);
       } else {
-        const isJump = chart.arrows[arrowIndex.current].direction.match(/[12].*[12]/);
+        const isJump = chart.arrowTimeline[arrowIndex.current].direction.match(/[12].*[12]/);
         playSound(destinations.normal, audioBuffers.tick);
         if (isJump) {
           playSound(destinations.normal, audioBuffers.tick);
         }
       }
-      while (chart.arrows[arrowIndex.current]
-          && chart.arrows[arrowIndex.current].offset <= offsetRef.current) {
+      while (chart.arrowTimeline[arrowIndex.current]
+          && chart.arrowTimeline[arrowIndex.current].offset <= offsetRef.current) {
         arrowIndex.current++;
       }
     }
@@ -80,7 +80,7 @@ const PreviewSound = ({ chart, offsetRef, enableBeatTick }: {
   const resetHandler = React.useCallback(() => {
     if (offsetRef.current < lastOffset.current) {
       nextBeat.current = offsetRef.current - (offsetRef.current % 0.25);
-      arrowIndex.current = chart.arrows.findIndex((a) => offsetRef.current < a.offset);
+      arrowIndex.current = chart.arrowTimeline.findIndex((a) => offsetRef.current < a.offset);
       nextBeat.current = chart.bpmTimeline.findIndex((e) => (
         offsetRef.current < e.offset && e.bpm === 0
       ));

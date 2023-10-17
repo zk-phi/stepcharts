@@ -39,8 +39,8 @@ const AllSongsTable = ({
   const [offset, playing, start, stop] = usePreview(previewChart);
 
   const enableBeatTick = React.useMemo(() => !!previewChart && (
-    previewChart.arrows.reduce((l, r) => l + (r.beat === 4 ? 1 : 0), 0)
-    >= previewChart.arrows.length / 4
+    previewChart.arrowTimeline.reduce((l, r) => l + (r.beat === 4 ? 1 : 0), 0)
+    >= previewChart.arrowTimeline.length / 4
   ) , [previewChart]);
 
   const play = React.useCallback(async ([mix, song, difficulty]) => {

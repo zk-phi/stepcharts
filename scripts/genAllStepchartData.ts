@@ -147,7 +147,6 @@ const allData: AllData = mixDirs.map((mixDir) => {
               ...simfile.stats[chartType.difficulty],
             },
             chart: {
-              arrows: chart.arrows,
               freezes: chart.freezes,
               bpmTimeline,
               arrowTimeline,

@@ -13,7 +13,8 @@ const PreviewPage = ({ chart }: {
     Math.floor(620 / chart.meta.mainBpm * 4) / 4
   ));
   const [tick, setTick] = React.useState(() => (
-    chart.arrows.reduce((l, r) => l + (r.beat === 4 ? 1 : 0), 0) >= chart.arrows.length / 4
+    chart.arrowTimeline.reduce((l, r) => l + (r.beat === 4 ? 1 : 0), 0)
+    >= chart.arrowTimeline.length / 4
   ));
   const [turn, setTurn] = React.useState<Turn>("OFF");
   const [showModal, setShowModal] = React.useState(false);

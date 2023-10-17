@@ -12,7 +12,7 @@ export const usePreview = (chart?: ChartData | null): [
   const offsetRef = React.useRef<number>(0);
 
   const lastMeasure = React.useMemo(() => (
-    chart ? Math.floor(chart.arrows[chart.arrows.length - 1].offset) + 1 : 0
+    chart ? Math.floor(chart.arrowTimeline[chart.arrowTimeline.length - 1].offset) + 1 : 0
   ), [chart]);
 
   const timelineIndex = React.useRef(0);
