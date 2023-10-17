@@ -2,7 +2,8 @@ import React from "react";
 import ChartPreview from "./ChartPreview";
 import PreviewSound from "./PreviewSound";
 import { usePreview } from "../../../../../lib/hooks/usePreview";
-import { prepareAudioContext } from "../.../../../../../../lib/audioContext";
+import { prepareAudioContext } from "../../../../../lib/audioContext";
+import { TURNS } from "../../../../../constants/turn";
 
 const PreviewPage = ({ chart }: {
   chart: ChartData,
@@ -14,7 +15,7 @@ const PreviewPage = ({ chart }: {
   const [tick, setTick] = React.useState(() => (
     chart.arrows.reduce((l, r) => l + (r.beat === 4 ? 1 : 0), 0) >= chart.arrows.length / 4
   ));
-  const [turn, setTurn] = React.useState<Turn>("off");
+  const [turn, setTurn] = React.useState<Turn>("OFF");
   const [showModal, setShowModal] = React.useState(false);
 
   const onChangeSpeed = React.useCallback((e) => setSpeed(Number(e.target.value)), [setSpeed]);
@@ -77,10 +78,9 @@ const PreviewPage = ({ chart }: {
             Turn:
             {" "}
             <select value={turn} onInput={onChangeTurn}>
-              <option value="off">off</option>
-              <option value="mirror">mirror</option>
-              <option value="left">left</option>
-              <option value="right">right</option>
+              {TURNS.map((turn) => (
+                <option key={turn} value={turn}>{turn}</option>
+              ))}
             </select>
           </div>
           <div>
