@@ -39,10 +39,15 @@ type BpmEvent = {
   bpm: number;
 };
 
+type ArrowEvent = Arrow & {
+  time: number,
+};
+
 type AllMeta = MixMeta & SongMeta & ChartMeta & { filterString: string };
 type AnalyzedStepchart = {
   arrows: Arrow[];
   freezes: FreezeBody[];
+  arrowTimeline: ArrowEvent[];
   bpmTimeline: BpmEvent[];
 };
 type ChartData = AnalyzedStepchart & {

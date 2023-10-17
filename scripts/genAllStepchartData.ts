@@ -50,6 +50,33 @@ const findMainBpm = (chart: Stepchart, bpmTimeline: BpmEvent[]) => {
   return Number(Object.entries(hist).reduce((l, r) => l[1] > r[1] ? l : r)[0]);
 };
 
+type Converter = (input: number) => number;
+
+const makeOffsetToSecConverter = (bpmTimeline: BpmEvent[]): Converter => {
+  let ix = 0;
+  let lastOffset = 0;
+  const offsetToSec = (offset: number): number => {
+    if (offset < lastOffset) {
+      ix = 0;
+    }
+    while (bpmTimeline[ix + 1] && bpmTimeline[ix + 1].offset < offset) {
+      ix++;
+    }
+    return bpmTimeline[ix].time + (
+      (offset - bpmTimeline[ix].offset) * 4 / bpmTimeline[ix].bpm * 60
+    );
+  };
+  return offsetToSec;
+}
+
+const computeArrowTimings = (arrows: Arrow[], bpmTimeline: BpmEvent[]): ArrowEvent[] => {
+  const converter = makeOffsetToSecConverter(bpmTimeline);
+  return arrows.map((arrow) => ({
+    ...arrow,
+    time: converter(arrow.offset),
+  }));
+};
+
 function getFiles(...dirPath: string[]): string[] {
   const builtPath = dirPath.reduce((building, d) => {
     return path.join(building, d);
@@ -106,6 +133,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
         charts: simfile.availableTypes.map((chartType: StepchartType) => {
           const chart = simfile.charts[chartType.difficulty];
           const bpmTimeline = extractTimelineEvents(chart);
+          const arrowTimeline = computeArrowTimings(chart.arrows, bpmTimeline);
           return {
             meta: {
               difficulty: chartType.difficulty,
@@ -122,6 +150,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
               arrows: chart.arrows,
               freezes: chart.freezes,
               bpmTimeline,
+              arrowTimeline,
             },
           };
         }),
