@@ -1,4 +1,4 @@
-export const TURNS = [
+export const TURNS: Turn[] = [
   "OFF",
   "LEFT",
   "RIGHT",
@@ -25,7 +25,7 @@ export const TURNS = [
   "SHUFFLE5+MIR (→←)",
 ];
 
-export const TURN_VALUES = {
+export const TURN_VALUES: Record<Turn, [Direction, Direction, Direction, Direction]> = {
   "OFF":               [0, 1, 2, 3],
   "LEFT":              [2, 0, 3, 1],
   "RIGHT":             [1, 3, 0, 2],

@@ -143,7 +143,7 @@ const JudgeLine = () => {
   );
 };
 
-const ChartObjectsRaw = ({ chart, speed = 1, turn = "off", showBeat }: {
+const ChartObjectsRaw = ({ chart, speed = 1, turn = "OFF", showBeat }: {
   chart: ChartData,
   speed: number,
   turn: Turn,
@@ -320,7 +320,7 @@ const ChartContainer = ({ offsetRef, speed = 1, playing, children }: {
   );
 };
 
-export const ChartPreview = ({ chart, speed = 1, turn = "off", offsetRef, playing, showBeat }: {
+export const ChartPreview = ({ chart, speed = 1, turn = "OFF", offsetRef, playing, showBeat }: {
   chart: ChartData,
   speed: number,
   turn: Turn,
