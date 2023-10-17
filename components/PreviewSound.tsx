@@ -1,6 +1,6 @@
 import React from "react";
-import { audioContext, audioBuffers, destinations } from "../../../../../lib/audioContext";
-import { useAnimationFrame } from "../../../../../lib/hooks/useAnimationFrame";
+import { audioContext, audioBuffers, destinations } from "../lib/audioContext";
+import { useAnimationFrame } from "../lib/hooks/useAnimationFrame";
 
 const playSound = (
   destination: AudioNode | null,

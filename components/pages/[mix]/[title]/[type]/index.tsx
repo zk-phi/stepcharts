@@ -1,6 +1,6 @@
 import React from "react";
-import ChartPreview from "./ChartPreview";
-import PreviewSound from "./PreviewSound";
+import ChartPreview from "../../../../ChartPreview";
+import PreviewSound from "../../../../PreviewSound";
 import { usePreview } from "../../../../../lib/hooks/usePreview";
 import { prepareAudioContext } from "../../../../../lib/audioContext";
 import { TURNS } from "../../../../../constants/turn";

@@ -4,9 +4,14 @@ import Link from "next/link";
 import { Root } from "../../layout/Root";
 
 import { Breadcrumbs } from "../../Breadcrumbs";
-import ListConfig, { SORT_KEYS, LEVELS, getSortFunction, getSortValueFunction } from "./ListConfig";
+import ListConfig, {
+  SORT_KEYS,
+  LEVELS,
+  getSortFunction,
+  getSortValueFunction,
+} from "../../ListConfig";
 import { usePreview } from "../../../lib/hooks/usePreview";
-import PreviewSound from "../[mix]/[title]/[type]/PreviewSound";
+import PreviewSound from "../../PreviewSound";
 import { prepareAudioContext } from "../../../lib/audioContext";
 
 import styles from "./index.module.css";

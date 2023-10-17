@@ -1,6 +1,6 @@
 import React from "react";
-import { useAnimationFrame } from "../../../../../lib/hooks/useAnimationFrame";
-import { TURN_VALUES } from "../../../../../constants/turn";
+import { useAnimationFrame } from "../lib/hooks/useAnimationFrame";
+import { TURN_VALUES } from "../constants/turn";
 
 const ARROW_HEIGHT = 13.5; /* vh */
 const LANE_HEIGHT = 100; /* vh */
