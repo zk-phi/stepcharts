@@ -69,6 +69,11 @@ function findFirstNonEmptyMeasure(
   );
 }
 
+// Round arrow timing values to match with stop and bpm-shift timing values
+function roundOffset(num: number, den: number): number {
+  return Math.round(4 * 100000 * num / den) / 100000 * 0.25;
+};
+
 function parseSm(sm: string, _titlePath: string): RawSimfile {
   const lines = sm.split("\n").map((l) => l.trim());
 
@@ -176,7 +181,7 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
           const startBeatFraction = curOffset;
           open[d] = {
             direction: d as FreezeBody["direction"],
-            startOffset: startBeatFraction.n / startBeatFraction.d,
+            startOffset: roundOffset(startBeatFraction.n, startBeatFraction.d),
           };
         } else if (cleanedLine[d] === "3") {
           if (!open[d]) {
@@ -186,7 +191,7 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
           }
 
           const endBeatFraction = curOffset.add(new Fraction(1).div(4));
-          open[d]!.endOffset = endBeatFraction.n / endBeatFraction.d;
+          open[d]!.endOffset = roundOffset(endBeatFraction.n, endBeatFraction.d);
           freezes.push(open[d] as FreezeBody);
           open[d] = undefined;
         }
@@ -250,7 +255,7 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
       if (!isRest(line)) {
         arrows.push({
           beat: determineBeat(curOffset),
-          offset: curOffset.n / curOffset.d,
+          offset: roundOffset(curOffset.n, curOffset.d),
           direction: line as Arrow["direction"],
         });
       }
