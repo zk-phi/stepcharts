@@ -2,7 +2,7 @@ type Arrow = {
   // other beats such as 5ths and 32nds end up being colored
   // the same as 6ths. This probably should be "color" not "beat" TODO
   beat: 4 | 6 | 8 | 12 | 16;
-  direction: `${0 | 1 | 2}${0 | 1 | 2}${0 | 1 | 2}${0 | 1 | 2}`;
+  direction: `${0 | 1 | 2}${0 | 1 | 2}${0 | 1 | 2}${0 | 1 | 2}` | 'MMMM';
   offset: number;
 };
 
