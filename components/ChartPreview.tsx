@@ -76,14 +76,14 @@ const Freeze = ({ direction, offset, endOffset, speed }: {
     position: "absolute",
     top: `${judgePos(offset, speed)}vh`,
     left: `${direction * ARROW_HEIGHT + ARROW_HEIGHT * 0.05}vh`,
-    height: `${(endOffset - offset - 0.25) * 4 * speed * HEIGHT_PER_BEAT}vh`,
+    height: `${(endOffset - offset) * 4 * speed * HEIGHT_PER_BEAT}vh`,
     width: `${ARROW_HEIGHT * 0.9}vh`,
     backgroundColor: "#5e5",
   };
 
   const tailStyle = {
     position: "absolute",
-    top: `${judgePos(endOffset - 0.25, speed)}vh`,
+    top: `${judgePos(endOffset, speed)}vh`,
     left: `${direction * ARROW_HEIGHT + ARROW_HEIGHT * 0.05}vh`,
     height: 0,
     width: `${ARROW_HEIGHT * 0.9}vh`,

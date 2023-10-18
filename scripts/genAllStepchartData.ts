@@ -147,7 +147,13 @@ const allData: AllData = mixDirs.map((mixDir) => {
               ...simfile.stats[chartType.difficulty],
             },
             chart: {
-              freezes: chart.freezes,
+              // I dont know why but all freezes in RawSimfile
+              // are longer by 1 beat, so we substract 1 beat here
+              // to make them correct through the rest of this app.
+              freezes: chart.freezes.map((freeze) => ({
+                ...freeze,
+                endOffset: freeze.endOffset - 0.25,
+              })),
               bpmTimeline,
               arrowTimeline,
             },
