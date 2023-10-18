@@ -81,24 +81,15 @@ const Freeze = ({ direction, offset, endOffset, speed }: {
     backgroundColor: "#5e5",
   };
 
-  /* const tailStyle = {
-   *   position: "absolute",
-   *   top: `${judgePos(endOffset - 0.25, speed)}vh`,
-   *   left: `${direction * ARROW_HEIGHT + ARROW_HEIGHT * 0.05}vh`,
-   *   height: 0,
-   *   width: `${ARROW_HEIGHT * 0.9}vh`,
-   *   borderTop: `${ARROW_HEIGHT / 2 * 0.9}vh solid #3b3`,
-   *   borderLeft: `${ARROW_HEIGHT / 2 * 0.9}vh solid transparent`,
-   *   borderRight: `${ARROW_HEIGHT / 2 * 0.9}vh solid transparent`,
-   * }; */
-
-  const tailStyle: React.CSSProperties = {
+  const tailStyle = {
     position: "absolute",
     top: `${judgePos(endOffset - 0.25, speed)}vh`,
     left: `${direction * ARROW_HEIGHT + ARROW_HEIGHT * 0.05}vh`,
-    height: `${ARROW_HEIGHT / 2 * 0.9}vh`,
+    height: 0,
     width: `${ARROW_HEIGHT * 0.9}vh`,
-    backgroundColor: "#3b3",
+    borderTop: `${ARROW_HEIGHT / 2 * 0.9}vh solid #3b3`,
+    borderLeft: `${ARROW_HEIGHT / 2 * 0.9}vh solid transparent`,
+    borderRight: `${ARROW_HEIGHT / 2 * 0.9}vh solid transparent`,
   };
 
   return (
