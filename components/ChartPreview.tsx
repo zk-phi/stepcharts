@@ -81,7 +81,7 @@ const Freeze = ({ direction, offset, endOffset, speed }: {
     backgroundColor: "#5e5",
   };
 
-  const tailStyle = {
+  const tailStyle: React.CSSProperties = {
     position: "absolute",
     top: `${judgePos(endOffset, speed)}vh`,
     left: `${direction * ARROW_HEIGHT + ARROW_HEIGHT * 0.05}vh`,
