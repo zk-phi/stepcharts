@@ -15,6 +15,8 @@ const STAT_KEYS = [
   "gallops",
   "bpmShifts",
   "shocks",
+  "sixteenths",
+  "trips",
 ];
 
 export const SORT_KEYS = [
@@ -29,9 +31,11 @@ export const SORT_KEYS = [
   { value: "jacks", label: "縦連" },
   { value: "freezes", label: "フリーズ" },
   { value: "gallops", label: "スキップ" },
+  { value: "shocks", label: "ショック" },
   { value: "stops", label: "停止回数" },
   { value: "bpmShifts", label: "変速回数" },
-  { value: "shocks", label: "ショック" },
+  { value: "sixteenths", label: "黄矢印%" },
+  { value: "trips", label: "緑矢印%" },
 ];
 
 export function getSortFunction(key: string) {
@@ -78,7 +82,7 @@ export function getSortValueFunction(key: string) {
   if (sortingOnStats) {
     return (a: AllMeta) => {
       const value = a[key as keyof Stats];
-      return `${value} ${depluralize(key, value)}`;
+      return `${value.toString().slice(0, 5)} ${depluralize(key, value)}`;
     };
   } else if (key === "artist") {
     return (a: AllMeta) => (

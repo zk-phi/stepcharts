@@ -71,12 +71,16 @@ function calculateStats(chart: Stepchart): Stats {
   );
   const jacks = chart.arrows.filter((a, i, array) => isJack(a, array[i - 1]));
   const shocks = chart.arrows.filter((a) => a.direction.match(/M/)).length;
+  const sixteenths = chart.arrows.filter((a) => a.beat === 16);
+  const trips = chart.arrows.filter((a) => a.beat === 12 || a.beat === 6);
 
   return {
     jumps: jumps.length,
     jacks: jacks.length,
     freezes: freezes.length,
     gallops: gallops.length,
+    sixteenths: sixteenths.length / chart.arrows.length * 100,
+    trips: trips.length / chart.arrows.length * 100,
     shocks,
   };
 }
