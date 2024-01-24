@@ -1,1 +1,0 @@
-self.__SSG_MANIFEST=new Set(["\u002F","\u002Fall-songs","\u002F[mix]\u002F[title]\u002F[type]","\u002F[mix]\u002F[title]","\u002F[mix]"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()
