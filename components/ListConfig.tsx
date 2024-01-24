@@ -21,6 +21,7 @@ export const SORT_KEYS = [
   { value: "title", label: "曲名" },
   { value: "artist", label: "アーティスト" },
   { value: "level", label: "難易度値" },
+  { value: "mainBpm", label: "メインBPM" },
   { value: "minBpm", label: "最小BPM" },
   { value: "maxBpm", label: "最大BPM" },
   { value: "arrows", label: "ステップ数" },
@@ -50,6 +51,7 @@ export function getSortFunction(key: string) {
           .localeCompare(b.artist);
       };
     case "minBpm":
+      /* sort in reverse order */
       return (a: AllMeta, b: AllMeta) => {
         return a.minBpm - b.minBpm;
       };
@@ -82,7 +84,7 @@ export function getSortValueFunction(key: string) {
     return (a: AllMeta) => (
       a.artist
     );
-  } else if (key === "minBpm" || key === "maxBpm") {
+  } else if (key === "mainBpm" || key === "minBpm" || key === "maxBpm") {
     return (a: AllMeta) => (
       (a.minBpm !== a.mainBpm ? `(${a.minBpm})-` : '')
       + `${a.mainBpm}`
