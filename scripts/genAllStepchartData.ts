@@ -50,6 +50,49 @@ const findMainBpm = (chart: Stepchart, bpmTimeline: BpmEvent[]) => {
   return Number(Object.entries(hist).reduce((l, r) => l[1] > r[1] ? l : r)[0]);
 };
 
+const phraseVariance = (timings: number[]): number => {
+  const table: Record<string, number> = {};
+  timings.forEach((_, ix) => {
+    if (ix >= 2) {
+      const offset1 = Math.round(1000 * (timings[ix] - timings[ix - 1]));
+      const offset2 = Math.round(1000 * (timings[ix - 1] - timings[ix - 2]));
+      const key = `${offset1}/${offset2}`;
+      table[key] = (table[key] ?? 0) + 1;
+    }
+  });
+  const values = Object.values(table);
+  const ave = values.reduce((l, r) => l + r) / values.length;
+  return Math.sqrt(values.reduce((l, r) => l + Math.pow(r - ave, 2), 0)) / timings.length;
+};
+
+// 「隙間が空いていて、かつ off-beat なノート」が難しいんだろうな
+// 徐々にソフランする系も、「現在のbpmからoff」ならoff-beatと見る
+// 'けど、桜のラストのジワソフランとかは、「隙間は空いていないがoff-beat」になるな
+// 「off-beatの程度」という概念がありそう
+// 「ひどくoff-beatな場合は隙間がさほど空いていなくても難しい」
+// 「off-beat度合いランク」と「隙間の空き具合ランク」の積がそのノートの難易度になりそう
+// off-beat かどうかについては、その直前のノートの bpm からいけそう？
+// そのとき、 offset ではなく time を原則使う（瞬停や２倍へのソフランを無視できるので）
+// ソフランについてはたとえば120-240の間にノーマライズするとかするのが良さそう
+// 300 の８分は実質150の16分の気持ちで踏んでると思うので
+// （倍取り譜面のリズム難が過小評価されたり、逆に低速のリズム難が過大評価されたりする）
+// 低速はそもそも難しい、という話もあるが、そこはリズム難ではなく認識難なので別枠で解析すべき
+//
+// offset を bpm の倍取りに応じて k 倍すればよいという話ではあるかもしれない
+// ジワジワ変速パート、「着地はoff-beatだが、それ以外は普通の８分として扱いたい」とかなりそう
+// その時、２種類の bpm （変速前と変速後）で off-beat 判定してもよいが、
+// ノートとノートの中間でも速度が変わってた場合とか、困る
+// offset がブチ壊れてる曲 (chaos とか) あるのが難点ではあるが、あれは譜面がおかしいので…
+// どうかしてる極少数の譜面だけ個別対応みたいのもアリだと思う
+//
+// あとは一度 off-beat になってから、そのまま off-beat で何拍か打つやつどう判定するか
+// それが l'amour とか xenon のパターン
+// 実はノートとノートの間は普通に４分なんだけど、裏に行ったままの状態で叩くので難しいやつ
+// これを追跡するのは難しいかなあ……
+// ５拍子とかだったらどうするのとかありそう、Holic とか
+// (一見 off-beat に見えるが、拍子の方がおかしいだけで実は素直パターン)
+// 小節単位じゃなく拍単位でのカウントにすればある程度行けるかなあ
+
 type Converter = (input: number) => number;
 
 const makeOffsetToSecConverter = (bpmTimeline: BpmEvent[]): Converter => {
@@ -69,12 +112,9 @@ const makeOffsetToSecConverter = (bpmTimeline: BpmEvent[]): Converter => {
   return offsetToSec;
 }
 
-const computeArrowTimings = (arrows: Arrow[], bpmTimeline: BpmEvent[]): ArrowEvent[] => {
+const computeArrowTimings = (arrows: Arrow[], bpmTimeline: BpmEvent[]): number[] => {
   const converter = makeOffsetToSecConverter(bpmTimeline);
-  return arrows.map((arrow) => ({
-    ...arrow,
-    time: converter(arrow.offset),
-  }));
+  return arrows.map((arrow) => converter(arrow.offset));
 };
 
 function getFiles(...dirPath: string[]): string[] {
@@ -133,7 +173,8 @@ const allData: AllData = mixDirs.map((mixDir) => {
         charts: simfile.availableTypes.map((chartType: StepchartType) => {
           const chart = simfile.charts[chartType.difficulty];
           const bpmTimeline = extractTimelineEvents(chart);
-          const arrowTimeline = computeArrowTimings(chart.arrows, bpmTimeline);
+          const arrowTimings = computeArrowTimings(chart.arrows, bpmTimeline);
+          const stats = simfile.stats[chartType.difficulty];
           return {
             meta: {
               difficulty: chartType.difficulty,
@@ -144,7 +185,8 @@ const allData: AllData = mixDirs.map((mixDir) => {
               minBpm: simfile.minBpm,
               maxBpm: simfile.maxBpm,
               mainBpm: Math.round(findMainBpm(chart, bpmTimeline)),
-              ...simfile.stats[chartType.difficulty],
+              complexity: stats.sixteenths + stats.trips + 100 * (1 - phraseVariance(arrowTimings)),
+              ...stats,
             },
             chart: {
               // I dont know why but all freezes in RawSimfile
@@ -155,7 +197,10 @@ const allData: AllData = mixDirs.map((mixDir) => {
                 endOffset: freeze.endOffset - 0.25,
               })),
               bpmTimeline,
-              arrowTimeline,
+              arrowTimeline: chart.arrows.map((arrow, ix) => ({
+                ...arrow,
+                time: arrowTimings[ix],
+              })),
             },
           };
         }),

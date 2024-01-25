@@ -17,6 +17,7 @@ const STAT_KEYS = [
   "shocks",
   "sixteenths",
   "trips",
+  "complexity",
 ];
 
 export const SORT_KEYS = [
@@ -36,6 +37,7 @@ export const SORT_KEYS = [
   { value: "bpmShifts", label: "変速回数" },
   { value: "sixteenths", label: "黄矢印%" },
   { value: "trips", label: "緑矢印%" },
+  { value: "complexity", label: "リズム難指数(仮)" },
 ];
 
 export function getSortFunction(key: string) {

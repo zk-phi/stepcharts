@@ -31,6 +31,7 @@ type ChartMeta = Stats & {
   minBpm: number;
   maxBpm: number;
   mainBpm: number;
+  complexity: number;
 };
 
 type BpmEvent = {
