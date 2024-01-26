@@ -19,7 +19,6 @@ type SongMeta = {
   title: string;
   titleTranslit: string | null;
   artist: string;
-  displayBpm: string;
 };
 
 type ChartMeta = Stats & {

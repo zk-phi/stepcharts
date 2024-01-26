@@ -222,7 +222,6 @@ function parseArrowStream(
 function parseDwi(dwi: string, titlePath?: string): RawSimfile {
   let bpm: string | null = null;
   let changebpm: string | null = null;
-  let displaybpm: string | null = null;
   let stops: string | null = null;
 
   const lines = dwi.split("\n").map((l) => l.trim());
@@ -318,28 +317,6 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
 
     finalBpms = mergeSimilarBpmRanges(finalBpms);
 
-    if (displaybpm) {
-      if (!isNaN(Number(displaybpm))) {
-        sc.displayBpm = displaybpm;
-      } else if (displaybpm.indexOf("..") > -1) {
-        const [min, max] = displaybpm.split("..");
-        sc.displayBpm = `${min}-${max}`;
-      } else {
-        // displayBpm is allowed to be '*', I know of no simfiles
-        // that actually do that though
-        sc.displayBpm = displaybpm;
-      }
-    } else {
-      const minBpm = Math.min(...finalBpms.map((b) => b.bpm));
-      const maxBpm = Math.max(...finalBpms.map((b) => b.bpm));
-
-      if (minBpm === maxBpm) {
-        sc.displayBpm = Math.round(minBpm).toString();
-      } else {
-        sc.displayBpm = `${Math.round(minBpm)}-${Math.round(maxBpm)}`;
-      }
-    }
-
     return finalBpms;
   }
 
@@ -356,8 +333,6 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
       if (metaTagsToConsume.includes(tag)) {
         // @ts-ignore
         sc[tag] = value;
-      } else if (tag === "displaybpm") {
-        displaybpm = value;
       } else if (tag === "bpm") {
         bpm = value;
       } else if (tag === "changebpm") {
@@ -388,7 +363,7 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
       }
     }
 
-    if (!displaybpm && !bpm) {
+    if (!bpm) {
       throw new Error(`No BPM found for ${titlePath}`);
     }
 

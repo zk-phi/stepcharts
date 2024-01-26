@@ -7,7 +7,6 @@ import { calculateStats } from "./calculateStats";
 type RawSimfile = Omit<Simfile, "title"> & {
   title: string;
   titletranslit: string | null;
-  displayBpm: string | undefined;
 };
 type Parser = (simfileSource: string, titleDir: string) => RawSimfile;
 
@@ -69,9 +68,6 @@ function parseSimfile(
   const minBpm = Math.round(Math.min(...bpms));
   const maxBpm = Math.round(Math.max(...bpms));
 
-  const displayBpm =
-    minBpm === maxBpm ? minBpm.toString() : `${minBpm}-${maxBpm}`;
-
   return {
     ...rawStepchart,
     title: {
@@ -106,7 +102,6 @@ function parseSimfile(
     })),
     minBpm,
     maxBpm,
-    displayBpm,
     stopCount: Object.values(rawStepchart.charts)[0].stops.length,
   };
 }

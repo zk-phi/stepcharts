@@ -123,18 +123,7 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
       };
     });
 
-    const mergedBpms = mergeSimilarBpmRanges(bpms);
-
-    const minBpm = Math.min(...mergedBpms.map((b) => b.bpm));
-    const maxBpm = Math.max(...mergedBpms.map((b) => b.bpm));
-
-    if (Math.abs(minBpm - maxBpm) < 2) {
-      sc.displayBpm = Math.round(minBpm).toString();
-    } else {
-      sc.displayBpm = `${Math.round(minBpm)}-${Math.round(maxBpm)}`;
-    }
-
-    return mergedBpms;
+    return mergeSimilarBpmRanges(bpms);
   }
 
   function parseFreezes(

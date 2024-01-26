@@ -168,7 +168,6 @@ const allData: AllData = mixDirs.map((mixDir) => {
           title: simfile.title.titleName,
           titleTranslit: simfile.title.translitTitleName,
           artist: simfile.artist,
-          displayBpm: simfile.displayBpm,
         },
         charts: simfile.availableTypes.map((chartType: StepchartType) => {
           const chart = simfile.charts[chartType.difficulty];
