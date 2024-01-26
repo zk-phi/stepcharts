@@ -102,7 +102,6 @@ function parseSimfile(
     })),
     minBpm,
     maxBpm,
-    stopCount: Object.values(rawStepchart.charts)[0].stops.length,
   };
 }
 

@@ -53,5 +53,4 @@ type Simfile = {
   charts: Record<string, Stepchart>;
   minBpm: number;
   maxBpm: number;
-  stopCount: number;
 };
