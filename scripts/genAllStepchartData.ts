@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { parseSimfile } from "../lib/parseSimfile";
+import { calculateStats } from "../lib/calculateStats";
 import { dateReleased, shortMixNames } from "../lib/meta";
 
 const ROOT = "resources/stepcharts";
@@ -173,7 +174,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
           const chart = simfile.charts[chartType.difficulty];
           const bpmTimeline = extractTimelineEvents(chart);
           const arrowTimings = computeArrowTimings(chart.arrows, bpmTimeline);
-          const stats = simfile.stats[chartType.difficulty];
+          const stats = calculateStats(chart);
           return {
             meta: {
               difficulty: chartType.difficulty,
@@ -181,8 +182,8 @@ const allData: AllData = mixDirs.map((mixDir) => {
               arrows: chart.arrows.length,
               stops: chart.stops.length,
               bpmShifts: chart.bpm.length - 1,
-              minBpm: simfile.minBpm,
-              maxBpm: simfile.maxBpm,
+              minBpm: Math.min(...chart.bpm.map((b) => b.bpm)),
+              maxBpm: Math.max(...chart.bpm.map((b) => b.bpm)),
               mainBpm: Math.round(findMainBpm(chart, bpmTimeline)),
               complexity: stats.sixteenths + stats.trips + 100 * (1 - phraseVariance(arrowTimings)),
               ...stats,

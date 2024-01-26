@@ -49,8 +49,5 @@ type Simfile = {
   title: Title;
   artist: string;
   availableTypes: StepchartType[];
-  stats: Record<Difficulty, Stats>;
   charts: Record<string, Stepchart>;
-  minBpm: number;
-  maxBpm: number;
 };

@@ -2,7 +2,6 @@ import * as fs from "fs";
 import * as path from "path";
 import { parseDwi } from "./parseDwi";
 import { parseSm } from "./parseSm";
-import { calculateStats } from "./calculateStats";
 
 type RawSimfile = Omit<Simfile, "title"> & {
   title: string;
@@ -32,12 +31,6 @@ function getSongFile(songDir: string): string {
   return songFile;
 }
 
-function getBpms(sm: RawSimfile): number[] {
-  const chart = Object.values(sm.charts)[0];
-
-  return chart.bpm.map((b) => b.bpm);
-}
-
 const mapObject = <K extends string | number | symbol, V, W>(
   obj: Record<K, V>,
   fn: (arg: V) => W,
@@ -64,10 +57,6 @@ function parseSimfile(
   const fileContents = fs.readFileSync(stepchartPath);
   const rawStepchart = parser(fileContents.toString(), stepchartSongDirPath);
 
-  const bpms = getBpms(rawStepchart);
-  const minBpm = Math.round(Math.min(...bpms));
-  const maxBpm = Math.round(Math.max(...bpms));
-
   return {
     ...rawStepchart,
     title: {
@@ -77,9 +66,6 @@ function parseSimfile(
     },
     artist: rawStepchart.artist,
     availableTypes: rawStepchart.availableTypes,
-    // the default type definition of .fromEntries in typescript is too weak
-    // to make this type-safe.
-    stats: mapObject(rawStepchart.charts, calculateStats),
     charts: mapObject(rawStepchart.charts, (chart) => ({
       arrows: chart.arrows.map((arrow) => ({
         ...arrow,
@@ -100,8 +86,6 @@ function parseSimfile(
         offset: stop.offset + INTRO_OFFSET,
       })).filter((stop) => stop.offset >= 0),
     })),
-    minBpm,
-    maxBpm,
   };
 }
 

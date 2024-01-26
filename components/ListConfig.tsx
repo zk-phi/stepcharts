@@ -91,11 +91,15 @@ export function getSortValueFunction(key: string) {
       a.artist
     );
   } else if (key === "mainBpm" || key === "minBpm" || key === "maxBpm") {
-    return (a: AllMeta) => (
-      (a.minBpm !== a.mainBpm ? `(${a.minBpm})-` : '')
-      + `${a.mainBpm}`
-      + (a.maxBpm !== a.mainBpm ? `-(${a.maxBpm})` : '')
-    );
+    return (a: AllMeta) => {
+      const min = Math.round(a.minBpm);
+      const max = Math.round(a.maxBpm);
+      return (
+        (min !== a.mainBpm ? `(${min})-` : '')
+        + `${a.mainBpm}`
+        + (max !== a.mainBpm ? `-(${max})` : '')
+      );
+    };
   } else {
     return (a: AllMeta) => (
       null
