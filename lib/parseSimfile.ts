@@ -84,9 +84,6 @@ function parseSimfile(
     // the default type definition of .fromEntries in typescript is too weak
     // to make this type-safe.
     stats: mapObject(rawStepchart.charts, calculateStats),
-    topDifficulty: rawStepchart.availableTypes.reduce((l, r) => (
-      r.feet < l.feet ? l : r
-    ), { feet: 0, difficulty: "beginner" }).difficulty,
     charts: mapObject(rawStepchart.charts, (chart) => ({
       arrows: chart.arrows.map((arrow) => ({
         ...arrow,
