@@ -20,17 +20,34 @@ export const extractBpmEvents = (chart: Stepchart): BpmEvent[] => {
     bpm: bpmEvents.shift().bpm,
   }];
 
-  bpmEvents.forEach((e) => {
+  for (let i = 0; i < bpmEvents.length; i++) {
+    const e = bpmEvents[i]!;
+    const next = bpmEvents[i + 1];
     const lastBpm = timeline[0].bpm;
     const dt = (e.offset - timeline[0].offset) * 4 / lastBpm * 60;
     const time = timeline[0].time + dt;
-    if ('bpm' in e) {
+    // stop and bpm-shift at the same time
+    if (next && e.offset === next.offset) {
+      if (('stop' in next) && ('bpm' in e)) {
+        timeline.unshift({ time,                   offset: e.offset, bpm: 0 });
+        timeline.unshift({ time: time + next.stop, offset: e.offset, bpm: e.bpm });
+        i++;
+      } else if (('stop' in e) && ('bpm' in next)) {
+        timeline.unshift({ time,                offset: e.offset, bpm: 0 });
+        timeline.unshift({ time: time + e.stop, offset: e.offset, bpm: next.bpm });
+        i++;
+      } else {
+        throw new Error("Unexpected: duplicated BPM events");
+      }
+    } else if ('bpm' in e) {
       timeline.unshift({ time, offset: e.offset, bpm: e.bpm });
-    } else {
+    } else if ('stop' in e){
       timeline.unshift({ time,                offset: e.offset, bpm: 0 });
       timeline.unshift({ time: time + e.stop, offset: e.offset, bpm: lastBpm });
+    } else {
+      throw new Error("Unexpected: BPM event is not stop nor bpm-shift");
     }
-  });
+  }
 
   return timeline.reverse();
 };
