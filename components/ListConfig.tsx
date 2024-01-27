@@ -92,13 +92,10 @@ export function getSortValueFunction(key: string) {
     );
   } else if (key === "mainBpm" || key === "minBpm" || key === "maxBpm") {
     return (a: AllMeta) => {
+      const main = Math.round(a.mainBpm);
       const min = Math.round(a.minBpm);
       const max = Math.round(a.maxBpm);
-      return (
-        (min !== a.mainBpm ? `(${min})-` : '')
-        + `${a.mainBpm}`
-        + (max !== a.mainBpm ? `-(${max})` : '')
-      );
+      return (min !== main ? `(${min})-` : '') + `${main}` + (max !== main ? `-(${max})` : '');
     };
   } else {
     return (a: AllMeta) => (

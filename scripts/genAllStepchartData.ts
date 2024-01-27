@@ -3,53 +3,10 @@ import * as path from "path";
 import { parseSimfile } from "../lib/parseSimfile";
 import { calculateStats } from "../lib/calculateStats";
 import { dateReleased, shortMixNames } from "../lib/meta";
+import { extractBpmEvents, makeOffsetToSecConverter } from "../lib/analyzers/timingAnalyzers";
+import { calculateBpmStats } from "../lib/analyzers/calculateBpmStats";
 
 const ROOT = "resources/stepcharts";
-
-const extractTimelineEvents = (chart: Stepchart): BpmEvent[] => {
-  const bpmEvents = [
-    ...chart.bpm.map((b) => (
-      { offset: b.startOffset, bpm: b.bpm }
-    )),
-    ...chart.stops.map((s) => (
-      { offset: s.offset, stop: s.duration }
-    )),
-  ].sort((a, b) => (
-    a.offset - b.offset
-  ));
-
-  const timeline: BpmEvent[] = [{
-    time: 0,
-    offset: 0,
-    // @ts-ignore `bpm` can be undefined in type-level but it must be defined actually
-    bpm: bpmEvents.shift().bpm,
-  }];
-
-  bpmEvents.forEach((e) => {
-    const lastBpm = timeline[0].bpm;
-    const dt = (e.offset - timeline[0].offset) * 4 / lastBpm * 60;
-    const time = timeline[0].time + dt;
-    if ('bpm' in e) {
-      timeline.unshift({ time, offset: e.offset, bpm: e.bpm });
-    } else {
-      timeline.unshift({ time,                offset: e.offset, bpm: 0 });
-      timeline.unshift({ time: time + e.stop, offset: e.offset, bpm: lastBpm });
-    }
-  });
-
-  return timeline.reverse();
-};
-
-const findMainBpm = (chart: Stepchart, bpmTimeline: BpmEvent[]) => {
-  const lastOffset = chart.arrows[chart.arrows.length - 1].offset;
-
-  const hist: Record<number, number> = {};
-  bpmTimeline.forEach((event, i, arr) => {
-    hist[event.bpm] = (hist[event.bpm] ?? 0) + (arr[i + 1]?.offset ?? lastOffset) - event.offset;
-  });
-
-  return Number(Object.entries(hist).reduce((l, r) => l[1] > r[1] ? l : r)[0]);
-};
 
 const phraseVariance = (timings: number[]): number => {
   const table: Record<string, number> = {};
@@ -93,25 +50,6 @@ const phraseVariance = (timings: number[]): number => {
 // ５拍子とかだったらどうするのとかありそう、Holic とか
 // (一見 off-beat に見えるが、拍子の方がおかしいだけで実は素直パターン)
 // 小節単位じゃなく拍単位でのカウントにすればある程度行けるかなあ
-
-type Converter = (input: number) => number;
-
-const makeOffsetToSecConverter = (bpmTimeline: BpmEvent[]): Converter => {
-  let ix = 0;
-  let lastOffset = 0;
-  const offsetToSec = (offset: number): number => {
-    if (offset < lastOffset) {
-      ix = 0;
-    }
-    while (bpmTimeline[ix + 1] && bpmTimeline[ix + 1].offset < offset) {
-      ix++;
-    }
-    return bpmTimeline[ix].time + (
-      (offset - bpmTimeline[ix].offset) * 4 / bpmTimeline[ix].bpm * 60
-    );
-  };
-  return offsetToSec;
-}
 
 const computeArrowTimings = (arrows: Arrow[], bpmTimeline: BpmEvent[]): number[] => {
   const converter = makeOffsetToSecConverter(bpmTimeline);
@@ -177,7 +115,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
         },
         charts: simfile.availableTypes.map((chartType: StepchartType) => {
           const chart = simfile.charts[chartType.difficulty];
-          const bpmTimeline = extractTimelineEvents(chart);
+          const bpmTimeline = extractBpmEvents(chart);
           const arrowTimings = computeArrowTimings(chart.arrows, bpmTimeline);
           const stats = calculateStats(chart);
           return {
@@ -187,10 +125,8 @@ const allData: AllData = mixDirs.map((mixDir) => {
               arrows: chart.arrows.length,
               stops: chart.stops.length,
               bpmShifts: chart.bpm.length - 1,
-              minBpm: Math.min(...chart.bpm.map((b) => b.bpm)),
-              maxBpm: Math.max(...chart.bpm.map((b) => b.bpm)),
-              mainBpm: Math.round(findMainBpm(chart, bpmTimeline)),
               complexity: stats.sixteenths + stats.trips + 100 * (1 - phraseVariance(arrowTimings)),
+              ...calculateBpmStats(chart, bpmTimeline),
               ...stats,
             },
             chart: {

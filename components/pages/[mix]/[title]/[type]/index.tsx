@@ -45,6 +45,10 @@ const PreviewPage = ({ chart }: {
     background: "#ffffff80",
   };
 
+  const mainBpm = Math.round(chart.meta.mainBpm);
+  const minBpm = Math.round(chart.meta.minBpm);
+  const maxBpm = Math.round(chart.meta.maxBpm);
+
   return (
     <div style={{ display: "flex" }}>
       <ChartPreview
@@ -72,9 +76,9 @@ const PreviewPage = ({ chart }: {
                 value={speed}
                 onInput={onChangeSpeed} />
             x{speed} (
-            {chart.meta.minBpm !== chart.meta.mainBpm ? `${chart.meta.minBpm * speed}-` : ''}
-            {chart.meta.mainBpm * speed}
-            {chart.meta.mainBpm !== chart.meta.maxBpm ? `-${chart.meta.maxBpm * speed}` : ''})
+            {minBpm !== mainBpm ? `${minBpm * speed}-` : ''}
+            {mainBpm * speed}
+            {mainBpm !== maxBpm ? `-${maxBpm * speed}` : ''})
           </div>
           <div>
             Turn:
