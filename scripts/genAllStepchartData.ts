@@ -3,7 +3,11 @@ import * as path from "path";
 import { parseSimfile } from "../lib/parseSimfile";
 import { calculateStats } from "../lib/calculateStats";
 import { dateReleased, shortMixNames } from "../lib/meta";
-import { extractBpmEvents, computeArrowTimings } from "../lib/analyzers/timingAnalyzers";
+import {
+  extractBpmEvents,
+  computeArrowTimings,
+  computeFreezeTimings,
+} from "../lib/analyzers/timingAnalyzers";
 import { calculateBpmStats } from "../lib/analyzers/calculateBpmStats";
 
 const ROOT = "resources/stepcharts";
@@ -113,6 +117,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
           const chart = simfile.charts[chartType.difficulty];
           const bpmTimeline = extractBpmEvents(chart);
           const arrowTimeline = computeArrowTimings(chart.arrows, bpmTimeline);
+          const freezeTimeline = computeFreezeTimings(chart.freezes, bpmTimeline);
           const stats = calculateStats(chart);
           return {
             meta: {
@@ -128,15 +133,9 @@ const allData: AllData = mixDirs.map((mixDir) => {
               ...stats,
             },
             chart: {
-              // I dont know why but all freezes in RawSimfile
-              // are longer by 1 beat, so we substract 1 beat here
-              // to make them correct through the rest of this app.
-              freezes: chart.freezes.map((freeze) => ({
-                ...freeze,
-                endOffset: freeze.endOffset - 0.25,
-              })),
               bpmTimeline,
               arrowTimeline,
+              freezeTimeline,
             },
           };
         }),

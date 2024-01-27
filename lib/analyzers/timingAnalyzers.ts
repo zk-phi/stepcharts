@@ -74,7 +74,23 @@ export const makeOffsetToSecConverter = (bpmTimeline: BpmEvent[]): Converter => 
   return offsetToSec;
 }
 
-export const computeArrowTimings = (arrows: Arrow[], bpmTimeline: BpmEvent[]): ArrowEvent[] => {
-  const converter = makeOffsetToSecConverter(bpmTimeline);
+export const computeArrowTimings = (arrows: Arrow[], bpms: BpmEvent[]): ArrowEvent[] => {
+  const converter = makeOffsetToSecConverter(bpms);
   return arrows.map((arrow) => ({ ...arrow, time: converter(arrow.offset) }));
+};
+
+export const computeFreezeTimings = (freezes: FreezeBody[], bpms: BpmEvent[]): FreezeEvent[] => {
+  const converter1 = makeOffsetToSecConverter(bpms);
+  const converter2 = makeOffsetToSecConverter(bpms);
+  return freezes.map((freeze) => ({
+    direction: freeze.direction,
+    start: {
+      offset: freeze.startOffset,
+      time: converter1(freeze.startOffset),
+    },
+    end: {
+      offset: freeze.endOffset,
+      time: converter2(freeze.endOffset),
+    }
+  }));
 };

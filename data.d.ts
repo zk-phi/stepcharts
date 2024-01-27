@@ -41,8 +41,13 @@ type ArrowEvent = Arrow & {
   time: number,
 };
 
+type FreezeEvent = Pick<FreezeBody, "direction"> & {
+  start: { time: number, offset: number },
+  end: { time: number, offset: number },
+};
+
 type AnalyzedStepchart = {
-  freezes: FreezeBody[];
+  freezeTimeline: FreezeEvent[];
   arrowTimeline: ArrowEvent[];
   bpmTimeline: BpmEvent[];
 };

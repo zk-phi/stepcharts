@@ -1,5 +1,6 @@
 import React from "react";
 import { useAnimationFrame } from "../lib/hooks/useAnimationFrame";
+import { makeOffsetToSecConverter } from "../lib/analyzers/timingAnalyzers";
 import { TURN_VALUES } from "../constants/turn";
 
 const ARROW_HEIGHT = 13.5; /* vh */
@@ -44,15 +45,14 @@ const Spacer = ({ offset, speed }: {
   );
 }
 
-const Arrow = ({ beat, direction, offset, speed }: {
+const Arrow = ({ beat, direction, pos }: {
   beat: Beat | "freeze" | "shock",
   direction: Direction,
-  offset: number,
-  speed: number,
+  pos: number,
 }) => {
   const style: React.CSSProperties = {
     position: "absolute",
-    top: `${judgePos(offset, speed) - ARROW_HEIGHT / 2}vh`,
+    top: `${pos - ARROW_HEIGHT / 2}vh`,
     left: `${direction * ARROW_HEIGHT}vh`,
     height: `${ARROW_HEIGHT}vh`,
     width: `${ARROW_HEIGHT}vh`,
@@ -66,24 +66,23 @@ const Arrow = ({ beat, direction, offset, speed }: {
   );
 };
 
-const Freeze = ({ direction, offset, endOffset, speed }: {
+const Freeze = ({ direction, pos, endPos }: {
   direction: Direction,
-  offset: number,
-  endOffset: number,
-  speed: number,
+  pos: number,
+  endPos: number,
 }) => {
   const bodyStyle: React.CSSProperties = {
     position: "absolute",
-    top: `${judgePos(offset, speed)}vh`,
+    top: `${pos}vh`,
     left: `${direction * ARROW_HEIGHT + ARROW_HEIGHT * 0.05}vh`,
-    height: `${(endOffset - offset) * 4 * speed * HEIGHT_PER_BEAT}vh`,
+    height: `${endPos - pos}vh`,
     width: `${ARROW_HEIGHT * 0.9}vh`,
     backgroundColor: "#5e5",
   };
 
   const tailStyle: React.CSSProperties = {
     position: "absolute",
-    top: `${judgePos(endOffset, speed)}vh`,
+    top: `${endPos}vh`,
     left: `${direction * ARROW_HEIGHT + ARROW_HEIGHT * 0.05}vh`,
     height: 0,
     width: `${ARROW_HEIGHT * 0.9}vh`,
@@ -100,18 +99,20 @@ const Freeze = ({ direction, offset, endOffset, speed }: {
   );
 };
 
-const Bar = ({ offset, speed, color }: {
-  offset: number,
-  speed: number,
+const Bar = ({ pos, endPos, color, bgColor }: {
+  pos: number,
+  endPos?: number,
   color: string,
+  bgColor: string,
 }) => {
   const style: React.CSSProperties = {
     position: "absolute",
-    height: 0,
+    height: `${endPos ? endPos - pos : 0}vh`,
     width: `${4 * ARROW_HEIGHT}vh`,
     left: 0,
-    top: `${judgePos(offset, speed)}vh`,
-    border: `2px solid ${color}`,
+    top: `${pos}vh`,
+    borderTop: `4px solid ${color}`,
+    background: bgColor,
   };
 
   return (
@@ -134,131 +135,90 @@ const JudgeLine = () => {
   );
 };
 
-const ChartObjectsRaw = ({ chart, speed = 1, turn = "OFF", showBeat }: {
+const ChartObjectsRaw = ({ chart, speed = 1, turn = "OFF", showBeat, constantMode }: {
   chart: ChartData,
   speed: number,
   turn: Turn,
   showBeat: boolean,
+  constantMode: boolean,
 }) => {
-  const lastMeasure = Math.floor(chart.arrowTimeline[chart.arrowTimeline.length - 1].offset);
+  const lastArrow = chart.arrowTimeline[chart.arrowTimeline.length - 1];
+  const lastMeasure = Math.floor(lastArrow.offset);
+  const endTime = lastArrow.time + 1;
   const reversedArrows = [...chart.arrowTimeline].reverse();
-  const reversedFreezes = [...chart.freezes].reverse();
+  const reversedFreezes = [...chart.freezeTimeline].reverse();
+
+  const posFn = (e: { time: number, offset: number }) => (
+    constantMode ? judgePos(e.time, speed) : judgePos(e.offset, speed)
+  );
+
+  const beats = showBeat && (() => {
+    const converter = makeOffsetToSecConverter(chart.bpmTimeline);
+    return [...Array((lastMeasure + 1) * 4)].map((_, i) => ({
+      offset: i / 4,
+      time: converter(i / 4),
+    }))
+  })();
 
   return (
     <>
-      {showBeat && [...Array((lastMeasure + 1) * 4)].map((_, i) => (
-        <Bar key={`b${i}`} offset={i / 4} speed={speed} color={i % 4 === 0 ? "#888" : "#444"} />
+      {showBeat && beats.map((b, i) => (
+        <Bar key={`b${i}`} pos={posFn(b)} color={i % 4 === 0 ? "#fffa" : "#fff5"} />
       ))}
       {chart.bpmTimeline.map((e, i, es) => (
         i === 0 ? (
           null
         ) : e.bpm === 0 ? (
-          <Bar key={`ts${i}`} offset={e.offset} speed={speed} color={"#4f4"} />
+          <Bar
+              key={`ts${i}`}
+              pos={posFn(e)}
+              endPos={posFn(chart.bpmTimeline[i + 1])}
+              color={"#4f4"}
+              bgColor={"#4f44"} />
         ) : es[i - 1].bpm === 0 ? (
           null
         ) : es[i - 1].bpm < e.bpm ? (
-          <Bar key={`ts${i}`} offset={e.offset} speed={speed} color={"#fc4"} />
+          <Bar key={`ts${i}`} pos={posFn(e)} color={"#fc4"} />
         ) : (
-          <Bar key={`ts${i}`} offset={e.offset} speed={speed} color={"#4cf"} />
+          <Bar key={`ts${i}`} pos={posFn(e)} color={"#4cf"} />
         )
       ))}
-      {reversedFreezes.map((f, i) => (
-        <Freeze
-            key={`f${i}`}
-            direction={TURN_VALUES[turn][f.direction]}
-            offset={f.startOffset}
-            endOffset={f.endOffset}
-            speed={speed} />
-      ))}
+      {reversedFreezes.map((f, i) => {
+        const direction = TURN_VALUES[turn][f.direction];
+        return (
+          <Freeze key={`f${i}`} direction={direction} pos={posFn(f.start)} endPos={posFn(f.end)} />
+        );
+      })}
       {reversedArrows.map((a, i) => {
         const isFreeze = a.direction.match(/2/);
         const beat = isFreeze ? "freeze" : a.beat;
+        const pos = posFn(a);
         return (
           <>
             { a.direction.match(/^1.../) &&
-              <Arrow
-                  key={`a${i}l`}
-                  beat={beat}
-                  direction={TURN_VALUES[turn][0]}
-                  offset={a.offset}
-                  speed={speed} /> }
+              <Arrow key={`a${i}l`} beat={beat} direction={TURN_VALUES[turn][0]} pos={pos} /> }
             { a.direction.match(/^.1../) &&
-              <Arrow
-                  key={`a${i}d`}
-                  beat={beat}
-                  direction={TURN_VALUES[turn][1]}
-                  offset={a.offset}
-                  speed={speed} /> }
+              <Arrow key={`a${i}d`} beat={beat} direction={TURN_VALUES[turn][1]} pos={pos} /> }
             { a.direction.match(/^..1./) &&
-              <Arrow
-                  key={`a${i}u`}
-                  beat={beat}
-                  direction={TURN_VALUES[turn][2]}
-                  offset={a.offset}
-                  speed={speed} /> }
+              <Arrow key={`a${i}u`} beat={beat} direction={TURN_VALUES[turn][2]} pos={pos} /> }
             { a.direction.match(/^...1/) &&
-              <Arrow
-                  key={`a${i}r`}
-                  beat={beat}
-                  direction={TURN_VALUES[turn][3]}
-                  offset={a.offset}
-                  speed={speed} /> }
+              <Arrow key={`a${i}r`} beat={beat} direction={TURN_VALUES[turn][3]} pos={pos} /> }
             { a.direction.match(/^2.../) &&
-              <Arrow
-                  key={`a${i}l`}
-                  beat="freeze"
-                  direction={TURN_VALUES[turn][0]}
-                  offset={a.offset}
-                  speed={speed} /> }
+              <Arrow key={`a${i}l`} beat="freeze" direction={TURN_VALUES[turn][0]} pos={pos} /> }
             { a.direction.match(/^.2../) &&
-              <Arrow
-                  key={`a${i}d`}
-                  beat="freeze"
-                  direction={TURN_VALUES[turn][1]}
-                  offset={a.offset}
-                  speed={speed} /> }
+              <Arrow key={`a${i}d`} beat="freeze" direction={TURN_VALUES[turn][1]} pos={pos} /> }
             { a.direction.match(/^..2./) &&
-              <Arrow
-                  key={`a${i}u`}
-                  beat="freeze"
-                  direction={TURN_VALUES[turn][2]}
-                  offset={a.offset}
-                  speed={speed} /> }
+              <Arrow key={`a${i}u`} beat="freeze" direction={TURN_VALUES[turn][2]} pos={pos} /> }
             { a.direction.match(/^...2/) &&
-              <Arrow
-                  key={`a${i}r`}
-                  beat="freeze"
-                  direction={TURN_VALUES[turn][3]}
-                  offset={a.offset}
-                  speed={speed} /> }
+              <Arrow key={`a${i}r`} beat="freeze" direction={TURN_VALUES[turn][3]} pos={pos} /> }
             { a.direction.match(/^M.../) &&
-              <Arrow
-                  key={`a${i}l`}
-                  beat="shock"
-                  direction={TURN_VALUES[turn][0]}
-                  offset={a.offset}
-                  speed={speed} /> }
+              <Arrow key={`a${i}l`} beat="shock" direction={TURN_VALUES[turn][0]} pos={pos} /> }
             { a.direction.match(/^.M../) &&
-              <Arrow
-                  key={`a${i}d`}
-                  beat="shock"
-                  direction={TURN_VALUES[turn][1]}
-                  offset={a.offset}
-                  speed={speed} /> }
+              <Arrow key={`a${i}d`} beat="shock" direction={TURN_VALUES[turn][1]} pos={pos} /> }
             { a.direction.match(/^..M./) &&
-              <Arrow
-                  key={`a${i}u`}
-                  beat="shock"
-                  direction={TURN_VALUES[turn][2]}
-                  offset={a.offset}
-                  speed={speed} /> }
+              <Arrow key={`a${i}u`} beat="shock" direction={TURN_VALUES[turn][2]} pos={pos} /> }
             { a.direction.match(/^...M/) &&
-              <Arrow
-                  key={`a${i}r`}
-                  beat="shock"
-                  direction={TURN_VALUES[turn][3]}
-                  offset={a.offset}
-                  speed={speed} /> }
+              <Arrow key={`a${i}r`} beat="shock" direction={TURN_VALUES[turn][3]} pos={pos} /> }
           </>
         );
       })}
@@ -269,10 +229,19 @@ const ChartObjectsRaw = ({ chart, speed = 1, turn = "OFF", showBeat }: {
 
 const ChartObjects = React.memo(ChartObjectsRaw);
 
-const ChartContainer = ({ offsetRef, speed = 1, playing, children }: {
+const ChartContainer = ({
+  offsetRef,
+  timeRef,
+  speed = 1,
+  playing,
+  constantMode,
+  children,
+}: {
+  timeRef: React.MutableRefObject<number>,
   offsetRef: React.MutableRefObject<number>,
   speed: number,
   playing: boolean,
+  constantMode: boolean,
   children: React.ReactNode,
 }) => {
   const ref = React.useRef<HTMLDivElement>(null);
@@ -295,14 +264,26 @@ const ChartContainer = ({ offsetRef, speed = 1, playing, children }: {
   }, [ref, playing]);
 
   const lastOffset = React.useRef<number>();
+  const lastTime = React.useRef<number>();
   useAnimationFrame(() => {
-    if (ref.current && offsetRef.current && offsetRef.current != lastOffset.current) {
-      ref.current.scrollTop = (
-        (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * laneHeight / 100
-      );
-      lastOffset.current = offsetRef.current;
+    if (ref.current) {
+      if (offsetRef.current && offsetRef.current != lastOffset.current) {
+        lastOffset.current = offsetRef.current;
+        if (!constantMode) {
+          ref.current.scrollTop = (
+            (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * laneHeight / 100
+          );
+        }
+      }
+      if (timeRef.current && timeRef.current != lastTime.current) {
+        if (constantMode) {
+          ref.current.scrollTop = (
+            (judgePos(timeRef.current, speed) - JUDGE_LINE_POS) * laneHeight / 100
+          );
+        }
+      }
     }
-  }, [ref, offsetRef, lastOffset, speed, laneHeight]);
+  }, [ref, offsetRef, timeRef, lastOffset, lastTime, speed, laneHeight, constantMode]);
 
   return (
     <div ref={ref} style={style}>
@@ -311,18 +292,39 @@ const ChartContainer = ({ offsetRef, speed = 1, playing, children }: {
   );
 };
 
-export const ChartPreview = ({ chart, speed = 1, turn = "OFF", offsetRef, playing, showBeat }: {
+export const ChartPreview = ({
+  chart,
+  speed = 1,
+  turn = "OFF",
+  offsetRef,
+  timeRef,
+  playing,
+  showBeat,
+  constantMode = false,
+}: {
   chart: ChartData,
   speed: number,
   turn: Turn,
   offsetRef: React.MutableRefObject<number>,
+  timeRef: React.MutableRefObject<number>,
   playing: boolean,
   showBeat: boolean,
+  constantMode: boolean,
 }) => {
   return (
     <div style={{ position: "relative" }}>
-      <ChartContainer offsetRef={offsetRef} speed={speed} playing={playing}>
-        <ChartObjects chart={chart} speed={speed} turn={turn} showBeat={showBeat} />
+      <ChartContainer
+          offsetRef={offsetRef}
+          timeRef={timeRef}
+          speed={speed}
+          playing={playing}
+          constantMode={constantMode}>
+        <ChartObjects
+            chart={chart}
+            speed={speed}
+            turn={turn}
+            showBeat={showBeat}
+            constantMode={constantMode} />
       </ChartContainer>
       <JudgeLine />
     </div>

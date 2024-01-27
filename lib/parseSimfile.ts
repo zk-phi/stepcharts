@@ -74,7 +74,10 @@ function parseSimfile(
       freezes: chart.freezes.map((freeze) => ({
         ...freeze,
         startOffset: freeze.startOffset + INTRO_OFFSET,
-        endOffset: freeze.endOffset + INTRO_OFFSET,
+        // I dont know why but all freezes in RawSimfile
+        // are longer by 1 beat, so we substract 1 beat here
+        // to make them correct through the rest of this app.
+        endOffset: freeze.endOffset + INTRO_OFFSET - 0.25,
       })),
       bpm: chart.bpm.map((bpm) => ({
         ...bpm,
