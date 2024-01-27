@@ -56,3 +56,8 @@ export const makeOffsetToSecConverter = (bpmTimeline: BpmEvent[]): Converter => 
   };
   return offsetToSec;
 }
+
+export const computeArrowTimings = (arrows: Arrow[], bpmTimeline: BpmEvent[]): ArrowEvent[] => {
+  const converter = makeOffsetToSecConverter(bpmTimeline);
+  return arrows.map((arrow) => ({ ...arrow, time: converter(arrow.offset) }));
+};

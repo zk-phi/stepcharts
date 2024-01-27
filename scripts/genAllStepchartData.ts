@@ -3,13 +3,14 @@ import * as path from "path";
 import { parseSimfile } from "../lib/parseSimfile";
 import { calculateStats } from "../lib/calculateStats";
 import { dateReleased, shortMixNames } from "../lib/meta";
-import { extractBpmEvents, makeOffsetToSecConverter } from "../lib/analyzers/timingAnalyzers";
+import { extractBpmEvents, computeArrowTimings } from "../lib/analyzers/timingAnalyzers";
 import { calculateBpmStats } from "../lib/analyzers/calculateBpmStats";
 
 const ROOT = "resources/stepcharts";
 
-const phraseVariance = (timings: number[]): number => {
+const phraseVariance = (arrowTimeline: ArrowEvent[]): number => {
   const table: Record<string, number> = {};
+  const timings = arrowTimeline.map((arrow) => arrow.time);
   timings.forEach((_, ix) => {
     if (ix >= 2) {
       const offset1 = Math.round(1000 * (timings[ix] - timings[ix - 1]));
@@ -50,11 +51,6 @@ const phraseVariance = (timings: number[]): number => {
 // ５拍子とかだったらどうするのとかありそう、Holic とか
 // (一見 off-beat に見えるが、拍子の方がおかしいだけで実は素直パターン)
 // 小節単位じゃなく拍単位でのカウントにすればある程度行けるかなあ
-
-const computeArrowTimings = (arrows: Arrow[], bpmTimeline: BpmEvent[]): number[] => {
-  const converter = makeOffsetToSecConverter(bpmTimeline);
-  return arrows.map((arrow) => converter(arrow.offset));
-};
 
 function getFiles(...dirPath: string[]): string[] {
   const builtPath = dirPath.reduce((building, d) => {
@@ -116,7 +112,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
         charts: simfile.availableTypes.map((chartType: StepchartType) => {
           const chart = simfile.charts[chartType.difficulty];
           const bpmTimeline = extractBpmEvents(chart);
-          const arrowTimings = computeArrowTimings(chart.arrows, bpmTimeline);
+          const arrowTimeline = computeArrowTimings(chart.arrows, bpmTimeline);
           const stats = calculateStats(chart);
           return {
             meta: {
@@ -125,7 +121,9 @@ const allData: AllData = mixDirs.map((mixDir) => {
               arrows: chart.arrows.length,
               stops: chart.stops.length,
               bpmShifts: chart.bpm.length - 1,
-              complexity: stats.sixteenths + stats.trips + 100 * (1 - phraseVariance(arrowTimings)),
+              complexity: (
+                stats.sixteenths + stats.trips + 100 * (1 - phraseVariance(arrowTimeline))
+              ),
               ...calculateBpmStats(chart, bpmTimeline),
               ...stats,
             },
@@ -138,10 +136,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
                 endOffset: freeze.endOffset - 0.25,
               })),
               bpmTimeline,
-              arrowTimeline: chart.arrows.map((arrow, ix) => ({
-                ...arrow,
-                time: arrowTimings[ix],
-              })),
+              arrowTimeline,
             },
           };
         }),
