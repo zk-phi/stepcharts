@@ -1,3 +1,11 @@
+type Difficulty =
+  | "beginner"
+  | "basic"
+  | "difficult"
+  | "expert"
+  | "challenge"
+  | "edit";
+
 type StepchartType = {
   difficulty: Difficulty;
   feet: number;

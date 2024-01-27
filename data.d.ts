@@ -1,11 +1,3 @@
-type Difficulty =
-  | "beginner"
-  | "basic"
-  | "difficult"
-  | "expert"
-  | "challenge"
-  | "edit";
-
 type MixMeta = {
   mixId: string;
   name: string;
@@ -34,22 +26,28 @@ type ChartMeta = Stats & {
   complexity: number;
 };
 
+type AllMeta = MixMeta & SongMeta & ChartMeta;
+
+
+// stops and bpm-changes with both timing and offset values
 type BpmEvent = {
   time: number;
   offset: number;
   bpm: number;
 };
 
+// arrows with both timing and offset values
 type ArrowEvent = Arrow & {
   time: number,
 };
 
-type AllMeta = MixMeta & SongMeta & ChartMeta;
 type AnalyzedStepchart = {
   freezes: FreezeBody[];
   arrowTimeline: ArrowEvent[];
   bpmTimeline: BpmEvent[];
 };
+
+
 type ChartData = AnalyzedStepchart & {
   meta: AllMeta,
 };

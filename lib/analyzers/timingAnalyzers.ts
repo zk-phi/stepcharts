@@ -1,5 +1,6 @@
 // Align all stops and bpm-changes into a single timeline.
-// All timeline elements will have both offset and timing value.
+// All timeline events will have both offset and timing value.
+// Stops are represented by bpm-changes to zero.
 export const extractBpmEvents = (chart: Stepchart): BpmEvent[] => {
   const bpmEvents = [
     ...chart.bpm.map((b) => (
@@ -15,7 +16,7 @@ export const extractBpmEvents = (chart: Stepchart): BpmEvent[] => {
   const timeline: BpmEvent[] = [{
     time: 0,
     offset: 0,
-    // @ts-ignore `bpm` can be undefined in type-level but it must be defined actually
+    // @ts-ignore `bpm` can be undefined in type-level, but it's always defined in the real data
     bpm: bpmEvents.shift().bpm,
   }];
 
