@@ -129,7 +129,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
               complexity: (
                 stats.sixteenths + stats.trips + 100 * (1 - phraseVariance(arrowTimeline))
               ),
-              ...calculateBpmStats(chart, bpmTimeline),
+              ...calculateBpmStats(arrowTimeline, bpmTimeline),
               ...stats,
             },
             chart: {

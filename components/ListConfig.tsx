@@ -154,7 +154,7 @@ const ListConfig = ({
             value={sortedBy}
             onChange={(e) => onChangeSortedBy(e.target.value)}>
           {SORT_KEYS.map((k) => (
-            <option key={k.value} value={k.value}>
+            <option key={k.value} value={k.value} disabled={k.disabled}>
               {k.label}
             </option>
           ))}
