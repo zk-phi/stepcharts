@@ -152,7 +152,7 @@ const ChartObjectsRaw = ({ chart, speed = 1, turn = "OFF", showBeat, constantMod
     constantMode ? judgePos(e.time, speed) : judgePos(e.offset, speed)
   );
 
-  const beats = showBeat && (() => {
+  const beats = !showBeat ? [] : (() => {
     const converter = makeOffsetToSecConverter(chart.bpmTimeline);
     return [...Array((lastMeasure + 1) * 4)].map((_, i) => ({
       offset: i / 4,
@@ -162,7 +162,7 @@ const ChartObjectsRaw = ({ chart, speed = 1, turn = "OFF", showBeat, constantMod
 
   return (
     <>
-      {showBeat && beats.map((b, i) => (
+      {beats.map((b, i) => (
         <Bar key={`b${i}`} pos={posFn(b)} color={i % 4 === 0 ? "#fffa" : "#fff5"} />
       ))}
       {chart.bpmTimeline.map((e, i, es) => (
