@@ -103,7 +103,7 @@ const Bar = ({ pos, endPos, color, bgColor }: {
   pos: number,
   endPos?: number,
   color: string,
-  bgColor: string,
+  bgColor?: string,
 }) => {
   const style: React.CSSProperties = {
     position: "absolute",
