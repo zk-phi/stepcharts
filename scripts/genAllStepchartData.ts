@@ -169,6 +169,11 @@ const allData: AllData = mixDirs.map((mixDir) => {
           title: simfile.title.titleName,
           titleTranslit: simfile.title.translitTitleName,
           artist: simfile.artist,
+          filterString: [
+            simfile.title.translitTitleName,
+            simfile.title.titleName,
+            simfile.artist,
+          ].join(" ").toLowerCase(),
         },
         charts: simfile.availableTypes.map((chartType: StepchartType) => {
           const chart = simfile.charts[chartType.difficulty];
@@ -240,13 +245,6 @@ const allMixes: AllMeta[] = allData.flatMap((mix) => {
         ...mix.meta,
         ...song.meta,
         ...chart.meta,
-        filterString: [
-          song.meta.titleTranslit,
-          song.meta.title,
-          mix.meta.name,
-          song.meta.artist,
-          chart.meta.difficulty,
-        ].join(" ").toLowerCase(),
       };
       const chartData: ChartData = {
         meta: allMeta,

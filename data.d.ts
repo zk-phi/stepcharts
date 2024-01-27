@@ -19,6 +19,7 @@ type SongMeta = {
   title: string;
   titleTranslit: string | null;
   artist: string;
+  filterString: string;
 };
 
 type ChartMeta = Stats & {
@@ -43,7 +44,7 @@ type ArrowEvent = Arrow & {
   time: number,
 };
 
-type AllMeta = MixMeta & SongMeta & ChartMeta & { filterString: string };
+type AllMeta = MixMeta & SongMeta & ChartMeta;
 type AnalyzedStepchart = {
   freezes: FreezeBody[];
   arrowTimeline: ArrowEvent[];
