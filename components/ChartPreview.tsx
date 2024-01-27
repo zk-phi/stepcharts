@@ -165,22 +165,47 @@ const ChartObjectsRaw = ({ chart, speed = 1, turn = "OFF", showBeat, constantMod
       {beats.map((b, i) => (
         <Bar key={`b${i}`} pos={posFn(b)} color={i % 4 === 0 ? "#fffa" : "#fff5"} />
       ))}
+      {chart.bpmTimeline.map((e, i, es) => {
+        const end = es[i + 1] ?? beats[beats.length - 1];
+        return (
+          i === 0 ? (
+            chart.meta.mainBpm !== e.bpm && (
+              <Bar
+                  key={`ts${i}`}
+                  pos={0}
+                  endPos={posFn(end)}
+                  color={chart.meta.mainBpm < e.bpm ? "#fc4" : "#4cf"}
+                  bgColor={chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"} />
+            )
+          ) : es[i - 1].bpm < e.bpm ? (
+            <Bar
+                key={`ts${i}`}
+                pos={posFn(e)}
+                endPos={chart.meta.mainBpm !== e.bpm ? posFn(end) : undefined}
+                color={"#fc4"}
+                bgColor={chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"} />
+          ) : e.bpm < es[i - 1].bpm ? (
+            <Bar
+                key={`ts${i}`}
+                pos={posFn(e)}
+                endPos={chart.meta.mainBpm !== e.bpm ? posFn(end) : undefined}
+                color={"#4cf"}
+                bgColor={chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"} />
+          ) : (
+            null
+          )
+        );
+      })}
       {chart.bpmTimeline.map((e, i, es) => (
-        i === 0 ? (
-          null
-        ) : e.bpm === 0 ? (
+        e.bpm === 0 ? (
           <Bar
               key={`ts${i}`}
               pos={posFn(e)}
-              endPos={posFn(chart.bpmTimeline[i + 1])}
+              endPos={posFn(es[i + 1])}
               color={"#4f4"}
               bgColor={"#4f44"} />
-        ) : es[i - 1].bpm === 0 ? (
-          null
-        ) : es[i - 1].bpm < e.bpm ? (
-          <Bar key={`ts${i}`} pos={posFn(e)} color={"#fc4"} />
         ) : (
-          <Bar key={`ts${i}`} pos={posFn(e)} color={"#4cf"} />
+          null
         )
       ))}
       {reversedFreezes.map((f, i) => {
