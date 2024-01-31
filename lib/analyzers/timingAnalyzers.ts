@@ -13,6 +13,10 @@ export const extractBpmEvents = (chart: Stepchart): BpmEvent[] => {
     a.offset - b.offset
   ));
 
+  while (!('bpm' in bpmEvents[0])) {
+    bpmEvents.shift();
+  }
+
   const timeline: BpmEvent[] = [{
     time: 0,
     offset: 0,
