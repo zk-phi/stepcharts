@@ -71,6 +71,7 @@ export const makeOffsetToSecConverter = (bpmTimeline: BpmEvent[]): Converter => 
     while (bpmTimeline[ix + 1] && bpmTimeline[ix + 1].offset < offset) {
       ix++;
     }
+    lastOffset = offset;
     return bpmTimeline[ix].time + (
       (offset - bpmTimeline[ix].offset) * 4 / bpmTimeline[ix].bpm * 60
     );
