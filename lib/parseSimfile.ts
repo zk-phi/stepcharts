@@ -3,6 +3,8 @@ import * as path from "path";
 import { parseDwi } from "./parseDwi";
 import { parseSm } from "./parseSm";
 
+// TODO: round bpms and stops
+
 type RawSimfile = Omit<Simfile, "title"> & {
   title: string;
   titletranslit: string | null;
@@ -69,25 +71,24 @@ function parseSimfile(
     charts: mapObject(rawStepchart.charts, (chart) => ({
       arrows: chart.arrows.map((arrow) => ({
         ...arrow,
-        offset: arrow.offset + INTRO_OFFSET,
+        offset: arrow.offset.add(INTRO_OFFSET),
       })),
       freezes: chart.freezes.map((freeze) => ({
         ...freeze,
-        startOffset: freeze.startOffset + INTRO_OFFSET,
-        // I dont know why but all freezes in RawSimfile
-        // are longer by 1 beat, so we substract 1 beat here
-        // to make them correct through the rest of this app.
-        endOffset: freeze.endOffset + INTRO_OFFSET - 0.25,
+        startOffset: freeze.startOffset.add(INTRO_OFFSET),
+        endOffset: freeze.endOffset.add(INTRO_OFFSET),
       })),
       bpm: chart.bpm.map((bpm) => ({
         ...bpm,
-        startOffset: Math.max(bpm.startOffset + INTRO_OFFSET, 0),
-        endOffset: bpm.endOffset != null ? bpm.endOffset + INTRO_OFFSET : null,
-      })).filter((bpm, ix) => !chart.bpm[ix + 1] || chart.bpm[ix + 1].startOffset > 0),
+        startOffset: bpm.startOffset.add(INTRO_OFFSET),
+        endOffset: bpm.endOffset?.add(INTRO_OFFSET),
+      })).filter((bpm, ix) => (
+        !chart.bpm[ix + 1] || chart.bpm[ix + 1].startOffset.compare(0) > 0
+      )),
       stops: chart.stops.map((stop) => ({
         ...stop,
-        offset: stop.offset + INTRO_OFFSET,
-      })).filter((stop) => stop.offset >= 0),
+        offset: stop.offset.add(INTRO_OFFSET),
+      })).filter((stop) => stop.offset.compare(0) > 0),
     })),
   };
 }

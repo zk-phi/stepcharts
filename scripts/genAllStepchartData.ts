@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import Fraction from "fraction.js";
 import { parseSimfile } from "../lib/parseSimfile";
 import { calculateStats } from "../lib/calculateStats";
 import { dateReleased, shortMixNames } from "../lib/meta";
@@ -7,19 +8,20 @@ import {
   extractBpmEvents,
   computeArrowTimings,
   computeFreezeTimings,
+  computeBeatTimings,
 } from "../lib/analyzers/timingAnalyzers";
 import { calculateBpmStats } from "../lib/analyzers/calculateBpmStats";
 
 const ROOT = "resources/stepcharts";
 
-const phraseVariance = (arrowTimeline: ArrowEvent[]): number => {
+const phraseVariance = (arrowTimeline: ArrowEvent<Fraction>[]): number => {
   const table: Record<string, number> = {};
   const timings = arrowTimeline.map((arrow) => arrow.time);
   timings.forEach((_, ix) => {
     if (ix >= 2) {
-      const offset1 = Math.round(1000 * (timings[ix] - timings[ix - 1]));
-      const offset2 = Math.round(1000 * (timings[ix - 1] - timings[ix - 2]));
-      const key = `${offset1}/${offset2}`;
+      const offset1 = timings[ix].sub(timings[ix - 1]);
+      const offset2 = timings[ix - 1].sub(timings[ix - 2]);
+      const key = `${offset1.toString()}/${offset2.toString()}`;
       table[key] = (table[key] ?? 0) + 1;
     }
   });
@@ -80,7 +82,7 @@ type AllData = {
     meta: SongMeta,
     charts: {
       meta: ChartMeta,
-      chart: AnalyzedStepchart,
+      chart: AnalyzedStepchart<number>,
     }[],
   }[],
 }[];
@@ -118,6 +120,8 @@ const allData: AllData = mixDirs.map((mixDir) => {
           const bpmTimeline = extractBpmEvents(chart);
           const arrowTimeline = computeArrowTimings(chart.arrows, bpmTimeline);
           const freezeTimeline = computeFreezeTimings(chart.freezes, bpmTimeline);
+          const lastMeasure = Math.floor(chart.arrows[chart.arrows.length - 1].offset);
+          const beatTimeline = computeBeatTimings(lastMeasure, bpmTimeline);
           const stats = calculateStats(chart);
           return {
             meta: {
@@ -133,9 +137,31 @@ const allData: AllData = mixDirs.map((mixDir) => {
               ...stats,
             },
             chart: {
-              bpmTimeline,
-              arrowTimeline,
-              freezeTimeline,
+              bpmTimeline: bpmTimeline.map((b: BpmEvent<Fraction>): BpmEvent<number> => ({
+                bpm: b.bpm.n / b.bpm.d,
+                time: b.time.n / b.time.d,
+                offset: b.offset.n / b.offset.d,
+              })),
+              arrowTimeline: arrowTimeline.map((a: ArrowEvent<Fraction>): ArrowEvent<number> => ({
+                ...a,
+                time: a.time.n / a.time.d,
+                offset: a.offset.n / a.offset.d,
+              })),
+              freezeTimeline: freezeTimeline.map((f: FreezeEvent<Fraction>): FreezeEvent<number> => ({
+                ...f,
+                start: {
+                  time: f.start.time.n / f.start.time.d,
+                  offset: f.start.offset.n / f.start.offset.d,
+                },
+                end: {
+                  time: f.end.time.n / f.end.time.d,
+                  offset: f.end.offset.n / f.end.offset.d,
+                },
+              })),
+              beatTimeline: beatTimeline.map((b: Timestamp<Fraction>): Timestamp<number> => ({
+                time: b.time.n / b.time.d,
+                offset: b.offset.n / b.offset.d,
+              })),
             },
           };
         }),

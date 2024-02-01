@@ -26,24 +26,24 @@ type Arrow = {
   // the same as 6ths. This probably should be "color" not "beat" TODO
   beat: 4 | 6 | 8 | 12 | 16;
   direction: `${0 | 1 | 2}${0 | 1 | 2}${0 | 1 | 2}${0 | 1 | 2}` | 'MMMM';
-  offset: number;
+  offset: Fraction;
 };
 
 type FreezeBody = {
   direction: 0 | 1 | 2 | 3;
-  startOffset: number;
-  endOffset: number;
+  startOffset: Fraction;
+  endOffset: Fraction;
 };
 
 type Bpm = {
-  startOffset: number;
-  endOffset: number | null;
-  bpm: number;
+  startOffset: Fraction;
+  endOffset: Fraction | null;
+  bpm: Fraction;
 };
 
 type Stop = {
-  offset: number;
-  duration: number;
+  offset: Fraction;
+  duration: Fraction;
 };
 
 type Stepchart = {

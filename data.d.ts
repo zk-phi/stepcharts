@@ -29,31 +29,30 @@ type ChartMeta = Stats & {
 type AllMeta = MixMeta & SongMeta & ChartMeta;
 
 
-// stops and bpm-changes with both timing and offset values
-type BpmEvent = {
-  time: number;
-  offset: number;
-  bpm: number;
+type Timestamp<T extends Fraction | number> = {
+  time: T;
+  offset: T;
 };
+
+// stops and bpm-changes with both timing and offset values
+type BpmEvent<T extends Fraction | number> = { bpm: T } & Timestamp<T>;
 
 // arrows with both timing and offset values
-type ArrowEvent = Arrow & {
-  time: number,
+type ArrowEvent<T extends Fraction | number> =
+  Omit<Arrow, "offset"> & Timestamp<T>;
+
+type FreezeEvent<T extends Fraction | number> =
+  Omit<FreezeBody, "startOffset" | "endOffset"> & { start: Timestamp<T>, end: Timestamp<T> };
+
+type AnalyzedStepchart<T extends Fraction | number> = {
+  freezeTimeline: FreezeEvent<T>[];
+  arrowTimeline: ArrowEvent<T>[];
+  bpmTimeline: BpmEvent<T>[];
+  beatTimeline: Timestamp<T>[];
 };
 
-type FreezeEvent = Pick<FreezeBody, "direction"> & {
-  start: { time: number, offset: number },
-  end: { time: number, offset: number },
-};
 
-type AnalyzedStepchart = {
-  freezeTimeline: FreezeEvent[];
-  arrowTimeline: ArrowEvent[];
-  bpmTimeline: BpmEvent[];
-};
-
-
-type ChartData = AnalyzedStepchart & {
+type ChartData = AnalyzedStepchart<number> & {
   meta: AllMeta,
 };
 

@@ -2,7 +2,6 @@ import Fraction from "fraction.js";
 import { RawSimfile } from "./parseSimfile";
 import {
   determineBeat,
-  mergeSimilarBpmRanges,
   normalizedDifficultyMap,
 } from "./util";
 
@@ -69,11 +68,6 @@ function findFirstNonEmptyMeasure(
   );
 }
 
-// Round arrow timing values to match with stop and bpm-shift timing values
-function roundOffset(num: number, den: number): number {
-  return Math.round(4 * 100000 * num / den) / 100000 * 0.25;
-};
-
 function parseSm(sm: string, _titlePath: string): RawSimfile {
   const lines = sm.split("\n").map((l) => l.trim());
 
@@ -98,9 +92,10 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
 
     return entries.map((s) => {
       const [stopS, durationS] = s.split("=");
+      const offset = new Fraction(stopS).simplify().div(4).sub(emptyOffsetInMeasures);
       return {
-        offset: Number(stopS) * 0.25 - emptyOffsetInMeasures,
-        duration: Number(durationS),
+        offset,
+        duration: new Fraction(durationS).simplify(),
       };
     });
   }
@@ -112,18 +107,19 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
     const bpms = entries.map((e, i, a) => {
       const [beatS, bpmS] = e.split("=");
       const nextBeatS = a[i + 1]?.split("=")[0] ?? null;
+      const startOffset = new Fraction(beatS).simplify().div(4).sub(emptyOffsetInMeasures);
+      const endOffset = nextBeatS === null ? null : (
+        new Fraction(nextBeatS).simplify().div(4).sub(emptyOffsetInMeasures)
+      );
 
       return {
-        startOffset: Number(beatS) * 0.25 - emptyOffsetInMeasures,
-        endOffset:
-          nextBeatS === null
-            ? null
-            : Number(nextBeatS) * 0.25 - emptyOffsetInMeasures,
-        bpm: Number(bpmS),
+        startOffset,
+        endOffset,
+        bpm: new Fraction(bpmS).simplify(),
       };
     });
 
-    return mergeSimilarBpmRanges(bpms);
+    return bpms;
   }
 
   function parseFreezes(
@@ -167,10 +163,9 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
               `${sc.title}, ${difficulty} -- error parsing freezes, found a new starting freeze before a previous one finished`
             );
           }
-          const startBeatFraction = curOffset;
           open[d] = {
             direction: d as FreezeBody["direction"],
-            startOffset: roundOffset(startBeatFraction.n, startBeatFraction.d),
+            startOffset: curOffset,
           };
         } else if (cleanedLine[d] === "3") {
           if (!open[d]) {
@@ -179,8 +174,7 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
             );
           }
 
-          const endBeatFraction = curOffset.add(new Fraction(1).div(4));
-          open[d]!.endOffset = roundOffset(endBeatFraction.n, endBeatFraction.d);
+          open[d]!.endOffset = curOffset;
           freezes.push(open[d] as FreezeBody);
           open[d] = undefined;
         }
@@ -244,7 +238,7 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
       if (!isRest(line)) {
         arrows.push({
           beat: determineBeat(curOffset),
-          offset: roundOffset(curOffset.n, curOffset.d),
+          offset: curOffset,
           direction: line as Arrow["direction"],
         });
       }

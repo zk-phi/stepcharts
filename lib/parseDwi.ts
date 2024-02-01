@@ -3,7 +3,6 @@ import Fraction from "fraction.js";
 import { RawSimfile } from "./parseSimfile";
 import {
   determineBeat,
-  mergeSimilarBpmRanges,
   normalizedDifficultyMap,
 } from "./util";
 
@@ -41,20 +40,20 @@ function combinePadsIntoOneStream(
 ): ArrowParseResult {
   const arrows = p1.arrows
     .concat(p2.arrows)
-    .sort((a, b) => a.offset - b.offset);
+    .sort((a, b) => a.offset.compare(b.offset));
 
   const combinedArrows = arrows.reduce<Arrow[]>((building, arrow, i, rest) => {
     const prevArrow = rest[i - 1];
 
     // since previous offset matches, the previous one already
     // grabbed and combined with this arrow, throw it away
-    if (prevArrow?.offset === arrow.offset) {
+    if (prevArrow?.offset.equals(arrow.offset)) {
       return building;
     }
 
     const nextArrow = rest[i + 1];
 
-    if (nextArrow?.offset === arrow.offset) {
+    if (nextArrow?.offset.equals(arrow.offset)) {
       return building.concat({
         ...arrow,
         direction: arrow.direction + nextArrow.direction,
@@ -78,7 +77,7 @@ function combinePadsIntoOneStream(
 
   const freezes = p1.freezes
     .concat(bumpedP2Freezes)
-    .sort((a, b) => a.startOffset - b.startOffset);
+    .sort((a, b) => a.startOffset.compare(b.startOffset));
 
   return {
     arrows: combinedArrows,
@@ -145,7 +144,7 @@ function parseArrowStream(
           openFreezes[d as FreezeBody["direction"]]
         ) {
           const of = openFreezes[d as FreezeBody["direction"]];
-          of!.endOffset = curOffset.n / curOffset.d + 0.25;
+          of!.endOffset = curOffset;
           freezes.push(of as FreezeBody);
           openFreezes[d as FreezeBody["direction"]] = null;
           smDirectionSplit[d] = "0";
@@ -168,7 +167,7 @@ function parseArrowStream(
         if (smDirection[d] === "1") {
           openFreezes[d as FreezeBody["direction"]] = {
             direction: d as FreezeBody["direction"],
-            startOffset: curOffset.n / curOffset.d,
+            startOffset: curOffset,
           };
         }
       }
@@ -180,7 +179,7 @@ function parseArrowStream(
           "2"
         ) as Arrow["direction"],
         beat: determineBeat(curOffset),
-        offset: curOffset.n / curOffset.d,
+        offset: curOffset,
       });
 
       // remember the direction to know when to close the freeze
@@ -208,7 +207,7 @@ function parseArrowStream(
         arrows.push({
           direction,
           beat: determineBeat(curOffset),
-          offset: curOffset.n / curOffset.d,
+          offset: curOffset,
         });
       }
 
@@ -267,10 +266,11 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
 
     return stops.split(",").map((s) => {
       const [eigthNoteS, stopDurationS] = s.split("=");
+      const offset = new Fraction(eigthNoteS).simplify().div(16).sub(new Fraction(emptyOffset, 8));
 
       return {
-        offset: Number(eigthNoteS) * (1 / 16) - emptyOffset * (1 / 8),
-        duration: Number(stopDurationS) / 1000,
+        offset,
+        duration: new Fraction(stopDurationS).simplify().div(1000),
       };
     });
   }
@@ -279,7 +279,11 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
     let finalBpms: Bpm[] = [];
 
     if (bpm && !isNaN(Number(bpm))) {
-      finalBpms = [{ startOffset: 0, endOffset: null, bpm: Number(bpm) }];
+      finalBpms = [{
+        startOffset: new Fraction(0),
+        endOffset: null,
+        bpm: new Fraction(bpm).simplify(),
+      }];
     }
 
     if (changebpm) {
@@ -292,18 +296,18 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
         const [eigthNoteS, bpmVS] = bpmES.split("=");
         const nextEigthNoteS = a[i + 1]?.split("=")[0] ?? null;
 
-        const startOffset =
-          Number(eigthNoteS) * (1 / 16) - emptyOffset * (1 / 8);
+        const emptyOffsetFrac = new Fraction(emptyOffset, 8);
+        const startOffset = new Fraction(eigthNoteS).simplify().div(16).sub(emptyOffsetFrac);
         let endOffset = null;
 
         if (nextEigthNoteS) {
-          endOffset = Number(nextEigthNoteS) * (1 / 16) - emptyOffset * (1 / 8);
+          endOffset = new Fraction(nextEigthNoteS).simplify().div(16).sub(emptyOffsetFrac);
         }
 
         return {
           startOffset,
           endOffset,
-          bpm: Number(bpmVS),
+          bpm: new Fraction(bpmVS).simplify(),
         };
       });
 
@@ -314,8 +318,6 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
     if (!finalBpms) {
       throw new Error("parseDwi, determineBpm: failed to get bpm");
     }
-
-    finalBpms = mergeSimilarBpmRanges(finalBpms);
 
     return finalBpms;
   }
