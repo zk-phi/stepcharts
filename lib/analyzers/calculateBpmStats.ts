@@ -2,12 +2,12 @@ import type Fraction from "fraction.js";
 
 const findMainBpm =
   (arrowTimeline: ArrowEvent<Fraction>[], bpmTimeline: BpmEvent<Fraction>[]): number => {
-    const endTime = arrowTimeline[arrowTimeline.length - 1].time;
+    const lastOffset = arrowTimeline[arrowTimeline.length - 1].offset;
 
     const hist: Record<number, number> = {};
     bpmTimeline.forEach((event, i, arr) => {
       const key = event.bpm.n / event.bpm.d;
-      const dt = (arr[i + 1]?.time ?? endTime).sub(event.time);
+      const dt = (arr[i + 1]?.offset ?? lastOffset).sub(event.offset);
       hist[key] = (hist[key] ?? 0) + (dt.n / dt.d);
     });
 
