@@ -34,57 +34,6 @@ type ArrowParseResult = {
   freezes: FreezeBody[];
 };
 
-function combinePadsIntoOneStream(
-  p1: ArrowParseResult,
-  p2: ArrowParseResult
-): ArrowParseResult {
-  const arrows = p1.arrows
-    .concat(p2.arrows)
-    .sort((a, b) => a.offset.compare(b.offset));
-
-  const combinedArrows = arrows.reduce<Arrow[]>((building, arrow, i, rest) => {
-    const prevArrow = rest[i - 1];
-
-    // since previous offset matches, the previous one already
-    // grabbed and combined with this arrow, throw it away
-    if (prevArrow?.offset.equals(arrow.offset)) {
-      return building;
-    }
-
-    const nextArrow = rest[i + 1];
-
-    if (nextArrow?.offset.equals(arrow.offset)) {
-      return building.concat({
-        ...arrow,
-        direction: arrow.direction + nextArrow.direction,
-      } as Arrow);
-    }
-
-    return building.concat({
-      ...arrow,
-      direction: p1.arrows.includes(arrow)
-        ? `${arrow.direction}0000`
-        : `0000${arrow.direction}`,
-    } as Arrow);
-  }, []);
-
-  const bumpedP2Freezes = p2.freezes.map((f) => {
-    return {
-      ...f,
-      direction: f.direction + 4,
-    } as FreezeBody;
-  });
-
-  const freezes = p1.freezes
-    .concat(bumpedP2Freezes)
-    .sort((a, b) => a.startOffset.compare(b.startOffset));
-
-  return {
-    arrows: combinedArrows,
-    freezes,
-  };
-}
-
 function findFirstNonEmptyMeasure(
   p1Notes: string,
   p2Notes: string | undefined
