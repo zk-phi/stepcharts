@@ -100,11 +100,12 @@ const Freeze = ({ direction, pos, endPos, diminished }: {
   );
 };
 
-const Bar = ({ pos, endPos, color, bgColor }: {
+const Bar = ({ pos, endPos, color, bgColor, value }: {
   pos: number,
   endPos?: number,
   color: string,
   bgColor?: string,
+  value?: number
 }) => {
   const style: React.CSSProperties = {
     position: "absolute",
@@ -116,8 +117,18 @@ const Bar = ({ pos, endPos, color, bgColor }: {
     backgroundColor: bgColor,
   };
 
+  const innerStyle: React.CSSProperties = {
+    position: "absolute",
+    width: "100%",
+    color: color,
+    textAlign: "center",
+    top: "4px",
+  };
+
   return (
-    <div style={style} />
+    <div style={style}>
+      {value && <div style={innerStyle}>{value}</div>}
+    </div>
   );
 };
 
@@ -144,6 +155,8 @@ const ChartObjectsRaw = ({
   constantMode,
   colorFreezes,
   diminishFreezes,
+  soflanBg,
+  soflanValue,
 }: {
   chart: ChartData,
   speed: number,
@@ -152,6 +165,8 @@ const ChartObjectsRaw = ({
   constantMode: boolean,
   colorFreezes: boolean,
   diminishFreezes: boolean,
+  soflanBg: boolean,
+  soflanValue: boolean,
 }) => {
   const lastArrow = chart.arrowTimeline[chart.arrowTimeline.length - 1];
   const lastMeasure = Math.floor(lastArrow.offset);
@@ -178,7 +193,8 @@ const ChartObjectsRaw = ({
                   pos={0}
                   endPos={posFn(end)}
                   color={chart.meta.mainBpm < e.bpm ? "#fc4" : "#4cf"}
-                  bgColor={chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"} />
+                  bgColor={!soflanBg ? undefined : chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"}
+                  value={soflanValue ? e.bpm : undefined} />
             )
           ) : es[i - 1].bpm < e.bpm ? (
             <Bar
@@ -186,14 +202,16 @@ const ChartObjectsRaw = ({
                 pos={posFn(e)}
                 endPos={chart.meta.mainBpm !== e.bpm ? posFn(end) : undefined}
                 color={"#fc4"}
-                bgColor={chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"} />
-          ) : e.bpm < es[i - 1].bpm ? (
+                bgColor={!soflanBg ? undefined : chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"}
+                value={soflanValue ? e.bpm : undefined} />
+          ) : e.bpm < es[i - 1].bpm && e.bpm > 0 ? (
             <Bar
                 key={`ts${i}`}
                 pos={posFn(e)}
                 endPos={chart.meta.mainBpm !== e.bpm ? posFn(end) : undefined}
                 color={"#4cf"}
-                bgColor={chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"} />
+                bgColor={!soflanBg ? undefined : chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"}
+                value={soflanValue ? e.bpm : undefined} />
           ) : (
             null
           )
@@ -326,8 +344,10 @@ export const ChartPreview = ({
   playing,
   showBeat,
   constantMode = false,
-  colorFreezes = true,
+  colorFreezes = false,
   diminishFreezes = false,
+  soflanBg = false,
+  soflanValue = false,
 }: {
   chart: ChartData,
   speed: number,
@@ -339,6 +359,8 @@ export const ChartPreview = ({
   constantMode: boolean,
   colorFreezes: boolean,
   diminishFreezes: boolean,
+  soflanBg: boolean,
+  soflanValue: boolean,
 }) => {
   return (
     <div style={{ position: "relative" }}>
@@ -355,7 +377,9 @@ export const ChartPreview = ({
             showBeat={showBeat}
             constantMode={constantMode}
             colorFreezes={colorFreezes}
-            diminishFreezes={diminishFreezes} />
+            diminishFreezes={diminishFreezes}
+            soflanBg={soflanBg}
+            soflanValue={soflanValue} />
       </ChartContainer>
       <JudgeLine />
     </div>
