@@ -38,7 +38,12 @@ const normalizedDifficultyMap: Record<string, Difficulty> = {
   edit: "edit",
 };
 
+const mergeSameBpms = (bpms: Bpm[]): Bpm[] => (
+  bpms.filter((b, i) => i === 0 || !bpms[i - 1].bpm.equals(b.bpm))
+);
+
 export {
   determineBeat,
   normalizedDifficultyMap,
+  mergeSameBpms,
 };

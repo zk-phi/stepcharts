@@ -1,9 +1,11 @@
 import fs from "fs";
 import Fraction from "fraction.js";
 import { RawSimfile } from "./parseSimfile";
+import { bpmFrac, offsetFrac } from "../constants/precision";
 import {
   determineBeat,
   normalizedDifficultyMap,
+  mergeSameBpms,
 } from "./util";
 
 const metaTagsToConsume = ["title", "artist"];
@@ -215,11 +217,11 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
 
     return stops.split(",").map((s) => {
       const [eigthNoteS, stopDurationS] = s.split("=");
-      const offset = new Fraction(eigthNoteS).simplify().div(16).sub(new Fraction(emptyOffset, 8));
+      const offset = offsetFrac(eigthNoteS).div(16).sub(new Fraction(emptyOffset, 8));
 
       return {
         offset,
-        duration: new Fraction(stopDurationS).simplify().div(1000),
+        duration: offsetFrac(stopDurationS).div(1000),
       };
     });
   }
@@ -231,7 +233,7 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
       finalBpms = [{
         startOffset: new Fraction(0),
         endOffset: null,
-        bpm: new Fraction(bpm).simplify(),
+        bpm: bpmFrac(bpm),
       }];
     }
 
@@ -246,17 +248,17 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
         const nextEigthNoteS = a[i + 1]?.split("=")[0] ?? null;
 
         const emptyOffsetFrac = new Fraction(emptyOffset, 8);
-        const startOffset = new Fraction(eigthNoteS).simplify().div(16).sub(emptyOffsetFrac);
+        const startOffset = offsetFrac(eigthNoteS).div(16).sub(emptyOffsetFrac);
         let endOffset = null;
 
         if (nextEigthNoteS) {
-          endOffset = new Fraction(nextEigthNoteS).simplify().div(16).sub(emptyOffsetFrac);
+          endOffset = offsetFrac(nextEigthNoteS).div(16).sub(emptyOffsetFrac);
         }
 
         return {
           startOffset,
           endOffset,
-          bpm: new Fraction(bpmVS).simplify(),
+          bpm: bpmFrac(bpmVS),
         };
       });
 
@@ -268,7 +270,7 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
       throw new Error("parseDwi, determineBpm: failed to get bpm");
     }
 
-    return finalBpms;
+    return mergeSameBpms(finalBpms);
   }
 
   function parseTag(lines: string[], index: number): number {

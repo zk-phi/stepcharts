@@ -1,8 +1,10 @@
 import Fraction from "fraction.js";
 import { RawSimfile } from "./parseSimfile";
+import { bpmFrac, offsetFrac } from "../constants/precision";
 import {
   determineBeat,
   normalizedDifficultyMap,
+  mergeSameBpms,
 } from "./util";
 
 const metaTagsToConsume = ["title", "titletranslit", "artist"];
@@ -92,10 +94,10 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
 
     return entries.map((s) => {
       const [stopS, durationS] = s.split("=");
-      const offset = new Fraction(stopS).simplify().div(4).sub(emptyOffsetInMeasures);
+      const offset = offsetFrac(stopS).div(4).sub(emptyOffsetInMeasures);
       return {
         offset,
-        duration: new Fraction(durationS).simplify(),
+        duration: offsetFrac(durationS).simplify(),
       };
     });
   }
@@ -107,19 +109,19 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
     const bpms = entries.map((e, i, a) => {
       const [beatS, bpmS] = e.split("=");
       const nextBeatS = a[i + 1]?.split("=")[0] ?? null;
-      const startOffset = new Fraction(beatS).simplify().div(4).sub(emptyOffsetInMeasures);
+      const startOffset = offsetFrac(beatS).div(4).sub(emptyOffsetInMeasures);
       const endOffset = nextBeatS === null ? null : (
-        new Fraction(nextBeatS).simplify().div(4).sub(emptyOffsetInMeasures)
+        offsetFrac(nextBeatS).div(4).sub(emptyOffsetInMeasures)
       );
 
       return {
         startOffset,
         endOffset,
-        bpm: new Fraction(bpmS).simplify(),
+        bpm: bpmFrac(bpmS),
       };
     });
 
-    return bpms;
+    return mergeSameBpms(bpms);
   }
 
   function parseFreezes(
