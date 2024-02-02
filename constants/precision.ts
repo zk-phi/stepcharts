@@ -1,6 +1,6 @@
 import Fraction from "fraction.js";
 
-export const BPM_PRECISION = 4; // 0.25
+export const BPM_PRECISION = 2; // 0.5
 export const OFFSET_PRECISION = 192; // max precision of dwi DWI notes
 
 export const bpmFrac = (value: number) => (
