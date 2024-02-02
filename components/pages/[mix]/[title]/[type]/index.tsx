@@ -18,6 +18,8 @@ const PreviewPage = ({ chart }: {
   ));
   const [turn, setTurn] = React.useState<Turn>("OFF");
   const [constantMode, setConstantMode] = React.useState<boolean>(false);
+  const [colorFreezes, setColorFreezes] = React.useState<boolean>(true);
+  const [diminishFreezes, setDiminishFreezes] = React.useState<boolean>(false);
   const [showModal, setShowModal] = React.useState(false);
 
   const onChangeSpeed = React.useCallback((e) => setSpeed(Number(e.target.value)), [setSpeed]);
@@ -70,7 +72,9 @@ const PreviewPage = ({ chart }: {
           playing={playing}
           turn={turn}
           showBeat={tick}
-          constantMode={constantMode} />
+          constantMode={constantMode}
+          colorFreezes={colorFreezes}
+          diminishFreezes={diminishFreezes} />
       <PreviewSound
           chart={chart}
           offsetRef={offsetRef}
@@ -105,6 +109,22 @@ const PreviewPage = ({ chart }: {
             Constant Mode:
             {" "}
             <input type="checkbox" checked={constantMode} onChange={toggleConstantMode} />
+          </div>
+          <div>
+            Color freezes:
+            {" "}
+            <input
+                type="checkbox"
+                checked={colorFreezes}
+                onChange={(e) => setColorFreezes(e.target.checked)} />
+          </div>
+          <div>
+            Diminish freezes:
+            {" "}
+            <input
+                type="checkbox"
+                checked={diminishFreezes}
+                onChange={(e) => setDiminishFreezes(e.target.checked)} />
           </div>
           <div>
             Turn:

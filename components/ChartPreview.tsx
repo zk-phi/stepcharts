@@ -66,10 +66,11 @@ const Arrow = ({ beat, direction, pos }: {
   );
 };
 
-const Freeze = ({ direction, pos, endPos }: {
+const Freeze = ({ direction, pos, endPos, diminished }: {
   direction: Direction,
   pos: number,
   endPos: number,
+  diminished: boolean,
 }) => {
   const bodyStyle: React.CSSProperties = {
     position: "absolute",
@@ -77,7 +78,7 @@ const Freeze = ({ direction, pos, endPos }: {
     left: `${direction * ARROW_HEIGHT + ARROW_HEIGHT * 0.05}vh`,
     height: `${endPos - pos}vh`,
     width: `${ARROW_HEIGHT * 0.9}vh`,
-    backgroundColor: "#5e5",
+    backgroundColor: diminished ? "#5e54" : "#5e5",
   };
 
   const tailStyle: React.CSSProperties = {
@@ -86,7 +87,7 @@ const Freeze = ({ direction, pos, endPos }: {
     left: `${direction * ARROW_HEIGHT + ARROW_HEIGHT * 0.05}vh`,
     height: 0,
     width: `${ARROW_HEIGHT * 0.9}vh`,
-    borderTop: `${ARROW_HEIGHT / 2 * 0.9}vh solid #3b3`,
+    borderTop: `${ARROW_HEIGHT / 2 * 0.9}vh solid ${diminished ? "#3b34" : "#3b3"}`,
     borderLeft: `${ARROW_HEIGHT / 2 * 0.9}vh solid transparent`,
     borderRight: `${ARROW_HEIGHT / 2 * 0.9}vh solid transparent`,
   };
@@ -135,12 +136,22 @@ const JudgeLine = () => {
   );
 };
 
-const ChartObjectsRaw = ({ chart, speed = 1, turn = "OFF", showBeat, constantMode }: {
+const ChartObjectsRaw = ({
+  chart,
+  speed = 1,
+  turn = "OFF",
+  showBeat,
+  constantMode,
+  colorFreezes,
+  diminishFreezes,
+}: {
   chart: ChartData,
   speed: number,
   turn: Turn,
   showBeat: boolean,
   constantMode: boolean,
+  colorFreezes: boolean,
+  diminishFreezes: boolean,
 }) => {
   const lastArrow = chart.arrowTimeline[chart.arrowTimeline.length - 1];
   const lastMeasure = Math.floor(lastArrow.offset);
@@ -203,31 +214,28 @@ const ChartObjectsRaw = ({ chart, speed = 1, turn = "OFF", showBeat, constantMod
       {reversedFreezes.map((f, i) => {
         const direction = TURN_VALUES[turn][f.direction];
         return (
-          <Freeze key={`f${i}`} direction={direction} pos={posFn(f.start)} endPos={posFn(f.end)} />
+          <Freeze
+              key={`f${i}`}
+              direction={direction}
+              pos={posFn(f.start)}
+              endPos={posFn(f.end)}
+              diminished={diminishFreezes} />
         );
       })}
       {reversedArrows.map((a, i) => {
         const isFreeze = a.direction.match(/2/);
-        const beat = isFreeze ? "freeze" : a.beat;
+        const beat = isFreeze && !colorFreezes ? "freeze" : a.beat;
         const pos = posFn(a);
         return (
           <>
-            { a.direction.match(/^1.../) &&
+            { a.direction.match(/^[12].../) &&
               <Arrow key={`a${i}l`} beat={beat} direction={TURN_VALUES[turn][0]} pos={pos} /> }
-            { a.direction.match(/^.1../) &&
+            { a.direction.match(/^.[12]../) &&
               <Arrow key={`a${i}d`} beat={beat} direction={TURN_VALUES[turn][1]} pos={pos} /> }
-            { a.direction.match(/^..1./) &&
+            { a.direction.match(/^..[12]./) &&
               <Arrow key={`a${i}u`} beat={beat} direction={TURN_VALUES[turn][2]} pos={pos} /> }
-            { a.direction.match(/^...1/) &&
+            { a.direction.match(/^...[12]/) &&
               <Arrow key={`a${i}r`} beat={beat} direction={TURN_VALUES[turn][3]} pos={pos} /> }
-            { a.direction.match(/^2.../) &&
-              <Arrow key={`a${i}l`} beat="freeze" direction={TURN_VALUES[turn][0]} pos={pos} /> }
-            { a.direction.match(/^.2../) &&
-              <Arrow key={`a${i}d`} beat="freeze" direction={TURN_VALUES[turn][1]} pos={pos} /> }
-            { a.direction.match(/^..2./) &&
-              <Arrow key={`a${i}u`} beat="freeze" direction={TURN_VALUES[turn][2]} pos={pos} /> }
-            { a.direction.match(/^...2/) &&
-              <Arrow key={`a${i}r`} beat="freeze" direction={TURN_VALUES[turn][3]} pos={pos} /> }
             { a.direction.match(/^M.../) &&
               <Arrow key={`a${i}l`} beat="shock" direction={TURN_VALUES[turn][0]} pos={pos} /> }
             { a.direction.match(/^.M../) &&
@@ -318,6 +326,8 @@ export const ChartPreview = ({
   playing,
   showBeat,
   constantMode = false,
+  colorFreezes = true,
+  diminishFreezes = false,
 }: {
   chart: ChartData,
   speed: number,
@@ -327,6 +337,8 @@ export const ChartPreview = ({
   playing: boolean,
   showBeat: boolean,
   constantMode: boolean,
+  colorFreezes: boolean,
+  diminishFreezes: boolean,
 }) => {
   return (
     <div style={{ position: "relative" }}>
@@ -341,7 +353,9 @@ export const ChartPreview = ({
             speed={speed}
             turn={turn}
             showBeat={showBeat}
-            constantMode={constantMode} />
+            constantMode={constantMode}
+            colorFreezes={colorFreezes}
+            diminishFreezes={diminishFreezes} />
       </ChartContainer>
       <JudgeLine />
     </div>
