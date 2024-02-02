@@ -56,7 +56,7 @@ const Arrow = ({ beat, direction, pos }: {
     left: `${direction * ARROW_HEIGHT}vh`,
     height: `${ARROW_HEIGHT}vh`,
     width: `${ARROW_HEIGHT}vh`,
-    background: `url(${ARROW_IMG[beat]})`,
+    backgroundImage: `url(${ARROW_IMG[beat]})`,
     backgroundSize: "cover",
     transform: `rotate(${ARROW_ROTATION[direction]})`,
   };
@@ -113,7 +113,7 @@ const Bar = ({ pos, endPos, color, bgColor }: {
     left: 0,
     top: `${pos}vh`,
     borderTop: `4px solid ${color}`,
-    background: bgColor,
+    backgroundColor: bgColor,
   };
 
   return (
