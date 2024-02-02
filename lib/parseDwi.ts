@@ -217,11 +217,11 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
 
     return stops.split(",").map((s) => {
       const [eigthNoteS, stopDurationS] = s.split("=");
-      const offset = offsetFrac(eigthNoteS).div(16).sub(new Fraction(emptyOffset, 8));
+      const offset = offsetFrac(Number(eigthNoteS) / 16 - emptyOffset / 8);
 
       return {
         offset,
-        duration: offsetFrac(stopDurationS).div(1000),
+        duration: offsetFrac(Number(stopDurationS) / 1000),
       };
     });
   }
@@ -233,7 +233,7 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
       finalBpms = [{
         startOffset: new Fraction(0),
         endOffset: null,
-        bpm: bpmFrac(bpm),
+        bpm: bpmFrac(Number(bpm)),
       }];
     }
 
@@ -247,18 +247,17 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
         const [eigthNoteS, bpmVS] = bpmES.split("=");
         const nextEigthNoteS = a[i + 1]?.split("=")[0] ?? null;
 
-        const emptyOffsetFrac = new Fraction(emptyOffset, 8);
-        const startOffset = offsetFrac(eigthNoteS).div(16).sub(emptyOffsetFrac);
+        const startOffset = offsetFrac(Number(eigthNoteS) / 16 - emptyOffset / 8);
         let endOffset = null;
 
         if (nextEigthNoteS) {
-          endOffset = offsetFrac(nextEigthNoteS).div(16).sub(emptyOffsetFrac);
+          endOffset = offsetFrac(Number(nextEigthNoteS) / 16 - emptyOffset / 8);
         }
 
         return {
           startOffset,
           endOffset,
-          bpm: bpmFrac(bpmVS),
+          bpm: bpmFrac(Number(bpmVS)),
         };
       });
 

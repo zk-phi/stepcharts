@@ -94,10 +94,10 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
 
     return entries.map((s) => {
       const [stopS, durationS] = s.split("=");
-      const offset = offsetFrac(stopS).div(4).sub(emptyOffsetInMeasures);
+      const offset = offsetFrac(Number(stopS) / 4 - emptyOffsetInMeasures);
       return {
         offset,
-        duration: offsetFrac(durationS).simplify(),
+        duration: offsetFrac(Number(durationS)),
       };
     });
   }
@@ -109,15 +109,15 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
     const bpms = entries.map((e, i, a) => {
       const [beatS, bpmS] = e.split("=");
       const nextBeatS = a[i + 1]?.split("=")[0] ?? null;
-      const startOffset = offsetFrac(beatS).div(4).sub(emptyOffsetInMeasures);
+      const startOffset = offsetFrac(Number(beatS) / 4 - emptyOffsetInMeasures);
       const endOffset = nextBeatS === null ? null : (
-        offsetFrac(nextBeatS).div(4).sub(emptyOffsetInMeasures)
+        offsetFrac(Number(nextBeatS) / 4 - emptyOffsetInMeasures)
       );
 
       return {
         startOffset,
         endOffset,
-        bpm: bpmFrac(bpmS),
+        bpm: bpmFrac(Number(bpmS)),
       };
     });
 
