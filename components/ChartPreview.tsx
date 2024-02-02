@@ -140,6 +140,7 @@ const JudgeLine = () => {
     left: 0,
     top: `${JUDGE_LINE_POS - ARROW_HEIGHT / 2}vh`,
     border: `${ARROW_HEIGHT / 2}vh solid #ffffff60`,
+    pointerEvents: "none",
   };
 
   return (
