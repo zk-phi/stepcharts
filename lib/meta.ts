@@ -15,14 +15,14 @@ const dateReleased: Record<string, string> = {
   max: "2001-10-19",
   max2: "2002-03-27",
   supernova: "2006-07-12",
-  supernovaA2: "2007-08-22",
+  supernova2: "2007-08-22",
   x: "2008-12-24",
   x2: "2010-07-07",
   "x3-vs-2nd-mix": "2011-11-16",
   "lsp": "9999-12-31",
 };
 
-const MixNames: Record<string, string> = {
+const mixNames: Record<string, string> = {
   "1stmix": "初代",
   "2013": "2013",
   "2014": "2014",
@@ -70,4 +70,4 @@ const shortMixNames: Record<string, string> = {
   "lsp": "LSP",
 };
 
-export { dateReleased, shortMixNames };
+export { dateReleased, mixNames, shortMixNames };

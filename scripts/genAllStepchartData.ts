@@ -3,7 +3,7 @@ import * as path from "path";
 import Fraction from "fraction.js";
 import { parseSimfile } from "../lib/parseSimfile";
 import { calculateStats } from "../lib/calculateStats";
-import { dateReleased, shortMixNames } from "../lib/meta";
+import { dateReleased, mixNames, shortMixNames } from "../lib/meta";
 import {
   extractBpmEvents,
   computeArrowTimings,
@@ -100,7 +100,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
   return {
     meta: {
       mixId: mixDir,
-      name: mixDir.replace(/-/g, " "),
+      name: mixNames[mixDir],
       shortName: shortMixNames[mixDir],
       year: new Date(dateReleased[mixDir]).getFullYear(),
       songs: mixSongDirs.length,
