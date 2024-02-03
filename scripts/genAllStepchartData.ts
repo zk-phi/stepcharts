@@ -71,8 +71,13 @@ function getDirectories(...dirPath: string[]): string[] {
     return path.join(building, d);
   }, "");
 
+  console.log(`Scanning ${builtPath}`);
+
   return getFiles(builtPath).filter((d) => {
-    return fs.statSync(path.join(builtPath, d)).isDirectory();
+    const filePath = path.join(builtPath, d);
+    const test = fs.statSync(filePath).isDirectory();
+    console.log(`- ${test ? '' : 'SKIPPED: '}${filePath}`);
+    return test;
   });
 }
 
