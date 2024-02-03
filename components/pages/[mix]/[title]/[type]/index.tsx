@@ -158,6 +158,10 @@ const FloatMenu = ({
   turn: Turn,
   onChangeTurn: (newValue: Turn) => void,
 }) => {
+  const onInputTurn = React.useCallback((e) => (
+    onChangeTurn(e.target.value)
+  ), [onChangeTurn]);
+
   const buttonStyle: React.CSSProperties = {
     color: "white",
     fontWeight: "bold",
@@ -176,7 +180,7 @@ const FloatMenu = ({
       <button onClick={onOpenOptions} style={buttonStyle}>
         OPTIONS
       </button>
-      <select value={turn} onInput={(e) => onChangeTurn(e.target.value)} style={buttonStyle}>
+      <select value={turn} onInput={onInputTurn} style={buttonStyle}>
         {TURNS.map((turn) => (
           <option key={turn.name} value={turn.name}>TURN: {turn.shortName}</option>
         ))}
