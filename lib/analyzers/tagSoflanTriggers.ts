@@ -11,8 +11,7 @@ export const tagSoflanTriggers =
       }
       if (bi < bpmTimeline.length
           && ai + 1 < arrowTimeline.length
-          && bpmTimeline[bi].offset.compare(arrowTimeline[ai + 1].offset) < 0
-          && bpmTimeline[bi].offset.sub(a.offset).compare(0.34) <= 0) {
+          && bpmTimeline[bi].offset.compare(arrowTimeline[ai + 1].offset) < 0) {
         a.tags.soflanTrigger = true;
       }
     });
