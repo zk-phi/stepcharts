@@ -10,7 +10,6 @@ const defaultSpeedFn = (mainBpm: number) => Math.floor(620 / mainBpm * 4) / 4
 type Options = {
   speed: number,
   tick: boolean,
-  turn: Turn,
   constantMode: boolean,
   colorFreezes: boolean,
   diminishFreezes: boolean,
@@ -26,9 +25,6 @@ const OptionsPanel = ({
   minBpm,
   mainBpm,
   maxBpm,
-  playing,
-  onPlay,
-  onPause,
   onClose,
 }: {
   options: Options,
@@ -37,9 +33,6 @@ const OptionsPanel = ({
   minBpm: number,
   mainBpm: number,
   maxBpm: number,
-  playing: boolean,
-  onPlay: () => void,
-  onPause: () => void,
   onClose: () => void,
 }) => {
   const onChangeSpeed = React.useCallback((e) => onChange({
@@ -50,11 +43,6 @@ const OptionsPanel = ({
   const onChangeTick = React.useCallback((e) => onChange({
     ...options,
     tick: e.target.checked,
-  }), [options, onChange]);
-
-  const onChangeTurn = React.useCallback((e) => onChange({
-    ...options,
-    turn: e.target.value,
   }), [options, onChange]);
 
   const onChangeConstantMode = React.useCallback((e) => onChange({
@@ -114,13 +102,6 @@ const OptionsPanel = ({
         )}
       </div>
       <div>
-        TURN:
-        {" "}
-        <select value={options.turn} onInput={onChangeTurn}>
-          {TURNS.map((turn) => <option key={turn} value={turn}>{turn}</option>)}
-        </select>
-      </div>
-      <div>
         スクロール速度を一定に
         {" "}
         <input type="checkbox" checked={options.constantMode} onChange={onChangeConstantMode} />
@@ -156,21 +137,60 @@ const OptionsPanel = ({
         <input type="checkbox" checked={options.tick} onChange={onChangeTick} />
       </div>
       <button onClick={onClose}>[Close]</button>
-      {" "}
-      { playing ? (
-        <button onClick={onPause}>[STOP]</button>
-      ) : (
-        <button onClick={onPlay}>[PLAY]</button>
-      ) }
     </div>
   );
 };
+
+const FloatMenu = ({
+  style,
+  onPlay,
+  onPause,
+  onOpenOptions,
+  playing,
+  turn,
+  onChangeTurn,
+}: {
+  style: React.CSSProperties,
+  onPlay: () => void,
+  onPause: () => void,
+  onOpenOptions: () => void,
+  playing: boolean,
+  turn: Turn,
+  onChangeTurn: (newValue: Turn) => void,
+}) => {
+  const buttonStyle: React.CSSProperties = {
+    color: "white",
+    fontWeight: "bold",
+    backgroundColor: "#ea0",
+    borderRadius: "0.75em",
+    padding: "0.5em 0.75em",
+    border: "none",
+    marginRight: "1em",
+  };
+
+  return (
+    <div style={style}>
+      <button onClick={playing ? onPause : onPlay} style={buttonStyle}>
+        {playing ? "STOP" : "PLAY"}
+      </button>
+      <button onClick={onOpenOptions} style={buttonStyle}>
+        OPTIONS
+      </button>
+      <select value={turn} onInput={(e) => onChangeTurn(e.target.value)} style={buttonStyle}>
+        {TURNS.map((turn) => (
+          <option key={turn.name} value={turn.name}>TURN: {turn.shortName}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
 
 const PreviewPage = ({ chart }: {
   chart: ChartData,
 }) => {
   const [offsetRef, timeRef, playing, start, stop] = usePreview(chart);
   const [showModal, setShowModal] = React.useState(false);
+  const [turn, setTurn] = React.useState("OFF");
 
   const [options, setOptions] = React.useState<Options>({
     speed: defaultSpeedFn(chart.meta.mainBpm),
@@ -178,7 +198,6 @@ const PreviewPage = ({ chart }: {
       chart.arrowTimeline.reduce((l, r) => l + (r.beat === 4 ? 1 : 0), 0)
       >= chart.arrowTimeline.length / 4
     ),
-    turn: "OFF",
     constantMode: false,
     colorFreezes: true,
     diminishFreezes: true,
@@ -209,6 +228,12 @@ const PreviewPage = ({ chart }: {
     background: "#ffffff80",
   };
 
+  const menuStyle: React.CSSProperties = {
+    position: "absolute",
+    bottom: "1vw",
+    left: "1vw"
+  };
+
   const mainBpm = Math.round(chart.meta.mainBpm);
   const minBpm = Math.round(chart.meta.minBpm);
   const maxBpm = Math.round(chart.meta.maxBpm);
@@ -221,7 +246,7 @@ const PreviewPage = ({ chart }: {
           offsetRef={offsetRef}
           timeRef={timeRef}
           playing={playing}
-          turn={options.turn}
+          turn={turn}
           showBeat={options.tick}
           constantMode={options.constantMode}
           colorFreezes={options.colorFreezes}
@@ -234,6 +259,14 @@ const PreviewPage = ({ chart }: {
           offsetRef={offsetRef}
           timeRef={timeRef}
           enableBeatTick={options.tick} />
+      <FloatMenu
+          style={menuStyle}
+          turn={turn}
+          playing={playing}
+          onChangeTurn={setTurn}
+          onPlay={onPlay}
+          onPause={onPause}
+          onOpenOptions={openModal} />
       { showModal && (
         <OptionsPanel
             options={options}
@@ -242,12 +275,8 @@ const PreviewPage = ({ chart }: {
             minBpm={minBpm}
             mainBpm={mainBpm}
             maxBpm={maxBpm}
-            playing={playing}
-            onPlay={onPlay}
-            onPause={onPause}
             onClose={closeModal} />
       ) }
-      <button onClick={openModal}>⚙️</button>
     </div>
   );
 };
