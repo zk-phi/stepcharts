@@ -84,7 +84,7 @@ export const makeOffsetToSecConverter = (bpmTimeline: BpmEvent<Fraction>[]): Con
 export const computeArrowTimings =
   (arrows: Arrow[], bpms: BpmEvent<Fraction>[]): ArrowEvent<Fraction>[] => {
     const converter = makeOffsetToSecConverter(bpms);
-    return arrows.map((arrow) => ({ ...arrow, time: converter(arrow.offset) }));
+    return arrows.map((arrow) => ({ ...arrow, tags: {}, time: converter(arrow.offset) }));
   };
 
 export const computeFreezeTimings =

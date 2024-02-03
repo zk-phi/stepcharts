@@ -1,3 +1,5 @@
+type ArrowTags = "soflanTrigger";
+
 type MixMeta = {
   mixId: string;
   name: string;
@@ -39,7 +41,7 @@ type BpmEvent<T extends Fraction | number> = { bpm: T } & Timestamp<T>;
 
 // arrows with both timing and offset values
 type ArrowEvent<T extends Fraction | number> =
-  Omit<Arrow, "offset"> & Timestamp<T>;
+  Omit<Arrow, "offset"> & { tags: Partial<Record<ArrowTags, boolean>> } & Timestamp<T>;
 
 type FreezeEvent<T extends Fraction | number> =
   Omit<FreezeBody, "startOffset" | "endOffset"> & { start: Timestamp<T>, end: Timestamp<T> };

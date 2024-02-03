@@ -22,6 +22,7 @@ const PreviewPage = ({ chart }: {
   const [diminishFreezes, setDiminishFreezes] = React.useState<boolean>(true);
   const [soflanBg, setSoflanBg] = React.useState<boolean>(true);
   const [soflanValue, setSoflanValue] = React.useState<boolean>(true);
+  const [highlightSoflan, setHighlightSoflan] = React.useState<boolean>(true);
   const [showModal, setShowModal] = React.useState(false);
 
   const onChangeSpeed = React.useCallback((e) => setSpeed(Number(e.target.value)), [setSpeed]);
@@ -78,7 +79,8 @@ const PreviewPage = ({ chart }: {
           colorFreezes={colorFreezes}
           diminishFreezes={diminishFreezes}
           soflanBg={soflanBg}
-          soflanValue={soflanValue} />
+          soflanValue={soflanValue}
+          highlightSoflan={highlightSoflan} />
       <PreviewSound
           chart={chart}
           offsetRef={offsetRef}
@@ -132,7 +134,7 @@ const PreviewPage = ({ chart }: {
                 onChange={(e) => setColorFreezes(e.target.checked)} />
           </div>
           <div>
-            フリーズの棒部分を薄く表示
+            フリーズの棒部分を控えめに表示
             {" "}
             <input
                 type="checkbox"
@@ -154,6 +156,14 @@ const PreviewPage = ({ chart }: {
                 type="checkbox"
                 checked={soflanValue}
                 onChange={(e) => setSoflanValue(e.target.checked)} />
+          </div>
+          <div>
+            ソフラン箇所をハイライト
+            {" "}
+            <input
+                type="checkbox"
+                checked={highlightSoflan}
+                onChange={(e) => setHighlightSoflan(e.target.checked)} />
           </div>
           <div>
             小節線を表示＆メトロノームを再生

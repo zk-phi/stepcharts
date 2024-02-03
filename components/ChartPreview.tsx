@@ -45,10 +45,11 @@ const Spacer = ({ offset, speed }: {
   );
 }
 
-const Arrow = ({ beat, direction, pos }: {
+const Arrow = ({ beat, direction, pos, highlight = false }: {
   beat: Beat | "freeze" | "shock",
   direction: Direction,
   pos: number,
+  highlight?: boolean,
 }) => {
   const style: React.CSSProperties = {
     position: "absolute",
@@ -58,6 +59,9 @@ const Arrow = ({ beat, direction, pos }: {
     width: `${ARROW_HEIGHT}vh`,
     backgroundImage: `url(${ARROW_IMG[beat]})`,
     backgroundSize: "cover",
+    backgroundColor: highlight ? "#fff6" : undefined,
+    boxShadow: highlight ? `0 0 ${ARROW_HEIGHT / 4}vh #fff` : undefined,
+    borderRadius: `${ARROW_HEIGHT / 2}vh`,
     transform: `rotate(${ARROW_ROTATION[direction]})`,
   };
 
@@ -158,6 +162,7 @@ const ChartObjectsRaw = ({
   diminishFreezes,
   soflanBg,
   soflanValue,
+  highlightSoflan,
 }: {
   chart: ChartData,
   speed: number,
@@ -168,6 +173,7 @@ const ChartObjectsRaw = ({
   diminishFreezes: boolean,
   soflanBg: boolean,
   soflanValue: boolean,
+  highlightSoflan: boolean,
 }) => {
   const lastArrow = chart.arrowTimeline[chart.arrowTimeline.length - 1];
   const lastMeasure = Math.floor(lastArrow.offset);
@@ -248,21 +254,61 @@ const ChartObjectsRaw = ({
         return (
           <>
             { a.direction.match(/^[12].../) &&
-              <Arrow key={`a${i}l`} beat={beat} direction={TURN_VALUES[turn][0]} pos={pos} /> }
+              <Arrow
+                  key={`a${i}l`}
+                  beat={beat}
+                  direction={TURN_VALUES[turn][0]}
+                  pos={pos}
+                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
             { a.direction.match(/^.[12]../) &&
-              <Arrow key={`a${i}d`} beat={beat} direction={TURN_VALUES[turn][1]} pos={pos} /> }
+              <Arrow
+                  key={`a${i}d`}
+                  beat={beat}
+                  direction={TURN_VALUES[turn][1]}
+                  pos={pos}
+                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
             { a.direction.match(/^..[12]./) &&
-              <Arrow key={`a${i}u`} beat={beat} direction={TURN_VALUES[turn][2]} pos={pos} /> }
+              <Arrow
+                  key={`a${i}u`}
+                  beat={beat}
+                  direction={TURN_VALUES[turn][2]}
+                  pos={pos}
+                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
             { a.direction.match(/^...[12]/) &&
-              <Arrow key={`a${i}r`} beat={beat} direction={TURN_VALUES[turn][3]} pos={pos} /> }
+              <Arrow
+                  key={`a${i}r`}
+                  beat={beat}
+                  direction={TURN_VALUES[turn][3]}
+                  pos={pos}
+                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
             { a.direction.match(/^M.../) &&
-              <Arrow key={`a${i}l`} beat="shock" direction={TURN_VALUES[turn][0]} pos={pos} /> }
+              <Arrow
+                  key={`a${i}l`}
+                  beat="shock"
+                  direction={TURN_VALUES[turn][0]}
+                  pos={pos}
+                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
             { a.direction.match(/^.M../) &&
-              <Arrow key={`a${i}d`} beat="shock" direction={TURN_VALUES[turn][1]} pos={pos} /> }
+              <Arrow
+                  key={`a${i}d`}
+                  beat="shock"
+                  direction={TURN_VALUES[turn][1]}
+                  pos={pos}
+                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
             { a.direction.match(/^..M./) &&
-              <Arrow key={`a${i}u`} beat="shock" direction={TURN_VALUES[turn][2]} pos={pos} /> }
+              <Arrow
+                  key={`a${i}u`}
+                  beat="shock"
+                  direction={TURN_VALUES[turn][2]}
+                  pos={pos}
+                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
             { a.direction.match(/^...M/) &&
-              <Arrow key={`a${i}r`} beat="shock" direction={TURN_VALUES[turn][3]} pos={pos} /> }
+              <Arrow
+                  key={`a${i}r`}
+                  beat="shock"
+                  direction={TURN_VALUES[turn][3]}
+                  pos={pos}
+                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
           </>
         );
       })}
@@ -349,6 +395,7 @@ export const ChartPreview = ({
   diminishFreezes = false,
   soflanBg = false,
   soflanValue = false,
+  highlightSoflan = false,
 }: {
   chart: ChartData,
   speed: number,
@@ -362,6 +409,7 @@ export const ChartPreview = ({
   diminishFreezes: boolean,
   soflanBg: boolean,
   soflanValue: boolean,
+  highlightSoflan: boolean,
 }) => {
   return (
     <div style={{ position: "relative" }}>
@@ -380,7 +428,8 @@ export const ChartPreview = ({
             colorFreezes={colorFreezes}
             diminishFreezes={diminishFreezes}
             soflanBg={soflanBg}
-            soflanValue={soflanValue} />
+            soflanValue={soflanValue}
+            highlightSoflan={highlightSoflan} />
       </ChartContainer>
       <JudgeLine />
     </div>

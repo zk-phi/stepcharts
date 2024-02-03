@@ -10,6 +10,7 @@ import {
   computeFreezeTimings,
   computeBeatTimings,
 } from "../lib/analyzers/timingAnalyzers";
+import { tagSoflanTriggers } from "../lib/analyzers/tagSoflanTriggers";
 import { calculateBpmStats } from "../lib/analyzers/calculateBpmStats";
 
 const ROOT = "resources/stepcharts";
@@ -128,6 +129,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
           const lastMeasure = Math.floor(chart.arrows[chart.arrows.length - 1].offset);
           const beatTimeline = computeBeatTimings(lastMeasure, bpmTimeline);
           const stats = calculateStats(chart);
+          tagSoflanTriggers(arrowTimeline, bpmTimeline);
           return {
             meta: {
               difficulty: chartType.difficulty,
