@@ -1,7 +1,22 @@
+const Kuroshiro = require("@dsquare-gbu/kuroshiro");
+const KuromojiAnalyzer = require("kuroshiro-analyzer-kuromoji");
+const Slugify = require('slugify');
+
 const path = require("path");
 const fs = require("fs");
 
-function traverse(dirPath) {
+const kuroshiro = new Kuroshiro();
+const kuroshiroInitialized = kuroshiro.init(new KuromojiAnalyzer());
+
+const toSafeFilename = (filename) => (
+  kuroshiroInitialized.then(() =>
+    kuroshiro.convert(filename, { to: "romaji" })
+  ).then((res) => (
+    Slugify(res, { lower: true, strict: true, locale: "ja" })
+  ))
+);
+
+async function traverse(dirPath) {
   const stat = fs.statSync(dirPath);
 
   if (stat.isDirectory()) {
@@ -13,7 +28,7 @@ function traverse(dirPath) {
     });
 
     const filename = path.basename(dirPath);
-    const filenameWithoutSpaces = filename.replace(/\s/g, "-");
+    const filenameWithoutSpaces = await toSafeFilename(filename);
     const newPath = dirPath.replace(filename, filenameWithoutSpaces);
 
     if (dirPath !== newPath) {
@@ -28,13 +43,13 @@ function traverse(dirPath) {
   }
 }
 
-function main() {
+async function main() {
   if (!process.argv[2]) {
     console.log("usage: node cleanSimfiles.js [root-dir]");
     process.exit(1);
   }
 
-  traverse(path.join(process.cwd(), process.argv[2]));
+  await traverse(path.join(process.cwd(), process.argv[2]));
 }
 
 main();
