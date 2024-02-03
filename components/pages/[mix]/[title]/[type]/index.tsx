@@ -194,7 +194,7 @@ const PreviewPage = ({ chart }: {
 }) => {
   const [offsetRef, timeRef, playing, start, stop] = usePreview(chart);
   const [showModal, setShowModal] = React.useState(false);
-  const [turn, setTurn] = React.useState("OFF");
+  const [turn, setTurn] = React.useState<Turn>("OFF");
 
   const [options, setOptions] = React.useState<Options>({
     speed: defaultSpeedFn(chart.meta.mainBpm),
