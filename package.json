@@ -34,6 +34,9 @@
     "typescript": "^4.1.3"
   },
   "devDependencies": {
+    "@dsquare-gbu/kuroshiro": "^1.1.2-iedev-1",
+    "kuroshiro-analyzer-kuromoji": "^1.1.0",
+    "slugify": "^1.6.6",
     "ts-node": "^10.9.1"
   },
   "license": "MIT"
