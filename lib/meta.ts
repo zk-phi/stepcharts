@@ -1,11 +1,7 @@
-// TODO: 直す
-
 const dateReleased: Record<string, string> = {
   "1stmix": "1998-09-26",
   "2013": "2013-03-14",
   "2014": "2014-05-12",
-  "2nd-append-club-v1": "1999-04-21",
-  "2nd-append-club-v2": "1999-12-22",
   "2ndmix": "1999-01-29",
   "3rd-plus": "2000-06-21",
   "3rdmix": "1999-10-30",
@@ -26,12 +22,34 @@ const dateReleased: Record<string, string> = {
   "lsp": "9999-12-31",
 };
 
-const shortMixNames: Record<keyof typeof dateReleased, string> = {
+const MixNames: Record<string, string> = {
+  "1stmix": "初代",
+  "2013": "2013",
+  "2014": "2014",
+  "2ndmix": "2ndMIX",
+  "3rd-plus": "3rdMIX PLUS",
+  "3rdmix": "3rdMIX",
+  "4thmix": "4thMIX",
+  "4th-plus": "4thMIX PLUS",
+  "5thmix": "5thMIX",
+  a: "A",
+  "a20": "A20",
+  "a3": "A3",
+  extreme: "EXTREME",
+  max: "MAX",
+  max2: "MAX2",
+  supernova: "SuperNOVA",
+  supernova2: "SuperNOVA2",
+  x: "X",
+  x2: "X2",
+  "x3-vs-2nd-mix": "X3 VS 2ndMIX",
+  "lsp": "EDIT: LSP",
+};
+
+const shortMixNames: Record<string, string> = {
   "1stmix": "1st",
   "2013": "2013",
   "2014": "2014",
-  "2nd-append-club-v1": "2ndC1",
-  "2nd-append-club-v2": "2ndC2",
   "2ndmix": "2nd",
   "3rd-plus": "3rd+",
   "3rdmix": "3rd",
