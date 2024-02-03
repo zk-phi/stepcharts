@@ -138,9 +138,9 @@ const Bar = ({ pos, endPos, color, bgColor, value }: {
 
 const JudgeLine = () => {
   const style: React.CSSProperties = {
-    position: "absolute",
+    position: "fixed",
     height: 0,
-    width: `${4 * ARROW_HEIGHT}vh`,
+    width: "100vw",
     left: 0,
     top: `${JUDGE_LINE_POS - ARROW_HEIGHT / 2}vh`,
     border: `${ARROW_HEIGHT / 2}vh solid #ffffff60`,
@@ -319,30 +319,36 @@ const ChartObjectsRaw = ({
 
 const ChartObjects = React.memo(ChartObjectsRaw);
 
-const ChartContainer = ({
+export const ChartPreview = ({
+  chart,
+  speed = 1,
+  turn = "OFF",
   offsetRef,
   timeRef,
-  speed = 1,
   playing,
-  constantMode,
-  children,
+  showBeat,
+  constantMode = false,
+  colorFreezes = false,
+  diminishFreezes = false,
+  soflanBg = false,
+  soflanValue = false,
+  highlightSoflan = false,
 }: {
-  timeRef: React.MutableRefObject<number>,
-  offsetRef: React.MutableRefObject<number>,
+  chart: ChartData,
   speed: number,
+  turn: Turn,
+  offsetRef: React.MutableRefObject<number>,
+  timeRef: React.MutableRefObject<number>,
   playing: boolean,
+  showBeat: boolean,
   constantMode: boolean,
-  children: React.ReactNode,
+  colorFreezes: boolean,
+  diminishFreezes: boolean,
+  soflanBg: boolean,
+  soflanValue: boolean,
+  highlightSoflan: boolean,
 }) => {
   const ref = React.useRef<HTMLDivElement>(null);
-
-  const style: React.CSSProperties = {
-    position: "relative",
-    width: `${4 * ARROW_HEIGHT}vh`,
-    height: `100vh`,
-    backgroundColor: "black",
-    overflow: "scroll",
-  };
 
   const laneHeight = React.useMemo(() => {
     if (ref.current && playing) {
@@ -375,50 +381,23 @@ const ChartContainer = ({
     }
   }, [ref, offsetRef, timeRef, lastOffset, lastTime, speed, laneHeight, constantMode]);
 
-  return (
-    <div ref={ref} style={style}>
-      {children}
-    </div>
-  );
-};
+  const laneStyle: React.CSSProperties = {
+    position: "relative",
+    width: `${4 * ARROW_HEIGHT}vh`,
+    margin: "auto",
+  };
 
-export const ChartPreview = ({
-  chart,
-  speed = 1,
-  turn = "OFF",
-  offsetRef,
-  timeRef,
-  playing,
-  showBeat,
-  constantMode = false,
-  colorFreezes = false,
-  diminishFreezes = false,
-  soflanBg = false,
-  soflanValue = false,
-  highlightSoflan = false,
-}: {
-  chart: ChartData,
-  speed: number,
-  turn: Turn,
-  offsetRef: React.MutableRefObject<number>,
-  timeRef: React.MutableRefObject<number>,
-  playing: boolean,
-  showBeat: boolean,
-  constantMode: boolean,
-  colorFreezes: boolean,
-  diminishFreezes: boolean,
-  soflanBg: boolean,
-  soflanValue: boolean,
-  highlightSoflan: boolean,
-}) => {
+  const scrollContainerStyle: React.CSSProperties = {
+    position: "relative",
+    overflow: "scroll",
+    backgroundColor: "black",
+    height: "100vh",
+    width: "100vw",
+  };
+
   return (
-    <div style={{ position: "relative" }}>
-      <ChartContainer
-          offsetRef={offsetRef}
-          timeRef={timeRef}
-          speed={speed}
-          playing={playing}
-          constantMode={constantMode}>
+    <div style={scrollContainerStyle} ref={ref}>
+      <div style={laneStyle}>
         <ChartObjects
             chart={chart}
             speed={speed}
@@ -430,7 +409,7 @@ export const ChartPreview = ({
             soflanBg={soflanBg}
             soflanValue={soflanValue}
             highlightSoflan={highlightSoflan} />
-      </ChartContainer>
+      </div>
       <JudgeLine />
     </div>
   );
