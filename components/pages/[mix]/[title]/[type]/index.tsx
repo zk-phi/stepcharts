@@ -236,8 +236,9 @@ const PreviewPage = ({ chart }: {
 
   const menuStyle: React.CSSProperties = {
     position: "absolute",
+    textAlign: "center",
     bottom: "1vw",
-    left: "1vw"
+    width: "100vw",
   };
 
   const mainBpm = Math.round(chart.meta.mainBpm);
