@@ -1,5 +1,5 @@
 // SHUFFLE5+MIRROR = SHUFFLE6
-export const TURNS: Turn[] = [
+export const TURNS: { name: Turn, shortName: string }[] = [
   { name: "OFF", shortName: "OFF" },
   { name: "LEFT", shortName: "←" },
   { name: "RIGHT", shortName: "→" },
