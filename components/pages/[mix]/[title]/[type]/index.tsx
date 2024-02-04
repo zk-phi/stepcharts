@@ -9,6 +9,7 @@ const defaultSpeedFn = (mainBpm: number) => Math.floor(620 / mainBpm * 4) / 4
 
 type Options = {
   speed: number,
+  turn: Turn,
   tick: boolean,
   constantMode: boolean,
   colorFreezes: boolean,
@@ -39,6 +40,11 @@ const OptionsPanel = ({
     ...options,
     speed: Number(e.target.value),
   }), [options, onChange]);
+
+  const onChangeTurn = React.useCallback((e) => onChange({
+    ...options,
+    turn: e.target.value,
+  }), [onChangeTurn]);
 
   const onChangeTick = React.useCallback((e) => onChange({
     ...options,
@@ -107,6 +113,15 @@ const OptionsPanel = ({
         <input type="checkbox" checked={options.constantMode} onChange={onChangeConstantMode} />
       </div>
       <div>
+        TURN:
+        {" "}
+        <select value={options.turn} onInput={onChangeTurn}>
+          {TURNS.map((turn) => (
+            <option key={turn.name} value={turn.name}>TURN: {turn.shortName}</option>
+          ))}
+        </select>
+      </div>
+      <div>
         フリーズも色分けする
         {" "}
         <input type="checkbox" checked={options.colorFreezes} onChange={onChangeColorFreezes} />
@@ -147,21 +162,13 @@ const FloatMenu = ({
   onPause,
   onOpenOptions,
   playing,
-  turn,
-  onChangeTurn,
 }: {
   style: React.CSSProperties,
   onPlay: () => void,
   onPause: () => void,
   onOpenOptions: () => void,
   playing: boolean,
-  turn: Turn,
-  onChangeTurn: (newValue: Turn) => void,
 }) => {
-  const onInputTurn = React.useCallback((e) => (
-    onChangeTurn(e.target.value)
-  ), [onChangeTurn]);
-
   const buttonStyle: React.CSSProperties = {
     color: "white",
     fontWeight: "bold",
@@ -180,11 +187,6 @@ const FloatMenu = ({
       <button onClick={onOpenOptions} style={buttonStyle}>
         OPTIONS
       </button>
-      <select value={turn} onInput={onInputTurn} style={buttonStyle}>
-        {TURNS.map((turn) => (
-          <option key={turn.name} value={turn.name}>TURN: {turn.shortName}</option>
-        ))}
-      </select>
     </div>
   );
 }
@@ -194,10 +196,10 @@ const PreviewPage = ({ chart }: {
 }) => {
   const [offsetRef, timeRef, playing, start, stop] = usePreview(chart);
   const [showModal, setShowModal] = React.useState(false);
-  const [turn, setTurn] = React.useState<Turn>("OFF");
 
   const [options, setOptions] = React.useState<Options>({
     speed: defaultSpeedFn(chart.meta.mainBpm),
+    turn: "OFF",
     tick: (
       chart.arrowTimeline.reduce((l, r) => l + (r.beat === 4 ? 1 : 0), 0)
       >= chart.arrowTimeline.length / 4
@@ -254,7 +256,7 @@ const PreviewPage = ({ chart }: {
             offsetRef={offsetRef}
             timeRef={timeRef}
             playing={playing}
-            turn={turn}
+            turn={options.turn}
             showBeat={options.tick}
             constantMode={options.constantMode}
             colorFreezes={options.colorFreezes}
@@ -269,9 +271,7 @@ const PreviewPage = ({ chart }: {
             enableBeatTick={options.tick} />
         <FloatMenu
             style={menuStyle}
-            turn={turn}
             playing={playing}
-            onChangeTurn={setTurn}
             onPlay={onPlay}
             onPause={onPause}
             onOpenOptions={openModal} />
