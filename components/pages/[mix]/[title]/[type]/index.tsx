@@ -106,9 +106,11 @@ const OptionsPanel = ({
         )}
       </div>
       <div>
-        スクロール速度を一定に
-        {" "}
-        <input type="checkbox" checked={options.constantMode} onChange={onChangeConstantMode} />
+        <label>
+          スクロール速度を一定に
+          {" "}
+          <input type="checkbox" checked={options.constantMode} onChange={onChangeConstantMode} />
+        </label>
       </div>
       <div>
         TURN:
@@ -120,34 +122,46 @@ const OptionsPanel = ({
         </select>
       </div>
       <div>
-        フリーズも色分けする
-        {" "}
-        <input type="checkbox" checked={options.colorFreezes} onChange={onChangeColorFreezes} />
+        <label>
+          フリーズも色分けする
+          {" "}
+          <input type="checkbox" checked={options.colorFreezes} onChange={onChangeColorFreezes} />
+        </label>
       </div>
       <div>
-        フリーズの棒部分を控えめに表示
-        {" "}
-        <input type="checkbox" checked={options.diminishFreezes} onChange={onChangeDiminishFreezes} />
+        <label>
+          フリーズの棒部分を控えめに表示
+          {" "}
+          <input type="checkbox" checked={options.diminishFreezes} onChange={onChangeDiminishFreezes} />
+        </label>
       </div>
       <div>
-        低速・高速地帯を色分け
-        {" "}
-        <input type="checkbox" checked={options.soflanBg} onChange={onChangeSoflanBg} />
+        <label>
+          低速・高速地帯を色分け
+          {" "}
+          <input type="checkbox" checked={options.soflanBg} onChange={onChangeSoflanBg} />
+        </label>
       </div>
       <div>
-        ソフラン箇所に BPM 値を表示
-        {" "}
-        <input type="checkbox" checked={options.soflanValue} onChange={onChangeSoflanValue} />
+        <label>
+          ソフラン箇所に BPM 値を表示
+          {" "}
+          <input type="checkbox" checked={options.soflanValue} onChange={onChangeSoflanValue} />
+        </label>
       </div>
       <div>
-        ソフラン箇所をハイライト
-        {" "}
-        <input type="checkbox" checked={options.highlightSoflan} onChange={onChangeHighlightSoflan} />
+        <label>
+          ソフラン箇所をハイライト
+          {" "}
+          <input type="checkbox" checked={options.highlightSoflan} onChange={onChangeHighlightSoflan} />
+        </label>
       </div>
       <div>
-        小節線を表示＆メトロノームを再生
-        {" "}
-        <input type="checkbox" checked={options.tick} onChange={onChangeTick} />
+        <label>
+          小節線を表示＆メトロノームを再生
+          {" "}
+          <input type="checkbox" checked={options.tick} onChange={onChangeTick} />
+        </label>
       </div>
     </div>
   );
