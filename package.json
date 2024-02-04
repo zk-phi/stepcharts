@@ -10,7 +10,7 @@
     "start": "next start",
     "type-check": "tsc --noemit",
     "test": "yarn jest",
-    "clean-simfiles": "node scripts/cleanSimfiles.js ./resources/stepcharts"
+    "clean-simfiles": "node scripts/cleanSimfiles.js ./stepcharts-data/simfiles"
   },
   "dependencies": {
     "@types/jest": "^26.0.20",

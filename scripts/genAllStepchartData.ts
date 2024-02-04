@@ -13,7 +13,7 @@ import {
 import { tagSoflanTriggers } from "../lib/analyzers/tagSoflanTriggers";
 import { calculateBpmStats } from "../lib/analyzers/calculateBpmStats";
 
-const ROOT = "./stepcharts-data";
+const ROOT = "./stepcharts-data/simfiles";
 
 const phraseVariance = (arrowTimeline: ArrowEvent<Fraction>[]): number => {
   const table: Record<string, number> = {};
