@@ -154,7 +154,6 @@ const OptionsPanel = ({
 };
 
 const FloatMenu = ({
-  style,
   onPlay,
   onPause,
   onOpenOptions,
@@ -162,7 +161,6 @@ const FloatMenu = ({
   playing,
   opened,
 }: {
-  style: React.CSSProperties,
   onPlay: () => void,
   onPause: () => void,
   onOpenOptions: () => void,
