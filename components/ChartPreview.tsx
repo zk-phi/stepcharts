@@ -142,8 +142,7 @@ const JudgeLine = () => {
   const style: React.CSSProperties = {
     position: "fixed",
     height: 0,
-    width: "100vw",
-    left: 0,
+    width: `${LANE_WIDTH}vh`,
     top: `${JUDGE_LINE_POS - ARROW_HEIGHT / 2}vh`,
     border: `${ARROW_HEIGHT / 2}vh solid #ffffff60`,
     pointerEvents: "none",
@@ -411,8 +410,8 @@ export const ChartPreview = ({
             soflanBg={soflanBg}
             soflanValue={soflanValue}
             highlightSoflan={highlightSoflan} />
+        <JudgeLine />
       </div>
-      <JudgeLine />
     </div>
   );
 };
