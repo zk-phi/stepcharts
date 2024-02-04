@@ -5,6 +5,8 @@ import { TURN_VALUES } from "../constants/turn";
 
 const ARROW_HEIGHT = 13.5; /* vh */
 const LANE_HEIGHT = 100; /* vh */
+const LANE_WIDTH = ARROW_HEIGHT * 4; /* vh */
+
 const JUDGE_LINE_POS = ARROW_HEIGHT * 1.25;
 const HEIGHT_PER_BEAT = ((LANE_HEIGHT - JUDGE_LINE_POS) / 6.25); /* vh */
 
@@ -114,7 +116,7 @@ const Bar = ({ pos, endPos, color, bgColor, value }: {
   const style: React.CSSProperties = {
     position: "absolute",
     height: `${endPos ? endPos - pos : 0}vh`,
-    width: `${4 * ARROW_HEIGHT}vh`,
+    width: `${LANE_WIDTH}vh`,
     left: 0,
     top: `${pos}vh`,
     borderTop: `4px solid ${color}`,
@@ -383,7 +385,7 @@ export const ChartPreview = ({
 
   const objectsContainerStyle: React.CSSProperties = {
     position: "relative",
-    width: `${4 * ARROW_HEIGHT}vh`,
+    width: `${LANE_WIDTH}vh`,
     margin: "auto",
   };
 
