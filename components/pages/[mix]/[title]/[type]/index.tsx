@@ -241,7 +241,7 @@ const PreviewPage = ({ chart }: {
   const maxBpm = Math.round(chart.meta.maxBpm);
 
   return (
-    <div>
+    <>
       <ChartPreview
           chart={chart}
           speed={options.speed}
@@ -280,7 +280,7 @@ const PreviewPage = ({ chart }: {
           offsetRef={offsetRef}
           timeRef={timeRef}
           enableBeatTick={options.tick} />
-    </div>
+    </>
   );
 };
 
