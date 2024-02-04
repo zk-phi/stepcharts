@@ -42,7 +42,7 @@ const OptionsPanel = ({
   const onChangeTurn = React.useCallback((e) => onChange({
     ...options,
     turn: e.target.value,
-  }), [onChangeTurn]);
+  }), [options, onChange]);
 
   const onChangeTick = React.useCallback((e) => onChange({
     ...options,
