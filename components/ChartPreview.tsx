@@ -383,7 +383,7 @@ export const ChartPreview = ({
     }
   }, [ref, offsetRef, timeRef, lastOffset, lastTime, speed, laneHeight, constantMode]);
 
-  const objectsContainerStyle: React.CSSProperties = {
+  const alignContainerStyle: React.CSSProperties = {
     position: "relative",
     width: `${LANE_WIDTH}vh`,
     margin: "auto",
@@ -399,7 +399,7 @@ export const ChartPreview = ({
 
   return (
     <div style={scrollContainerStyle} ref={ref}>
-      <div style={objectsContainerStyle}>
+      <div style={alignContainerStyle}>
         <ChartObjects
             chart={chart}
             speed={speed}
