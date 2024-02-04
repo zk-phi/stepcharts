@@ -28,7 +28,11 @@ async function traverse(dirPath) {
     });
 
     const filename = path.basename(dirPath);
-    const filenameWithoutSpaces = await toSafeFilename(filename);
+    const filenameWithoutSpaces = filename.match(/^[0-9A-z-]+$/) ? (
+      filename
+    ) : (
+      await toSafeFilename(filename)
+    );
     const newPath = dirPath.replace(filename, filenameWithoutSpaces);
 
     if (dirPath !== newPath) {
