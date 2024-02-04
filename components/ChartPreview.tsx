@@ -5,7 +5,7 @@ import { TURN_VALUES } from "../constants/turn";
 
 const ARROW_HEIGHT = 13.5; /* vh */
 const LANE_HEIGHT = 100; /* vh */
-const LANE_WIDTH = ARROW_HEIGHT * 4; /* vh */
+export const LANE_WIDTH = ARROW_HEIGHT * 4; /* vh */
 
 const JUDGE_LINE_POS = ARROW_HEIGHT * 1.25;
 const HEIGHT_PER_BEAT = ((LANE_HEIGHT - JUDGE_LINE_POS) / 6.25); /* vh */
@@ -334,6 +334,7 @@ export const ChartPreview = ({
   soflanBg = false,
   soflanValue = false,
   highlightSoflan = false,
+  children,
 }: {
   chart: ChartData,
   speed: number,
@@ -348,6 +349,7 @@ export const ChartPreview = ({
   soflanBg: boolean,
   soflanValue: boolean,
   highlightSoflan: boolean,
+  children: React.ReactNode,
 }) => {
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -411,6 +413,7 @@ export const ChartPreview = ({
             soflanValue={soflanValue}
             highlightSoflan={highlightSoflan} />
         <JudgeLine />
+        {children}
       </div>
     </div>
   );

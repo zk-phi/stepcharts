@@ -1,5 +1,5 @@
 import React from "react";
-import ChartPreview from "../../../../ChartPreview";
+import ChartPreview, { LANE_WIDTH } from "../../../../ChartPreview";
 import PreviewSound from "../../../../PreviewSound";
 import { usePreview } from "../../../../../lib/hooks/usePreview";
 import { prepareAudioContext } from "../../../../../lib/audioContext";
@@ -26,7 +26,6 @@ const OptionsPanel = ({
   minBpm,
   mainBpm,
   maxBpm,
-  onClose,
 }: {
   options: Options,
   onChange: (newValue: Options) => void,
@@ -34,7 +33,6 @@ const OptionsPanel = ({
   minBpm: number,
   mainBpm: number,
   maxBpm: number,
-  onClose: () => void,
 }) => {
   const onChangeSpeed = React.useCallback((e) => onChange({
     ...options,
@@ -117,7 +115,7 @@ const OptionsPanel = ({
         {" "}
         <select value={options.turn} onInput={onChangeTurn}>
           {TURNS.map((turn) => (
-            <option key={turn.name} value={turn.name}>TURN: {turn.shortName}</option>
+            <option key={turn.name} value={turn.name}>TURN: {turn.name}</option>
           ))}
         </select>
       </div>
@@ -151,7 +149,6 @@ const OptionsPanel = ({
         {" "}
         <input type="checkbox" checked={options.tick} onChange={onChangeTick} />
       </div>
-      <button onClick={onClose}>[Close]</button>
     </div>
   );
 };
@@ -161,13 +158,17 @@ const FloatMenu = ({
   onPlay,
   onPause,
   onOpenOptions,
+  onCloseOptions,
   playing,
+  opened,
 }: {
   style: React.CSSProperties,
   onPlay: () => void,
   onPause: () => void,
   onOpenOptions: () => void,
+  onCloseOptions: () => void,
   playing: boolean,
+  opened: boolean,
 }) => {
   const buttonStyle: React.CSSProperties = {
     color: "white",
@@ -184,8 +185,8 @@ const FloatMenu = ({
       <button onClick={playing ? onPause : onPlay} style={buttonStyle}>
         {playing ? "STOP" : "PLAY"}
       </button>
-      <button onClick={onOpenOptions} style={buttonStyle}>
-        OPTIONS
+      <button onClick={opened ? onCloseOptions : onOpenOptions} style={buttonStyle}>
+        {opened ? "x CLOSE" : "OPTIONS"}
       </button>
     </div>
   );
@@ -218,29 +219,21 @@ const PreviewPage = ({ chart }: {
   const onPlay = React.useCallback(async () => {
     await prepareAudioContext();
     start();
-    setShowModal(false);
   }, [start]);
 
-  const onPause = React.useCallback(() => {
-    stop();
-    setShowModal(false);
-  }, [stop]);
-
-  const controllStyle: React.CSSProperties = {
-    position: "absolute",
-    padding: 16,
-    width: "100vw",
-    height: "100vh",
-    background: "#ffffff80",
-    top: 0,
-    left: 0,
+  const panelStyle: React.CSSProperties = {
+    textAlign: "left",
+    padding: "1em",
+    marginBottom: "1em",
+    background: "#ffffffa0",
+    lineHeight: "2",
   };
 
-  const menuStyle: React.CSSProperties = {
-    position: "absolute",
+  const controlStyle: React.CSSProperties = {
+    position: "fixed",
     textAlign: "center",
-    bottom: "1vw",
-    width: "100vw",
+    bottom: "1em",
+    width: `${LANE_WIDTH}vh`,
   };
 
   const mainBpm = Math.round(chart.meta.mainBpm);
@@ -248,44 +241,45 @@ const PreviewPage = ({ chart }: {
   const maxBpm = Math.round(chart.meta.maxBpm);
 
   return (
-    <div style={{ display: "flex", justifyContent: "center" }}>
-      <div style={{ position: "relative" }}>
-        <ChartPreview
-            chart={chart}
-            speed={options.speed}
-            offsetRef={offsetRef}
-            timeRef={timeRef}
-            playing={playing}
-            turn={options.turn}
-            showBeat={options.tick}
-            constantMode={options.constantMode}
-            colorFreezes={options.colorFreezes}
-            diminishFreezes={options.diminishFreezes}
-            soflanBg={options.soflanBg}
-            soflanValue={options.soflanValue}
-            highlightSoflan={options.highlightSoflan} />
-        <PreviewSound
-            chart={chart}
-            offsetRef={offsetRef}
-            timeRef={timeRef}
-            enableBeatTick={options.tick} />
-        <FloatMenu
-            style={menuStyle}
-            playing={playing}
-            onPlay={onPlay}
-            onPause={onPause}
-            onOpenOptions={openModal} />
-        { showModal && (
-          <OptionsPanel
-              options={options}
-              onChange={setOptions}
-              style={controllStyle}
-              minBpm={minBpm}
-              mainBpm={mainBpm}
-              maxBpm={maxBpm}
-              onClose={closeModal} />
-        ) }
-      </div>
+    <div>
+      <ChartPreview
+          chart={chart}
+          speed={options.speed}
+          offsetRef={offsetRef}
+          timeRef={timeRef}
+          playing={playing}
+          turn={options.turn}
+          showBeat={options.tick}
+          constantMode={options.constantMode}
+          colorFreezes={options.colorFreezes}
+          diminishFreezes={options.diminishFreezes}
+          soflanBg={options.soflanBg}
+          soflanValue={options.soflanValue}
+          highlightSoflan={options.highlightSoflan}>
+        <div style={controlStyle}>
+          { showModal && (
+            <OptionsPanel
+                options={options}
+                onChange={setOptions}
+                style={panelStyle}
+                minBpm={minBpm}
+                mainBpm={mainBpm}
+                maxBpm={maxBpm} />
+          ) }
+          <FloatMenu
+              playing={playing}
+              opened={showModal}
+              onPlay={onPlay}
+              onPause={stop}
+              onOpenOptions={openModal}
+              onCloseOptions={closeModal} />
+        </div>
+      </ChartPreview>
+      <PreviewSound
+          chart={chart}
+          offsetRef={offsetRef}
+          timeRef={timeRef}
+          enableBeatTick={options.tick} />
     </div>
   );
 };
