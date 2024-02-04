@@ -179,7 +179,7 @@ const FloatMenu = ({
   };
 
   return (
-    <div style={style}>
+    <div>
       <button onClick={playing ? onPause : onPlay} style={buttonStyle}>
         {playing ? "STOP" : "PLAY"}
       </button>
