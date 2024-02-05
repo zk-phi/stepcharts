@@ -3,8 +3,6 @@ import * as path from "path";
 import { parseDwi } from "./parseDwi";
 import { parseSm } from "./parseSm";
 
-// TODO: round bpms and stops
-
 type RawSimfile = Omit<Simfile, "title"> & {
   title: string;
   titletranslit: string | null;

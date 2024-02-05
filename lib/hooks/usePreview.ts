@@ -10,6 +10,9 @@ export const usePreview = (chart?: ChartData | null): [
 ] => {
   const startTime = React.useRef<number>();
   const [playing, setPlaying] = React.useState(false);
+
+  // Time and offset values provided to components.
+  // Wrapped with refs in order to avoid heavy rerendering.
   const timeRef = React.useRef<number>(0);
   const offsetRef = React.useRef<number>(0);
 
