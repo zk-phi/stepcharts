@@ -6,6 +6,5 @@ module.exports = withOptimizedClassnames({
   trailingSlash: true,
   serverRuntimeConfig: {
     PROJECT_ROOT: __dirname,
-    ROOT_DOMAIN: "ddr.stepcharts.com",
   },
 });
