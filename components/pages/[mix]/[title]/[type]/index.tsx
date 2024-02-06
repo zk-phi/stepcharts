@@ -144,14 +144,14 @@ const OptionsPanel = ({
       </div>
       <div>
         <label>
-          ソフラン箇所に BPM 値を表示
+          ソフラン箇所に目印を表示
           {" "}
           <input type="checkbox" checked={options.soflanValue} onChange={onChangeSoflanValue} />
         </label>
       </div>
       <div>
         <label>
-          ソフラン箇所をハイライト
+          ソフラン直前のノートをハイライト
           {" "}
           <input type="checkbox" checked={options.highlightSoflan} onChange={onChangeHighlightSoflan} />
         </label>

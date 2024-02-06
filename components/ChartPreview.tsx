@@ -119,7 +119,7 @@ const Bar = ({ pos, endPos, color, bgColor, value }: {
     width: `${LANE_WIDTH}vh`,
     left: 0,
     top: `${pos}vh`,
-    borderTop: `4px solid ${color}`,
+    borderTop: value ? `4px solid ${color}` : undefined,
     backgroundColor: bgColor,
   };
 
