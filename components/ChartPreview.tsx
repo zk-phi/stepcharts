@@ -432,7 +432,6 @@ export const ChartPreview = ({
         <BeatIndicators
             chart={chart}
             speed={speed}
-            turn={turn}
             showBeat={showBeat}
             constantMode={constantMode}
             soflanBg={soflanBg}
