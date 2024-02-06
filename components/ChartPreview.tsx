@@ -145,7 +145,7 @@ const JudgeLine = () => {
     pointerEvents: "none",
   };
 
-  const arrowStyle: (rotation: number) => React.CSSProperties = (rotation) => ({
+  const arrowStyle: (rotation: Direction) => React.CSSProperties = (rotation) => ({
     display: "inline-block",
     height: `${ARROW_HEIGHT}vh`,
     width: `${ARROW_HEIGHT}vh`,
