@@ -141,55 +141,53 @@ const Bar = ({ pos, endPos, color, bgColor, value }: {
 const JudgeLine = () => {
   const style: React.CSSProperties = {
     position: "fixed",
-    height: 0,
-    width: `${LANE_WIDTH}vh`,
     top: `${JUDGE_LINE_POS - ARROW_HEIGHT / 2}vh`,
-    border: `${ARROW_HEIGHT / 2}vh solid #ffffff60`,
     pointerEvents: "none",
   };
 
+  const arrowStyle: (rotation: number) => React.CSSProperties = (rotation) => ({
+    display: "inline-block",
+    height: `${ARROW_HEIGHT}vh`,
+    width: `${ARROW_HEIGHT}vh`,
+    backgroundImage: `url(/stepcharts/arrowJudge.svg)`,
+    backgroundSize: "cover",
+    transform: `rotate(${ARROW_ROTATION[rotation]})`,
+  });
+
   return (
-    <div style={style} />
+    <div style={style}>
+      <div style={arrowStyle(0)} />
+      <div style={arrowStyle(1)} />
+      <div style={arrowStyle(2)} />
+      <div style={arrowStyle(3)} />
+    </div>
   );
 };
 
-const ChartObjectsRaw = ({
+const posFn = (speed: number, constantMode: boolean) => (e: { time: number, offset: number }) => (
+  constantMode ? judgePos(e.time, speed) : judgePos(e.offset, speed)
+);
+
+const BeatIndicatorsRaw = ({
   chart,
   speed = 1,
-  turn = "OFF",
   showBeat,
   constantMode,
-  colorFreezes,
-  diminishFreezes,
   soflanBg,
   soflanValue,
-  highlightSoflan,
 }: {
   chart: ChartData,
   speed: number,
-  turn: Turn,
   showBeat: boolean,
   constantMode: boolean,
-  colorFreezes: boolean,
-  diminishFreezes: boolean,
   soflanBg: boolean,
   soflanValue: boolean,
-  highlightSoflan: boolean,
 }) => {
-  const lastArrow = chart.arrowTimeline[chart.arrowTimeline.length - 1];
-  const lastMeasure = Math.floor(lastArrow.offset);
-  const endTime = lastArrow.time + 1;
-  const reversedArrows = [...chart.arrowTimeline].reverse();
-  const reversedFreezes = [...chart.freezeTimeline].reverse();
-
-  const posFn = (e: { time: number, offset: number }) => (
-    constantMode ? judgePos(e.time, speed) : judgePos(e.offset, speed)
-  );
-
+  const toPos = posFn(speed, constantMode);
   return (
     <>
       {showBeat && chart.beatTimeline.map((b, i) => (
-        <Bar key={`b${i}`} pos={posFn(b)} color={i % 4 === 0 ? "#fffa" : "#fff5"} />
+        <Bar key={`b${i}`} pos={toPos(b)} color={i % 4 === 0 ? "#fffa" : "#fff5"} />
       ))}
       {chart.bpmTimeline.map((e, i, es) => {
         const end = es[i + 1] ?? chart.beatTimeline[chart.beatTimeline.length - 1];
@@ -199,7 +197,7 @@ const ChartObjectsRaw = ({
               <Bar
                   key={`ts${i}`}
                   pos={0}
-                  endPos={posFn(end)}
+                  endPos={toPos(end)}
                   color={chart.meta.mainBpm < e.bpm ? "#fc4" : "#4cf"}
                   bgColor={!soflanBg ? undefined : chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"}
                   value={soflanValue ? e.bpm : undefined} />
@@ -207,16 +205,16 @@ const ChartObjectsRaw = ({
           ) : es[i - 1].bpm < e.bpm ? (
             <Bar
                 key={`ts${i}`}
-                pos={posFn(e)}
-                endPos={chart.meta.mainBpm !== e.bpm ? posFn(end) : undefined}
+                pos={toPos(e)}
+                endPos={chart.meta.mainBpm !== e.bpm ? toPos(end) : undefined}
                 color={"#fc4"}
                 bgColor={!soflanBg ? undefined : chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"}
                 value={soflanValue ? e.bpm : undefined} />
           ) : e.bpm < es[i - 1].bpm && e.bpm > 0 ? (
             <Bar
                 key={`ts${i}`}
-                pos={posFn(e)}
-                endPos={chart.meta.mainBpm !== e.bpm ? posFn(end) : undefined}
+                pos={toPos(e)}
+                endPos={chart.meta.mainBpm !== e.bpm ? toPos(end) : undefined}
                 color={"#4cf"}
                 bgColor={!soflanBg ? undefined : chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"}
                 value={soflanValue ? e.bpm : undefined} />
@@ -229,29 +227,58 @@ const ChartObjectsRaw = ({
         e.bpm === 0 ? (
           <Bar
               key={`ts${i}`}
-              pos={posFn(e)}
-              endPos={posFn(es[i + 1])}
+              pos={toPos(e)}
+              endPos={toPos(es[i + 1])}
               color={"#4f4"}
               bgColor={"#4f44"} />
         ) : (
           null
         )
       ))}
+    </>
+  );
+};
+
+const ChartObjectsRaw = ({
+  chart,
+  speed = 1,
+  turn = "OFF",
+  constantMode,
+  colorFreezes,
+  diminishFreezes,
+  highlightSoflan,
+}: {
+  chart: ChartData,
+  speed: number,
+  turn: Turn,
+  constantMode: boolean,
+  colorFreezes: boolean,
+  diminishFreezes: boolean,
+  highlightSoflan: boolean,
+}) => {
+  const lastArrow = chart.arrowTimeline[chart.arrowTimeline.length - 1];
+  const lastMeasure = Math.floor(lastArrow.offset);
+  const reversedArrows = [...chart.arrowTimeline].reverse();
+  const reversedFreezes = [...chart.freezeTimeline].reverse();
+  const toPos = posFn(speed, constantMode);
+
+  return (
+    <>
       {reversedFreezes.map((f, i) => {
         const direction = TURN_VALUES[turn][f.direction];
         return (
           <Freeze
               key={`f${i}`}
               direction={direction}
-              pos={posFn(f.start)}
-              endPos={posFn(f.end)}
+              pos={toPos(f.start)}
+              endPos={toPos(f.end)}
               diminished={diminishFreezes} />
         );
       })}
       {reversedArrows.map((a, i) => {
         const isFreeze = a.direction.match(/2/);
         const beat = isFreeze && !colorFreezes ? "freeze" : a.beat;
-        const pos = posFn(a);
+        const pos = toPos(a);
         return (
           <>
             { a.direction.match(/^[12].../) &&
@@ -318,6 +345,7 @@ const ChartObjectsRaw = ({
   );
 };
 
+const BeatIndicators = React.memo(BeatIndicatorsRaw);
 const ChartObjects = React.memo(ChartObjectsRaw);
 
 export const ChartPreview = ({
@@ -401,18 +429,23 @@ export const ChartPreview = ({
   return (
     <div style={scrollContainerStyle} ref={ref}>
       <div style={alignContainerStyle}>
-        <ChartObjects
+        <BeatIndicators
             chart={chart}
             speed={speed}
             turn={turn}
             showBeat={showBeat}
             constantMode={constantMode}
+            soflanBg={soflanBg}
+            soflanValue={soflanValue} />
+        <JudgeLine />
+        <ChartObjects
+            chart={chart}
+            speed={speed}
+            turn={turn}
+            constantMode={constantMode}
             colorFreezes={colorFreezes}
             diminishFreezes={diminishFreezes}
-            soflanBg={soflanBg}
-            soflanValue={soflanValue}
             highlightSoflan={highlightSoflan} />
-        <JudgeLine />
         {children}
       </div>
     </div>
