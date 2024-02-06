@@ -84,7 +84,7 @@ const Freeze = ({ direction, pos, endPos, diminished }: {
     left: `${direction * ARROW_HEIGHT + ARROW_HEIGHT * 0.05}vh`,
     height: `${endPos - pos}vh`,
     width: `${ARROW_HEIGHT * 0.9}vh`,
-    backgroundColor: diminished ? "#5e54" : "#5e5",
+    backgroundColor: diminished ? "#88ee4444" : "#88ee44",
   };
 
   const tailStyle: React.CSSProperties = {
@@ -93,7 +93,7 @@ const Freeze = ({ direction, pos, endPos, diminished }: {
     left: `${direction * ARROW_HEIGHT + ARROW_HEIGHT * 0.05}vh`,
     height: 0,
     width: `${ARROW_HEIGHT * 0.9}vh`,
-    borderTop: `${ARROW_HEIGHT / 2 * 0.9}vh solid ${diminished ? "#3b34" : "#3b3"}`,
+    borderTop: `${ARROW_HEIGHT / 2 * 0.9}vh solid ${diminished ? "#66cc2244" : "#66cc22"}`,
     borderLeft: `${ARROW_HEIGHT / 2 * 0.9}vh solid transparent`,
     borderRight: `${ARROW_HEIGHT / 2 * 0.9}vh solid transparent`,
   };
