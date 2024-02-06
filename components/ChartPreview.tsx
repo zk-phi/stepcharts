@@ -109,7 +109,7 @@ const Freeze = ({ direction, pos, endPos, diminished }: {
 const Bar = ({ pos, endPos, color, bgColor, value }: {
   pos: number,
   endPos?: number,
-  color: string,
+  color?: string,
   bgColor?: string,
   value?: number
 }) => {
@@ -119,7 +119,7 @@ const Bar = ({ pos, endPos, color, bgColor, value }: {
     width: `${LANE_WIDTH}vh`,
     left: 0,
     top: `${pos}vh`,
-    borderTop: value ? `4px solid ${color}` : undefined,
+    borderTop: color ? `4px solid ${color}` : undefined,
     backgroundColor: bgColor,
   };
 
@@ -198,7 +198,7 @@ const BeatIndicatorsRaw = ({
                   key={`ts${i}`}
                   pos={0}
                   endPos={toPos(end)}
-                  color={chart.meta.mainBpm < e.bpm ? "#fc4" : "#4cf"}
+                  color={!soflanValue ? undefined : chart.meta.mainBpm < e.bpm ? "#fc4" : "#4cf"}
                   bgColor={!soflanBg ? undefined : chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"}
                   value={soflanValue ? e.bpm : undefined} />
             )
@@ -207,7 +207,7 @@ const BeatIndicatorsRaw = ({
                 key={`ts${i}`}
                 pos={toPos(e)}
                 endPos={chart.meta.mainBpm !== e.bpm ? toPos(end) : undefined}
-                color={"#fc4"}
+                color={!soflanValue ? undefined : "#fc4"}
                 bgColor={!soflanBg ? undefined : chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"}
                 value={soflanValue ? e.bpm : undefined} />
           ) : e.bpm < es[i - 1].bpm && e.bpm > 0 ? (
@@ -215,7 +215,7 @@ const BeatIndicatorsRaw = ({
                 key={`ts${i}`}
                 pos={toPos(e)}
                 endPos={chart.meta.mainBpm !== e.bpm ? toPos(end) : undefined}
-                color={"#4cf"}
+                color={!soflanValue ? undefined : "#4cf"}
                 bgColor={!soflanBg ? undefined : chart.meta.mainBpm < e.bpm ? "#fc44" : "#4cf4"}
                 value={soflanValue ? e.bpm : undefined} />
           ) : (
@@ -229,8 +229,8 @@ const BeatIndicatorsRaw = ({
               key={`ts${i}`}
               pos={toPos(e)}
               endPos={toPos(es[i + 1])}
-              color={"#4f4"}
-              bgColor={"#4f44"} />
+              color={!soflanValue ? undefined : "#4f4"}
+              bgColor={!soflanBg ? undefined : "#4f44"} />
         ) : (
           null
         )
