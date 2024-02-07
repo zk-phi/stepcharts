@@ -71,15 +71,18 @@ function getDirectories(...dirPath: string[]): string[] {
   const builtPath = dirPath.reduce((building, d) => {
     return path.join(building, d);
   }, "");
+  // console.log(`Scanning ${builtPath}`);
 
-  console.log(`Scanning ${builtPath}`);
-
-  return getFiles(builtPath).filter((d) => {
+  const files = getFiles(builtPath);
+  files.forEach((d) => {
     const filePath = path.join(builtPath, d);
-    const test = fs.statSync(filePath).isDirectory();
-    console.log(`- ${test ? '' : 'SKIPPED: '}${filePath}`);
-    return test;
+    // console.log(`- ${filePath}`);
+    if (!fs.statSync(filePath).isDirectory()) {
+      throw new Error(`${filePath} is not a directory. Check the directory structure.`)
+    }
   });
+
+  return files;
 }
 
 type AllData = {
