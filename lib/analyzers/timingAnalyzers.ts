@@ -1,5 +1,7 @@
 import Fraction from "fraction.js";
 
+export const doffsetToTime = (offset: Fraction, bpm: Fraction) => offset.mul(4).div(bpm).mul(60);
+
 // Align all stops and bpm-changes into a single timeline.
 // All timeline events will have both offset and timing value.
 // Stops are represented by bpm-changes to zero.
@@ -30,7 +32,7 @@ export const extractBpmEvents = (chart: Stepchart): BpmEvent<Fraction>[] => {
     const e = bpmEvents[i]!;
     const next = bpmEvents[i + 1];
     const lastBpm = timeline[0].bpm;
-    const dt = e.offset.sub(timeline[0].offset).mul(4).div(lastBpm).mul(60);
+    const dt = doffsetToTime(e.offset.sub(timeline[0].offset), lastBpm);
     const time = dt.add(timeline[0].time);
     // stop and bpm-shift at the same time
     const baseEntry = { offset: e.offset };
@@ -60,23 +62,23 @@ export const extractBpmEvents = (chart: Stepchart): BpmEvent<Fraction>[] => {
 };
 
 // Generate a function that converts offset value (based on measures)
-// to time value in seconds. Input values to the function must be ordered.
-// i.e. if you convert offset value "4.5" then you no longer convert "2.0"
-// with the same function instance.
+// to time value in seconds.
 type Converter = (input: Fraction) => Fraction;
 export const makeOffsetToSecConverter = (bpmTimeline: BpmEvent<Fraction>[]): Converter => {
   let ix = 0;
-  let lastOffset = new Fraction(0);
   const offsetToSec = (offset: Fraction): Fraction => {
-    if (offset.compare(lastOffset) < 0) {
+    if (offset.compare(0) === 0) {
       ix = 0;
     }
-    while (bpmTimeline[ix + 1] && bpmTimeline[ix + 1].offset.compare(offset) < 0) {
+    while (ix > 0 && offset.compare(bpmTimeline[ix].offset) <= 0) {
+      ix--;
+    }
+    while (bpmTimeline[ix + 1] && offset.compare(bpmTimeline[ix + 1].offset) > 0) {
       ix++;
     }
-    lastOffset = offset;
-    const dt = offset.sub(bpmTimeline[ix].offset).mul(4).div(bpmTimeline[ix].bpm).mul(60);
-    return dt.add(bpmTimeline[ix].time);
+    const dt = doffsetToTime(offset.sub(bpmTimeline[ix].offset), bpmTimeline[ix].bpm);
+    const time = bpmTimeline[ix].time.add(dt);
+    return time;
   };
   return offsetToSec;
 }
