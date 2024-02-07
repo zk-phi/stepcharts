@@ -7,6 +7,11 @@ import { TURNS } from "../../../../../constants/turn";
 
 const defaultSpeedFn = (mainBpm: number) => Math.floor(620 / mainBpm * 4) / 4
 
+const defaultEnableTick = (chart: AnalyzedStepchart<number>) => (
+  chart.arrowTimeline.reduce((l, r) => l + (r.beat === 4 ? 1 : 0), 0)
+  >= chart.arrowTimeline.length / 4
+);
+
 type Options = {
   speed: number,
   turn: Turn,
@@ -213,10 +218,7 @@ const PreviewPage = ({ chart }: {
   const [options, setOptions] = React.useState<Options>({
     speed: defaultSpeedFn(chart.meta.mainBpm),
     turn: "OFF",
-    tick: (
-      chart.arrowTimeline.reduce((l, r) => l + (r.beat === 4 ? 1 : 0), 0)
-      >= chart.arrowTimeline.length / 4
-    ),
+    tick: defaultEnableTick(chart),
     constantMode: false,
     colorFreezes: true,
     diminishFreezes: true,
