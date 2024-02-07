@@ -17,7 +17,7 @@ const playSound = (
 };
 
 const PreviewSound = ({ chart, offsetRef, timeRef, enableBeatTick }: {
-  chart: ChartData,
+  chart: AnalyzedStepchart<number>,
   offsetRef: React.MutableRefObject<number>,
   timeRef: React.MutableRefObject<number>,
   enableBeatTick: boolean,

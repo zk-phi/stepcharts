@@ -40,7 +40,7 @@ const AllSongsTable = ({
   getSortValueFunction: (a: AllMeta) => string | null,
 }) => {
   const [previewChartId, setPreviewChartId] = useState<[string, string, string]>();
-  const [previewChart, setPreviewChart] = useState<ChartData>();
+  const [previewChart, setPreviewChart] = useState<AnalyzedStepchart<number>>();
   const [offset, time, playing, start, stop] = usePreview(previewChart);
 
   const enableBeatTick = React.useMemo(() => !!previewChart && (
@@ -52,7 +52,7 @@ const AllSongsTable = ({
     const response = await fetch(`/stepcharts/_data/${mix}/${song}/${difficulty}.json`);
     await prepareAudioContext();
     setPreviewChartId([mix, song, difficulty]);
-    setPreviewChart(await response.json());
+    setPreviewChart((await response.json()).chart);
   }, [setPreviewChart]);
 
   useEffect(() => {

@@ -126,13 +126,19 @@ const allData: AllData = mixDirs.map((mixDir) => {
         },
         charts: simfile.availableTypes.map((chartType: StepchartType) => {
           const chart = simfile.charts[chartType.difficulty];
+          const stats = calculateStats(chart);
+          const lastMeasure = Math.floor(chart.arrows[chart.arrows.length - 1].offset);
           const bpmTimeline = extractBpmEvents(chart);
           const arrowTimeline = computeArrowTimings(chart.arrows, bpmTimeline);
-          const freezeTimeline = computeFreezeTimings(chart.freezes, bpmTimeline);
-          const lastMeasure = Math.floor(chart.arrows[chart.arrows.length - 1].offset);
-          const beatTimeline = computeBeatTimings(lastMeasure, bpmTimeline);
-          const stats = calculateStats(chart);
-          tagSoflanTriggers(arrowTimeline, bpmTimeline);
+          const bpmStats = calculateBpmStats(arrowTimeline, bpmTimeline);
+          const analyzedChart = {
+            bpmTimeline,
+            arrowTimeline,
+            freezeTimeline: computeFreezeTimings(chart.freezes, bpmTimeline),
+            beatTimeline: computeBeatTimings(lastMeasure, bpmTimeline),
+            ...bpmStats,
+          };
+          tagSoflanTriggers(analyzedChart.arrowTimeline, bpmTimeline);
           return {
             meta: {
               difficulty: chartType.difficulty,
@@ -141,38 +147,14 @@ const allData: AllData = mixDirs.map((mixDir) => {
               stops: chart.stops.length,
               bpmShifts: chart.bpm.length - 1,
               complexity: (
-                stats.sixteenths + stats.trips + 100 * (1 - phraseVariance(arrowTimeline))
+                stats.sixteenths
+                + stats.trips
+                + 100 * (1 - phraseVariance(analyzedChart.arrowTimeline))
               ),
-              ...calculateBpmStats(arrowTimeline, bpmTimeline),
+              ...bpmStats,
               ...stats,
             },
-            chart: {
-              bpmTimeline: bpmTimeline.map((b: BpmEvent<Fraction>): BpmEvent<number> => ({
-                bpm: b.bpm.n / b.bpm.d,
-                time: b.time.n / b.time.d,
-                offset: b.offset.n / b.offset.d,
-              })),
-              arrowTimeline: arrowTimeline.map((a: ArrowEvent<Fraction>): ArrowEvent<number> => ({
-                ...a,
-                time: a.time.n / a.time.d,
-                offset: a.offset.n / a.offset.d,
-              })),
-              freezeTimeline: freezeTimeline.map((f: FreezeEvent<Fraction>): FreezeEvent<number> => ({
-                ...f,
-                start: {
-                  time: f.start.time.n / f.start.time.d,
-                  offset: f.start.offset.n / f.start.offset.d,
-                },
-                end: {
-                  time: f.end.time.n / f.end.time.d,
-                  offset: f.end.offset.n / f.end.offset.d,
-                },
-              })),
-              beatTimeline: beatTimeline.map((b: Timestamp<Fraction>): Timestamp<number> => ({
-                time: b.time.n / b.time.d,
-                offset: b.offset.n / b.offset.d,
-              })),
-            },
+            chart: serializedChart(analyzedChart),
           };
         }),
       };
@@ -214,7 +196,7 @@ const allMixes: AllMeta[] = allData.flatMap((mix) => {
       };
       const chartData: ChartData = {
         meta: allMeta,
-        ...chart.chart,
+        chart: chart.chart,
       };
       console.log(
         `Writing _data/${mix.meta.mixId}/${song.meta.songId}/${chart.meta.difficulty}.json ...`

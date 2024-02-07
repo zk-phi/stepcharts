@@ -47,6 +47,9 @@ type FreezeEvent<T extends Fraction | number> =
   Omit<FreezeBody, "startOffset" | "endOffset"> & { start: Timestamp<T>, end: Timestamp<T> };
 
 type AnalyzedStepchart<T extends Fraction | number> = {
+  minBpm: number;
+  maxBpm: number;
+  mainBpm: number;
   freezeTimeline: FreezeEvent<T>[];
   arrowTimeline: ArrowEvent<T>[];
   bpmTimeline: BpmEvent<T>[];
@@ -54,8 +57,9 @@ type AnalyzedStepchart<T extends Fraction | number> = {
 };
 
 
-type ChartData = AnalyzedStepchart<number> & {
+type ChartData = {
   meta: AllMeta,
+  chart: AnalyzedStepchart<number>,
 };
 
 type Index = {

@@ -26,19 +26,15 @@ type Options = {
 };
 
 const OptionsPanel = ({
+  chart,
   options,
   onChange,
   style,
-  minBpm,
-  mainBpm,
-  maxBpm,
 }: {
+  chart: ChartData,
   options: Options,
   onChange: (newValue: Options) => void,
   style: React.CSSProperties,
-  minBpm: number,
-  mainBpm: number,
-  maxBpm: number,
 }) => {
   const onChangeSpeed = React.useCallback((e) => onChange({
     ...options,
@@ -58,7 +54,7 @@ const OptionsPanel = ({
   const onChangeConstantMode = React.useCallback((e) => onChange({
     ...options,
     constantMode: e.target.checked,
-    speed: defaultSpeedFn(e.target.checked ? 240 : mainBpm),
+    speed: defaultSpeedFn(e.target.checked ? 240 : chart.chart.mainBpm),
   }), [options, onChange]);
 
   const onChangeColorFreezes = React.useCallback((e) => onChange({
@@ -90,6 +86,8 @@ const OptionsPanel = ({
     ...options,
     verboseColors: e.target.checked,
   }), [options, onChange]);
+
+  const { minBpm, mainBpm, maxBpm } = chart.chart;
 
   return (
     <div style={style}>
@@ -225,13 +223,13 @@ const FloatMenu = ({
 const PreviewPage = ({ chart }: {
   chart: ChartData,
 }) => {
-  const [offsetRef, timeRef, playing, start, stop] = usePreview(chart);
+  const [offsetRef, timeRef, playing, start, stop] = usePreview(chart.chart);
   const [showModal, setShowModal] = React.useState(false);
 
   const [options, setOptions] = React.useState<Options>({
-    speed: defaultSpeedFn(chart.meta.mainBpm),
+    speed: defaultSpeedFn(chart.chart.mainBpm),
     turn: "OFF",
-    tick: defaultEnableTick(chart),
+    tick: defaultEnableTick(chart.chart),
     constantMode: false,
     colorFreezes: true,
     diminishFreezes: true,
@@ -264,14 +262,10 @@ const PreviewPage = ({ chart }: {
     width: `${LANE_WIDTH}vh`,
   };
 
-  const mainBpm = Math.round(chart.meta.mainBpm);
-  const minBpm = Math.round(chart.meta.minBpm);
-  const maxBpm = Math.round(chart.meta.maxBpm);
-
   return (
     <>
       <ChartPreview
-          chart={chart}
+          chart={chart.chart}
           speed={options.speed}
           offsetRef={offsetRef}
           timeRef={timeRef}
@@ -288,12 +282,10 @@ const PreviewPage = ({ chart }: {
         <div style={controlStyle}>
           { showModal && (
             <OptionsPanel
+                chart={chart}
                 options={options}
                 onChange={setOptions}
-                style={panelStyle}
-                minBpm={minBpm}
-                mainBpm={mainBpm}
-                maxBpm={maxBpm} />
+                style={panelStyle} />
           ) }
           <FloatMenu
               playing={playing}
@@ -305,7 +297,7 @@ const PreviewPage = ({ chart }: {
         </div>
       </ChartPreview>
       <PreviewSound
-          chart={chart}
+          chart={chart.chart}
           offsetRef={offsetRef}
           timeRef={timeRef}
           enableBeatTick={options.tick} />

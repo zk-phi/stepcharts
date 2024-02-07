@@ -1,7 +1,7 @@
 import React from "react";
 import { useAnimationFrame } from "./useAnimationFrame";
 
-export const usePreview = (chart?: ChartData | null): [
+export const usePreview = (chart?: AnalyzedStepchart<number> | null): [
   React.MutableRefObject<number>,
   React.MutableRefObject<number>,
   boolean,
