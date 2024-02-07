@@ -1,5 +1,5 @@
 type Direction = 0 | 1 | 2 | 3;
-type Beat = 4 | 6 | 8 | 12 | 16;
+type Beat = 4 | 6 | 8 | 12 | 16 | 24 | 32 | 64 | "other";
 
 type Turn = "OFF" | "LEFT" | "RIGHT" | "MIRROR" |
   "SHUFFLE1 (→↑)" | "SHUFFLE1+LEFT" | "SHUFFLE1+RIGHT" | "SHUFFLE1+MIRROR" |

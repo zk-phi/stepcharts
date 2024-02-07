@@ -22,6 +22,7 @@ type Options = {
   soflanBg: boolean,
   soflanValue: boolean,
   highlightSoflan: boolean,
+  verboseColors: boolean,
 };
 
 const OptionsPanel = ({
@@ -83,6 +84,11 @@ const OptionsPanel = ({
   const onChangeHighlightSoflan = React.useCallback((e) => onChange({
     ...options,
     highlightSoflan: e.target.checked,
+  }), [options, onChange]);
+
+  const onChangeVerboseColors = React.useCallback((e) => onChange({
+    ...options,
+    verboseColors: e.target.checked,
   }), [options, onChange]);
 
   return (
@@ -163,6 +169,13 @@ const OptionsPanel = ({
       </div>
       <div>
         <label>
+          24 分以下のノートも色分け
+          {" "}
+          <input type="checkbox" checked={options.verboseColors} onChange={onChangeVerboseColors} />
+        </label>
+      </div>
+      <div>
+        <label>
           小節線を表示＆メトロノームを再生
           {" "}
           <input type="checkbox" checked={options.tick} onChange={onChangeTick} />
@@ -225,6 +238,7 @@ const PreviewPage = ({ chart }: {
     soflanBg: true,
     soflanValue: true,
     highlightSoflan: true,
+    verboseColors: true,
   });
 
   const closeModal = React.useCallback(() => setShowModal(false), [setShowModal]);
@@ -269,7 +283,8 @@ const PreviewPage = ({ chart }: {
           diminishFreezes={options.diminishFreezes}
           soflanBg={options.soflanBg}
           soflanValue={options.soflanValue}
-          highlightSoflan={options.highlightSoflan}>
+          highlightSoflan={options.highlightSoflan}
+          verboseColors={options.verboseColors}>
         <div style={controlStyle}>
           { showModal && (
             <OptionsPanel

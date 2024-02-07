@@ -16,6 +16,24 @@ const ARROW_IMG = {
   8: "/stepcharts/arrow8.svg",
   12: "/stepcharts/arrow6.svg",
   16: "/stepcharts/arrow16.svg",
+  24: "/stepcharts/arrow6.svg",
+  32: "/stepcharts/arrow6.svg",
+  64: "/stepcharts/arrow6.svg",
+  other: "/stepcharts/arrow6.svg",
+  shock: "/stepcharts/arrowShock.svg",
+  freeze: "/stepcharts/arrowFreeze.svg",
+};
+
+const VERBOSE_ARROW_IMG = {
+  4: "/stepcharts/arrow4.svg",
+  6: "/stepcharts/arrow6.svg",
+  8: "/stepcharts/arrow8.svg",
+  12: "/stepcharts/arrow6.svg",
+  16: "/stepcharts/arrow16.svg",
+  24: "/stepcharts/arrow24.svg",
+  32: "/stepcharts/arrow32.svg",
+  64: "/stepcharts/arrow64.svg",
+  other: "/stepcharts/arrowOther.svg",
   shock: "/stepcharts/arrowShock.svg",
   freeze: "/stepcharts/arrowFreeze.svg",
 };
@@ -47,11 +65,12 @@ const Spacer = ({ offset, speed }: {
   );
 }
 
-const Arrow = ({ beat, direction, pos, highlight = false }: {
+const Arrow = ({ beat, direction, pos, highlight = false, verboseColors = false }: {
   beat: Beat | "freeze" | "shock",
   direction: Direction,
   pos: number,
   highlight?: boolean,
+  verboseColors?: boolean,
 }) => {
   const style: React.CSSProperties = {
     position: "absolute",
@@ -59,7 +78,7 @@ const Arrow = ({ beat, direction, pos, highlight = false }: {
     left: `${direction * ARROW_HEIGHT}vh`,
     height: `${ARROW_HEIGHT}vh`,
     width: `${ARROW_HEIGHT}vh`,
-    backgroundImage: `url(${ARROW_IMG[beat]})`,
+    backgroundImage: `url(${verboseColors ? VERBOSE_ARROW_IMG[beat] : ARROW_IMG[beat]})`,
     backgroundSize: "cover",
     backgroundColor: highlight ? "#fff6" : undefined,
     boxShadow: highlight ? `0 0 ${ARROW_HEIGHT / 4}vh #fff` : undefined,
@@ -247,6 +266,7 @@ const ChartObjectsRaw = ({
   colorFreezes,
   diminishFreezes,
   highlightSoflan,
+  verboseColors,
 }: {
   chart: ChartData,
   speed: number,
@@ -255,6 +275,7 @@ const ChartObjectsRaw = ({
   colorFreezes: boolean,
   diminishFreezes: boolean,
   highlightSoflan: boolean,
+  verboseColors: boolean,
 }) => {
   const lastArrow = chart.arrowTimeline[chart.arrowTimeline.length - 1];
   const lastMeasure = Math.floor(lastArrow.offset);
@@ -287,28 +308,32 @@ const ChartObjectsRaw = ({
                   beat={beat}
                   direction={TURN_VALUES[turn][0]}
                   pos={pos}
-                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
+                  highlight={highlightSoflan && !!a.tags.soflanTrigger}
+                  verboseColors={verboseColors} /> }
             { a.direction.match(/^.[12]../) &&
               <Arrow
                   key={`a${i}d`}
                   beat={beat}
                   direction={TURN_VALUES[turn][1]}
                   pos={pos}
-                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
+                  highlight={highlightSoflan && !!a.tags.soflanTrigger}
+                  verboseColors={verboseColors} /> }
             { a.direction.match(/^..[12]./) &&
               <Arrow
                   key={`a${i}u`}
                   beat={beat}
                   direction={TURN_VALUES[turn][2]}
                   pos={pos}
-                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
+                  highlight={highlightSoflan && !!a.tags.soflanTrigger}
+                  verboseColors={verboseColors} /> }
             { a.direction.match(/^...[12]/) &&
               <Arrow
                   key={`a${i}r`}
                   beat={beat}
                   direction={TURN_VALUES[turn][3]}
                   pos={pos}
-                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
+                  highlight={highlightSoflan && !!a.tags.soflanTrigger}
+                  verboseColors={verboseColors} /> }
             { a.direction.match(/^M.../) &&
               <Arrow
                   key={`a${i}l`}
@@ -362,6 +387,7 @@ export const ChartPreview = ({
   soflanBg = false,
   soflanValue = false,
   highlightSoflan = false,
+  verboseColors = false,
   children,
 }: {
   chart: ChartData,
@@ -377,6 +403,7 @@ export const ChartPreview = ({
   soflanBg: boolean,
   soflanValue: boolean,
   highlightSoflan: boolean,
+  verboseColors: boolean,
   children: React.ReactNode,
 }) => {
   const ref = React.useRef<HTMLDivElement>(null);
@@ -444,7 +471,8 @@ export const ChartPreview = ({
             constantMode={constantMode}
             colorFreezes={colorFreezes}
             diminishFreezes={diminishFreezes}
-            highlightSoflan={highlightSoflan} />
+            highlightSoflan={highlightSoflan}
+            verboseColors={verboseColors} />
         {children}
       </div>
     </div>

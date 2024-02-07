@@ -37,7 +37,7 @@ function isGallop(
     return false;
   }
 
-  if (p.beat === 12 || p.beat === 16) {
+  if (p.beat > 8) {
     // only consider it a gallop if it's isolated
     if (!g || p.offset - g.offset >= 1 / 8) {
       return d.offset - p.offset < 1 / 8;
@@ -72,7 +72,9 @@ function calculateStats(chart: Stepchart): Stats {
   const jacks = chart.arrows.filter((a, i, array) => isJack(a, array[i - 1]));
   const shocks = chart.arrows.filter((a) => a.direction.match(/M/)).length;
   const sixteenths = chart.arrows.filter((a) => a.beat === 16);
-  const trips = chart.arrows.filter((a) => a.beat === 12 || a.beat === 6);
+  const trips = chart.arrows.filter((a) => (
+    a.beat === "other" || a.beat === 6 || a.beat === 12 || a.beat > 16
+  ));
 
   return {
     jumps: jumps.length,
