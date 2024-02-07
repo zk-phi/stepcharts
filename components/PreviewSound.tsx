@@ -70,7 +70,7 @@ const PreviewSound = ({ chart, offsetRef, timeRef, enableBeatTick }: {
         stopIndex.current++;
       }
     }
-  }, [offsetRef, stopIndex]);
+  }, [offsetRef, stopIndex, chart]);
 
   const lastOffset = React.useRef(0);
   const resetHandler = React.useCallback(() => {
