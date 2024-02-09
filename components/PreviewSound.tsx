@@ -76,7 +76,12 @@ const PreviewSound = ({ chart, offsetRef, timeRef, enableBeatTick }: {
   const resetHandler = React.useCallback(() => {
     if (offsetRef.current < lastOffset.current) {
       nextBeat.current = offsetRef.current - (offsetRef.current % 0.25);
-      arrowIndex.current = chart.arrowTimeline.findIndex((a) => offsetRef.current < a.offset);
+      arrowIndex.current = chart.arrowTimeline.findIndex((a) => (
+        offsetRef.current < a.offset
+      ));
+      stopIndex.current = chart.bpmTimeline.findIndex((e) => (
+        offsetRef.current < e.offset && e.bpm === 0
+      ));
       nextBeat.current = chart.bpmTimeline.findIndex((e) => (
         offsetRef.current < e.offset && e.bpm === 0
       ));
