@@ -266,7 +266,7 @@ const PreviewPage = ({ chart }: {
   const [showModal, setShowModal] = React.useState(false);
 
   const [options, setOptions] = React.useState<Options>({
-    speed: defaultSpeedFn(chart.canonicalChart.mainBpm),
+    speed: defaultSpeedFn(chart.chart.mainBpm),
     turn: "OFF",
     tick: defaultEnableTick(chart.chart),
     constantMode: false,
