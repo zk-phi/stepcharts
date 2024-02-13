@@ -97,7 +97,7 @@ function parseSm(sm: string, _titlePath: string): RawSimfile {
       const offset = offsetFrac(Number(stopS) / 4 - emptyOffsetInMeasures);
       return {
         offset,
-        duration: offsetFrac(Number(durationS)),
+        duration: new Fraction(Number(durationS)),
       };
     });
   }

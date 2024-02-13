@@ -221,7 +221,7 @@ function parseDwi(dwi: string, titlePath?: string): RawSimfile {
 
       return {
         offset,
-        duration: offsetFrac(Number(stopDurationS) / 1000),
+        duration: new Fraction(Number(stopDurationS), 1000),
       };
     });
   }
