@@ -286,83 +286,53 @@ const ChartObjectsRaw = ({
 
   return (
     <>
-      {reversedFreezes.map((f, i) => {
-        const direction = TURN_VALUES[turn][f.direction];
-        return (
-          <Freeze
-              key={`f${i}`}
-              direction={direction}
-              pos={toPos(f.start)}
-              endPos={toPos(f.end)}
-              diminished={diminishFreezes} />
+      {reversedFreezes.map((f, i) => (
+        <Freeze
+            key={`f${i}`}
+            direction={TURN_VALUES[turn][f.direction]}
+            pos={toPos(f.start)}
+            endPos={toPos(f.end)}
+            diminished={diminishFreezes} />
+      ))}
+      {reversedArrows.map((a, i) => {
+        const props = {
+          beat: "shock",
+          highlight: highlightSoflan && !!a.tags.soflanTrigger,
+          pos: toPos(a),
+        };
+        return a.direction === "MMMM" && (
+          <>
+            <Arrow key={`s${i}l`} direction={TURN_VALUES[turn][0]} {...props} />
+            <Arrow key={`s${i}d`} direction={TURN_VALUES[turn][1]} {...props} />
+            <Arrow key={`s${i}u`} direction={TURN_VALUES[turn][2]} {...props} />
+            <Arrow key={`s${i}r`} direction={TURN_VALUES[turn][3]} {...props} />
+          </>
         );
       })}
+      {chart.arrowTimeline.map((a, i) => a.direction.match(/^..[12]./) && (
+        <Arrow
+            key={`a${i}u`}
+            beat={a.direction.match(/2/) && !colorFreezes ? "freeze" : a.beat}
+            direction={TURN_VALUES[turn][2]}
+            pos={toPos(a)}
+            highlight={highlightSoflan && !!a.tags.soflanTrigger}
+            verboseColors={verboseColors} />
+      ))}
       {reversedArrows.map((a, i) => {
-        const isFreeze = a.direction.match(/2/);
-        const beat = isFreeze && !colorFreezes ? "freeze" : a.beat;
-        const pos = toPos(a);
+        const props = {
+          beat: a.direction.match(/2/) && !colorFreezes ? "freeze" : a.beat,
+          pos: toPos(a),
+          highlight: highlightSoflan && !!a.tags.soflanTrigger,
+          verboseColors,
+        }
         return (
           <>
             { a.direction.match(/^[12].../) &&
-              <Arrow
-                  key={`a${i}l`}
-                  beat={beat}
-                  direction={TURN_VALUES[turn][0]}
-                  pos={pos}
-                  highlight={highlightSoflan && !!a.tags.soflanTrigger}
-                  verboseColors={verboseColors} /> }
+              <Arrow key={`a${i}l`} direction={TURN_VALUES[turn][0]} {...props} /> }
             { a.direction.match(/^.[12]../) &&
-              <Arrow
-                  key={`a${i}d`}
-                  beat={beat}
-                  direction={TURN_VALUES[turn][1]}
-                  pos={pos}
-                  highlight={highlightSoflan && !!a.tags.soflanTrigger}
-                  verboseColors={verboseColors} /> }
-            { a.direction.match(/^..[12]./) &&
-              <Arrow
-                  key={`a${i}u`}
-                  beat={beat}
-                  direction={TURN_VALUES[turn][2]}
-                  pos={pos}
-                  highlight={highlightSoflan && !!a.tags.soflanTrigger}
-                  verboseColors={verboseColors} /> }
+              <Arrow key={`a${i}d`} direction={TURN_VALUES[turn][1]} {...props} /> }
             { a.direction.match(/^...[12]/) &&
-              <Arrow
-                  key={`a${i}r`}
-                  beat={beat}
-                  direction={TURN_VALUES[turn][3]}
-                  pos={pos}
-                  highlight={highlightSoflan && !!a.tags.soflanTrigger}
-                  verboseColors={verboseColors} /> }
-            { a.direction.match(/^M.../) &&
-              <Arrow
-                  key={`a${i}l`}
-                  beat="shock"
-                  direction={TURN_VALUES[turn][0]}
-                  pos={pos}
-                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
-            { a.direction.match(/^.M../) &&
-              <Arrow
-                  key={`a${i}d`}
-                  beat="shock"
-                  direction={TURN_VALUES[turn][1]}
-                  pos={pos}
-                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
-            { a.direction.match(/^..M./) &&
-              <Arrow
-                  key={`a${i}u`}
-                  beat="shock"
-                  direction={TURN_VALUES[turn][2]}
-                  pos={pos}
-                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
-            { a.direction.match(/^...M/) &&
-              <Arrow
-                  key={`a${i}r`}
-                  beat="shock"
-                  direction={TURN_VALUES[turn][3]}
-                  pos={pos}
-                  highlight={highlightSoflan && !!a.tags.soflanTrigger} /> }
+              <Arrow key={`a${i}r`} direction={TURN_VALUES[turn][3]} {...props} /> }
           </>
         );
       })}
