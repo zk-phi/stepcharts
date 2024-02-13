@@ -249,8 +249,8 @@ const BeatIndicatorsRaw = ({
               key={`ts${i}`}
               pos={toPos(e)}
               endPos={toPos(es[i + 1])}
-              color={!soflanValue ? undefined : "#03AF7A"}
-              bgColor={!soflanBg ? undefined : "#03AF7A44"} />
+              color={!soflanValue ? undefined : "#FF8082"}
+              bgColor={!soflanBg ? undefined : "#FF808244"} />
         ) : (
           null
         )
