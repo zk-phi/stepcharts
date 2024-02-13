@@ -203,6 +203,7 @@ const BeatIndicatorsRaw = ({
   soflanValue: boolean,
 }) => {
   const toPos = posFn(speed, constantMode);
+  const mainBpm = chart.mainBpm;
   return (
     <>
       {showBeat && chart.beatTimeline.map((b, i) => (
@@ -212,30 +213,30 @@ const BeatIndicatorsRaw = ({
         const end = es[i + 1] ?? chart.beatTimeline[chart.beatTimeline.length - 1];
         return (
           i === 0 ? (
-            chart.mainBpm !== e.bpm && (
+            mainBpm !== e.bpm && (
               <Bar
                   key={`ts${i}`}
                   pos={0}
                   endPos={toPos(end)}
-                  color={!soflanValue ? undefined : chart.mainBpm < e.bpm ? "#fc4" : "#4cf"}
-                  bgColor={!soflanBg ? undefined : chart.mainBpm < e.bpm ? "#fc44" : "#4cf4"}
+                  color={!soflanValue ? undefined : mainBpm < e.bpm ? "#F6AA00" : "#4DC4FF"}
+                  bgColor={!soflanBg ? undefined : mainBpm < e.bpm ? "#F6AA0044" : "#4DC4FF44"}
                   value={soflanValue ? e.bpm : undefined} />
             )
           ) : es[i - 1].bpm < e.bpm ? (
             <Bar
                 key={`ts${i}`}
                 pos={toPos(e)}
-                endPos={chart.mainBpm !== e.bpm ? toPos(end) : undefined}
-                color={!soflanValue ? undefined : "#fc4"}
-                bgColor={!soflanBg ? undefined : chart.mainBpm < e.bpm ? "#fc44" : "#4cf4"}
+                endPos={mainBpm !== e.bpm ? toPos(end) : undefined}
+                color={!soflanValue ? undefined : "#F6AA00"}
+                bgColor={!soflanBg ? undefined : mainBpm < e.bpm ? "#F6AA0044" : "#4DC4FF44"}
                 value={soflanValue ? e.bpm : undefined} />
           ) : e.bpm < es[i - 1].bpm && e.bpm > 0 ? (
             <Bar
                 key={`ts${i}`}
                 pos={toPos(e)}
-                endPos={chart.mainBpm !== e.bpm ? toPos(end) : undefined}
-                color={!soflanValue ? undefined : "#4cf"}
-                bgColor={!soflanBg ? undefined : chart.mainBpm < e.bpm ? "#fc44" : "#4cf4"}
+                endPos={mainBpm !== e.bpm ? toPos(end) : undefined}
+                color={!soflanValue ? undefined : "#4DC4FF"}
+                bgColor={!soflanBg ? undefined : mainBpm < e.bpm ? "#F6AA0044" : "#4DC4FF44"}
                 value={soflanValue ? e.bpm : undefined} />
           ) : (
             null
@@ -248,8 +249,8 @@ const BeatIndicatorsRaw = ({
               key={`ts${i}`}
               pos={toPos(e)}
               endPos={toPos(es[i + 1])}
-              color={!soflanValue ? undefined : "#4f4"}
-              bgColor={!soflanBg ? undefined : "#4f44"} />
+              color={!soflanValue ? undefined : "#03AF7A"}
+              bgColor={!soflanBg ? undefined : "#03AF7A44"} />
         ) : (
           null
         )
