@@ -287,21 +287,19 @@ const ChartObjectsRaw = ({
 }) => {
   const lastArrow = chart.arrowTimeline[chart.arrowTimeline.length - 1];
   const lastMeasure = Math.floor(lastArrow.offset);
-  const reversedArrows = [...chart.arrowTimeline].reverse();
-  const reversedFreezes = [...chart.freezeTimeline].reverse();
   const toPos = posFn(speed, constantMode);
 
   return (
     <>
-      {reversedFreezes.map((f, i) => (
+      {chart.freezeTimeline.map((f, i) => (
         <Freeze
             key={`f${i}`}
             direction={TURN_VALUES[turn][f.direction]}
             pos={toPos(f.start)}
             endPos={toPos(f.end)}
             diminished={diminishFreezes} />
-      ))}
-      {reversedArrows.map((a, i) => {
+      )).reverse()}
+      {chart.arrowTimeline.map((a, i) => {
         const props: ArrowCommonProps = {
           beat: "shock",
           highlight: highlightSoflan && !!a.tags.soflanTrigger,
@@ -315,7 +313,7 @@ const ChartObjectsRaw = ({
             <Arrow key={`s${i}r`} direction={TURN_VALUES[turn][3]} {...props} />
           </>
         );
-      })}
+      }).reverse()}
       {chart.arrowTimeline.map((a, i) => a.direction.match(/^..[12]./) && (
         <Arrow
             key={`a${i}u`}
@@ -325,7 +323,7 @@ const ChartObjectsRaw = ({
             highlight={highlightSoflan && !!a.tags.soflanTrigger}
             verboseColors={verboseColors} />
       ))}
-      {reversedArrows.map((a, i) => {
+      {chart.arrowTimeline.map((a, i) => {
         const props: ArrowCommonProps = {
           beat: a.direction.match(/2/) && !colorFreezes ? "freeze" : a.beat,
           pos: toPos(a),
@@ -342,7 +340,7 @@ const ChartObjectsRaw = ({
               <Arrow key={`a${i}r`} direction={TURN_VALUES[turn][3]} {...props} /> }
           </>
         );
-      })}
+      }).reverse()}
       <Spacer offset={lastMeasure + 2} speed={speed} />
     </>
   );
