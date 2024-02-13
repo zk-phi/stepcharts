@@ -259,6 +259,13 @@ const BeatIndicatorsRaw = ({
   );
 };
 
+type ArrowCommonProps = {
+  beat: Beat | "freeze" | "shock",
+  pos: number,
+  highlight: boolean,
+  verboseColors?: boolean,
+};
+
 const ChartObjectsRaw = ({
   chart,
   speed = 1,
@@ -295,7 +302,7 @@ const ChartObjectsRaw = ({
             diminished={diminishFreezes} />
       ))}
       {reversedArrows.map((a, i) => {
-        const props = {
+        const props: ArrowCommonProps = {
           beat: "shock",
           highlight: highlightSoflan && !!a.tags.soflanTrigger,
           pos: toPos(a),
@@ -319,7 +326,7 @@ const ChartObjectsRaw = ({
             verboseColors={verboseColors} />
       ))}
       {reversedArrows.map((a, i) => {
-        const props = {
+        const props: ArrowCommonProps = {
           beat: a.direction.match(/2/) && !colorFreezes ? "freeze" : a.beat,
           pos: toPos(a),
           highlight: highlightSoflan && !!a.tags.soflanTrigger,
