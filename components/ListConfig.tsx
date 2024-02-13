@@ -18,6 +18,7 @@ const STAT_KEYS = [
   "sixteenths",
   "trips",
   "complexity",
+  "canonicalChartErrorRate",
 ];
 
 export const SORT_KEYS = [
@@ -41,6 +42,7 @@ export const SORT_KEYS = [
   { value: "trips", label: "緑矢印%" },
   { value: "", label: "-- その他 --", disabled: true },
   { value: "complexity", label: "リズム難指数(仮)" },
+  { value: "canonicalChartErrorRate", label: "CER(※デバッグ用)" },
 ];
 
 export function getSortFunction(key: string) {

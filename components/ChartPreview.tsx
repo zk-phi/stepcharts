@@ -268,6 +268,7 @@ type ArrowCommonProps = {
 
 const ChartObjectsRaw = ({
   chart,
+  canonicalChart,
   speed = 1,
   turn = "OFF",
   constantMode,
@@ -275,8 +276,10 @@ const ChartObjectsRaw = ({
   diminishFreezes,
   highlightSoflan,
   verboseColors,
+  canonicalColors,
 }: {
   chart: AnalyzedStepchart<number>,
+  canonicalChart: AnalyzedStepchart<number>,
   speed: number,
   turn: Turn,
   constantMode: boolean,
@@ -284,10 +287,17 @@ const ChartObjectsRaw = ({
   diminishFreezes: boolean,
   highlightSoflan: boolean,
   verboseColors: boolean,
+  canonicalColors: boolean,
 }) => {
   const lastArrow = chart.arrowTimeline[chart.arrowTimeline.length - 1];
   const lastMeasure = Math.floor(lastArrow.offset);
   const toPos = posFn(speed, constantMode);
+
+  const beatFn = (i: number): Beat | "freeze" => (
+    chart.arrowTimeline[i].direction.match(/2/) && !colorFreezes ? "freeze" :
+    canonicalColors ? canonicalChart.arrowTimeline[i].beat :
+    chart.arrowTimeline[i].beat
+  );
 
   return (
     <>
@@ -317,7 +327,7 @@ const ChartObjectsRaw = ({
       {chart.arrowTimeline.map((a, i) => a.direction.match(/^..[12]./) && (
         <Arrow
             key={`a${i}u`}
-            beat={a.direction.match(/2/) && !colorFreezes ? "freeze" : a.beat}
+            beat={beatFn(i)}
             direction={TURN_VALUES[turn][2]}
             pos={toPos(a)}
             highlight={highlightSoflan && !!a.tags.soflanTrigger}
@@ -325,7 +335,7 @@ const ChartObjectsRaw = ({
       ))}
       {chart.arrowTimeline.map((a, i) => {
         const props: ArrowCommonProps = {
-          beat: a.direction.match(/2/) && !colorFreezes ? "freeze" : a.beat,
+          beat: beatFn(i),
           pos: toPos(a),
           highlight: highlightSoflan && !!a.tags.soflanTrigger,
           verboseColors,
@@ -351,6 +361,7 @@ const ChartObjects = React.memo(ChartObjectsRaw);
 
 export const ChartPreview = ({
   chart,
+  canonicalChart,
   speed = 1,
   turn = "OFF",
   offsetRef,
@@ -364,9 +375,11 @@ export const ChartPreview = ({
   soflanValue = false,
   highlightSoflan = false,
   verboseColors = false,
+  canonicalColors = false,
   children,
 }: {
   chart: AnalyzedStepchart<number>,
+  canonicalChart: AnalyzedStepchart<number>,
   speed: number,
   turn: Turn,
   offsetRef: React.MutableRefObject<number>,
@@ -380,6 +393,7 @@ export const ChartPreview = ({
   soflanValue: boolean,
   highlightSoflan: boolean,
   verboseColors: boolean,
+  canonicalColors: boolean,
   children: React.ReactNode,
 }) => {
   const ref = React.useRef<HTMLDivElement>(null);
@@ -442,13 +456,15 @@ export const ChartPreview = ({
         <JudgeLine />
         <ChartObjects
             chart={chart}
+            canonicalChart={canonicalChart}
             speed={speed}
             turn={turn}
             constantMode={constantMode}
             colorFreezes={colorFreezes}
             diminishFreezes={diminishFreezes}
             highlightSoflan={highlightSoflan}
-            verboseColors={verboseColors} />
+            verboseColors={verboseColors}
+            canonicalColors={canonicalColors} />
         {children}
       </div>
     </div>

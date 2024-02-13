@@ -17,12 +17,14 @@ type Options = {
   turn: Turn,
   tick: boolean,
   constantMode: boolean,
+  canonicalMode: boolean,
   colorFreezes: boolean,
   diminishFreezes: boolean,
   soflanBg: boolean,
   soflanValue: boolean,
   highlightSoflan: boolean,
   verboseColors: boolean,
+  canonicalColors: boolean,
 };
 
 const OptionsPanel = ({
@@ -54,7 +56,26 @@ const OptionsPanel = ({
   const onChangeConstantMode = React.useCallback((e) => onChange({
     ...options,
     constantMode: e.target.checked,
-    speed: defaultSpeedFn(e.target.checked ? 240 : chart.chart.mainBpm),
+    speed: defaultSpeedFn(e.target.checked ? (
+      240
+    ) : options.canonicalMode ? (
+      chart.canonicalChart.mainBpm
+    ) : (
+      chart.chart.mainBpm
+    )),
+  }), [options, onChange]);
+
+  const onChangeCanonicalMode = React.useCallback((e) => onChange({
+    ...options,
+    canonicalMode: e.target.checked,
+    speed: defaultSpeedFn(options.constantMode ? (
+      240
+    ) : e.target.checked ? (
+      chart.canonicalChart.mainBpm
+    ) : (
+      chart.chart.mainBpm
+    )),
+    tick: defaultEnableTick(e.target.checked ? chart.canonicalChart : chart.chart),
   }), [options, onChange]);
 
   const onChangeColorFreezes = React.useCallback((e) => onChange({
@@ -87,7 +108,12 @@ const OptionsPanel = ({
     verboseColors: e.target.checked,
   }), [options, onChange]);
 
-  const { minBpm, mainBpm, maxBpm } = chart.chart;
+  const onChangeCanonicalColors = React.useCallback((e) => onChange({
+    ...options,
+    canonicalColors: e.target.checked,
+  }), [options, onChange]);
+
+  const { minBpm, mainBpm, maxBpm } = options.canonicalMode ? chart.canonicalChart : chart.chart;
 
   return (
     <div style={style}>
@@ -179,6 +205,20 @@ const OptionsPanel = ({
           <input type="checkbox" checked={options.tick} onChange={onChangeTick} />
         </label>
       </div>
+      <div>
+        <label>
+          色分けをソフランに追従（β：一部の譜面で非対応）
+          {" "}
+          <input type="checkbox" checked={options.canonicalColors} onChange={onChangeCanonicalColors} />
+        </label>
+      </div>
+      <div>
+        <label>
+          show canonical chart（※デバッグ用）
+          {" "}
+          <input type="checkbox" checked={options.canonicalMode} onChange={onChangeCanonicalMode} />
+        </label>
+      </div>
     </div>
   );
 };
@@ -223,11 +263,10 @@ const FloatMenu = ({
 const PreviewPage = ({ chart }: {
   chart: ChartData,
 }) => {
-  const [offsetRef, timeRef, playing, start, stop] = usePreview(chart.chart);
   const [showModal, setShowModal] = React.useState(false);
 
   const [options, setOptions] = React.useState<Options>({
-    speed: defaultSpeedFn(chart.chart.mainBpm),
+    speed: defaultSpeedFn(chart.canonicalChart.mainBpm),
     turn: "OFF",
     tick: defaultEnableTick(chart.chart),
     constantMode: false,
@@ -237,7 +276,13 @@ const PreviewPage = ({ chart }: {
     soflanValue: true,
     highlightSoflan: true,
     verboseColors: true,
+    canonicalColors: false,
+    canonicalMode: false,
   });
+
+  const [offsetRef, timeRef, playing, start, stop] = usePreview(
+    options.canonicalMode ? chart.canonicalChart : chart.chart
+  );
 
   const closeModal = React.useCallback(() => setShowModal(false), [setShowModal]);
   const openModal = React.useCallback(() => setShowModal(true), [setShowModal]);
@@ -265,7 +310,8 @@ const PreviewPage = ({ chart }: {
   return (
     <>
       <ChartPreview
-          chart={chart.chart}
+          chart={options.canonicalMode ? chart.canonicalChart : chart.chart}
+          canonicalChart={chart.canonicalChart}
           speed={options.speed}
           offsetRef={offsetRef}
           timeRef={timeRef}
@@ -278,7 +324,8 @@ const PreviewPage = ({ chart }: {
           soflanBg={options.soflanBg}
           soflanValue={options.soflanValue}
           highlightSoflan={options.highlightSoflan}
-          verboseColors={options.verboseColors}>
+          verboseColors={options.verboseColors}
+          canonicalColors={options.canonicalColors}>
         <div style={controlStyle}>
           { showModal && (
             <OptionsPanel
@@ -297,7 +344,7 @@ const PreviewPage = ({ chart }: {
         </div>
       </ChartPreview>
       <PreviewSound
-          chart={chart.chart}
+          chart={options.canonicalMode ? chart.canonicalChart : chart.chart}
           offsetRef={offsetRef}
           timeRef={timeRef}
           enableBeatTick={options.tick} />
