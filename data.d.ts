@@ -26,6 +26,9 @@ type ChartMeta = Stats & {
   maxBpm: number;
   mainBpm: number;
   complexity: number;
+  // FOR DEBUG
+  // % of 32nd+ notes, which is considered as errors
+  canonicalChartErrorRate: number;
 };
 
 type AllMeta = MixMeta & SongMeta & ChartMeta;
@@ -37,7 +40,8 @@ type Timestamp<T extends Fraction | number> = {
 };
 
 // stops and bpm-changes with both timing and offset values
-type BpmEvent<T extends Fraction | number> = { bpm: T } & Timestamp<T>;
+// CALIB is used to cancel errors caused by inaccurate duration, when computing canonical chart
+type BpmEvent<T extends Fraction | number> = { bpm: T, calib: T } & Timestamp<T>;
 
 // arrows with both timing and offset values
 type ArrowEvent<T extends Fraction | number> =
@@ -60,6 +64,8 @@ type AnalyzedStepchart<T extends Fraction | number> = {
 type ChartData = {
   meta: AllMeta,
   chart: AnalyzedStepchart<number>,
+  // EXPERIMENTAL
+  canonicalChart: AnalyzedStepchart<number>,
 };
 
 type Index = {

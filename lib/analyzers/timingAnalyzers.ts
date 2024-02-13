@@ -1,6 +1,7 @@
 import Fraction from "fraction.js";
 
 export const doffsetToTime = (offset: Fraction, bpm: Fraction) => offset.mul(4).div(bpm).mul(60);
+export const dtimeToOffset = (sec: Fraction, bpm: Fraction) => bpm.mul(sec).div(60).div(4);
 
 // Align all stops and bpm-changes into a single timeline.
 // All timeline events will have both offset and timing value.
@@ -26,6 +27,7 @@ export const extractBpmEvents = (chart: Stepchart): BpmEvent<Fraction>[] => {
     offset: new Fraction(0),
     // @ts-ignore `bpm` can be undefined in type-level, but it's always defined in the real data
     bpm: bpmEvents.shift().bpm,
+    calib: new Fraction(0),
   }];
 
   for (let i = 0; i < bpmEvents.length; i++) {
@@ -34,8 +36,8 @@ export const extractBpmEvents = (chart: Stepchart): BpmEvent<Fraction>[] => {
     const lastBpm = timeline[0].bpm;
     const dt = doffsetToTime(e.offset.sub(timeline[0].offset), lastBpm);
     const time = dt.add(timeline[0].time);
+    const baseEntry = { offset: e.offset, calib: new Fraction(0) };
     // stop and bpm-shift at the same time
-    const baseEntry = { offset: e.offset };
     if (next && e.offset === next.offset) {
       if (('stop' in next) && ('bpm' in e)) {
         timeline.unshift({ ...baseEntry, time,                      bpm: new Fraction(0) });

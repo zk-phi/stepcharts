@@ -10,6 +10,7 @@ import {
   computeFreezeTimings,
   computeBeatTimings,
 } from "../lib/analyzers/timingAnalyzers";
+import { computeCanonicalChart } from "../lib/analyzers/computeCanonicalChart";
 import { tagSoflanTriggers } from "../lib/analyzers/tagSoflanTriggers";
 import { calculateBpmStats } from "../lib/analyzers/calculateBpmStats";
 
@@ -92,6 +93,7 @@ type AllData = {
     charts: {
       meta: ChartMeta,
       chart: AnalyzedStepchart<number>,
+      canonicalChart: AnalyzedStepchart<number>,
     }[],
   }[],
 }[];
@@ -103,6 +105,7 @@ const serializedChart = (chart: AnalyzedStepchart<Fraction>): AnalyzedStepchart<
     bpm: b.bpm.n / b.bpm.d,
     time: b.time.n / b.time.d,
     offset: b.offset.n / b.offset.d,
+    calib: b.calib.n / b.calib.d,
   })),
   arrowTimeline: chart.arrowTimeline.map((a: ArrowEvent<Fraction>): ArrowEvent<number> => ({
     ...a,
@@ -170,6 +173,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
             ...bpmStats,
           };
           tagSoflanTriggers(analyzedChart.arrowTimeline, bpmTimeline);
+          const canonicalChart = computeCanonicalChart(simfile.title.titleDir, analyzedChart);
           return {
             meta: {
               difficulty: chartType.difficulty,
@@ -182,10 +186,14 @@ const allData: AllData = mixDirs.map((mixDir) => {
                 + stats.trips
                 + 100 * (1 - phraseVariance(analyzedChart.arrowTimeline))
               ),
+              canonicalChartErrorRate: canonicalChart.arrowTimeline.filter((a) => (
+                a.beat > 24
+              )).length / canonicalChart.arrowTimeline.length * 100,
               ...bpmStats,
               ...stats,
             },
             chart: serializedChart(analyzedChart),
+            canonicalChart: serializedChart(canonicalChart),
           };
         }),
       };
@@ -228,6 +236,7 @@ const allMixes: AllMeta[] = allData.flatMap((mix) => {
       const chartData: ChartData = {
         meta: allMeta,
         chart: chart.chart,
+        canonicalChart: chart.canonicalChart,
       };
       console.log(
         `Writing _data/${mix.meta.mixId}/${song.meta.songId}/${chart.meta.difficulty}.json ...`
