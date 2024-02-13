@@ -98,6 +98,37 @@ type AllData = {
 
 const mixDirs = getDirectories(ROOT);
 
+const serializedChart = (chart: AnalyzedStepchart<Fraction>): AnalyzedStepchart<number> => ({
+  bpmTimeline: chart.bpmTimeline.map((b: BpmEvent<Fraction>): BpmEvent<number> => ({
+    bpm: b.bpm.n / b.bpm.d,
+    time: b.time.n / b.time.d,
+    offset: b.offset.n / b.offset.d,
+  })),
+  arrowTimeline: chart.arrowTimeline.map((a: ArrowEvent<Fraction>): ArrowEvent<number> => ({
+    ...a,
+    time: a.time.n / a.time.d,
+    offset: a.offset.n / a.offset.d,
+  })),
+  freezeTimeline: chart.freezeTimeline.map((f: FreezeEvent<Fraction>): FreezeEvent<number> => ({
+    ...f,
+    start: {
+      time: f.start.time.n / f.start.time.d,
+      offset: f.start.offset.n / f.start.offset.d,
+    },
+    end: {
+      time: f.end.time.n / f.end.time.d,
+      offset: f.end.offset.n / f.end.offset.d,
+    },
+  })),
+  beatTimeline: chart.beatTimeline.map((b: Timestamp<Fraction>): Timestamp<number> => ({
+    time: b.time.n / b.time.d,
+    offset: b.offset.n / b.offset.d,
+  })),
+  minBpm: chart.minBpm,
+  mainBpm: chart.mainBpm,
+  maxBpm: chart.maxBpm,
+});
+
 const allData: AllData = mixDirs.map((mixDir) => {
   const mixSongDirs = getDirectories(ROOT, mixDir);
 
