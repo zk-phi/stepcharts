@@ -222,7 +222,7 @@ const BeatIndicatorsRaw = ({
                   bgColor={!soflanBg ? undefined : mainBpm < e.bpm ? "#F6AA0044" : "#4DC4FF44"}
                   value={soflanValue ? e.bpm : undefined} />
             )
-          ) : es[i - 1].bpm < e.bpm ? (
+          ) : (es[i - 1].bpm || es[i - 2]!.bpm) < e.bpm ? (
             <Bar
                 key={`ts${i}`}
                 pos={toPos(e)}
@@ -230,7 +230,7 @@ const BeatIndicatorsRaw = ({
                 color={!soflanValue ? undefined : "#F6AA00"}
                 bgColor={!soflanBg ? undefined : mainBpm < e.bpm ? "#F6AA0044" : "#4DC4FF44"}
                 value={soflanValue ? e.bpm : undefined} />
-          ) : e.bpm < es[i - 1].bpm && e.bpm > 0 ? (
+          ) : e.bpm < (es[i - 1].bpm || es[i - 2]!.bpm) && e.bpm > 0 ? (
             <Bar
                 key={`ts${i}`}
                 pos={toPos(e)}
