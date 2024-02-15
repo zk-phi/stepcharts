@@ -222,6 +222,13 @@ const BeatIndicatorsRaw = ({
                   bgColor={!soflanBg ? undefined : mainBpm < e.bpm ? "#F6AA0044" : "#4DC4FF44"}
                   value={soflanValue ? e.bpm : undefined} />
             )
+          ) : e.bpm === 0 ? (
+            <Bar
+                key={`ts${i}`}
+                pos={toPos(e)}
+                endPos={toPos(end)}
+                color={!soflanValue ? undefined : "#FF8082"}
+                bgColor={!soflanBg ? undefined : "#FF808244"} />
           ) : (es[i - 1].bpm || es[i - 2]!.bpm) < e.bpm ? (
             <Bar
                 key={`ts${i}`}
@@ -230,7 +237,7 @@ const BeatIndicatorsRaw = ({
                 color={!soflanValue ? undefined : "#F6AA00"}
                 bgColor={!soflanBg ? undefined : mainBpm < e.bpm ? "#F6AA0044" : "#4DC4FF44"}
                 value={soflanValue ? e.bpm : undefined} />
-          ) : e.bpm < (es[i - 1].bpm || es[i - 2]!.bpm) && e.bpm > 0 ? (
+          ) : e.bpm < (es[i - 1].bpm || es[i - 2]!.bpm) ? (
             <Bar
                 key={`ts${i}`}
                 pos={toPos(e)}
@@ -243,18 +250,6 @@ const BeatIndicatorsRaw = ({
           )
         );
       })}
-      {chart.bpmTimeline.map((e, i, es) => (
-        e.bpm === 0 ? (
-          <Bar
-              key={`ts${i}`}
-              pos={toPos(e)}
-              endPos={toPos(es[i + 1])}
-              color={!soflanValue ? undefined : "#FF8082"}
-              bgColor={!soflanBg ? undefined : "#FF808244"} />
-        ) : (
-          null
-        )
-      ))}
     </>
   );
 };
