@@ -71,6 +71,7 @@ function calculateStats(chart: Stepchart): Stats {
   );
   const jacks = chart.arrows.filter((a, i, array) => isJack(a, array[i - 1]));
   const shocks = chart.arrows.filter((a) => a.direction.match(/M/)).length;
+  const eighths = chart.arrows.filter((a) => a.beat === 8);
   const sixteenths = chart.arrows.filter((a) => a.beat === 16);
   const trips = chart.arrows.filter((a) => (
     a.beat === "other" || a.beat === 6 || a.beat === 12 || a.beat > 16
@@ -81,6 +82,7 @@ function calculateStats(chart: Stepchart): Stats {
     jacks: jacks.length,
     freezes: freezes.length,
     gallops: gallops.length,
+    eighths: eighths.length / chart.arrows.length * 100,
     sixteenths: sixteenths.length / chart.arrows.length * 100,
     trips: trips.length / chart.arrows.length * 100,
     shocks,

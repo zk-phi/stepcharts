@@ -17,6 +17,7 @@ type Stats = {
   freezes: number;
   gallops: number;
   shocks: number;
+  eighths: number;
   sixteenths: number;
   trips: number;
 };
