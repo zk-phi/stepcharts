@@ -394,7 +394,7 @@ export const ChartPreview = ({
   const ref = React.useRef<HTMLDivElement>(null);
 
   const laneHeight = React.useMemo(() => {
-    if (ref.current && playing) {
+    if (ref.current) {
       const rect = ref.current.getBoundingClientRect();
       return rect.bottom - rect.top;
     } else {
