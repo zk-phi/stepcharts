@@ -16,22 +16,25 @@ const playSound = (
   return false;
 };
 
-const PreviewSound = ({ chart, offsetRef, timeRef, enableBeatTick }: {
+const PreviewSound = ({ chart, timeRef, enableBeatTick }: {
   chart: AnalyzedStepchart<number>,
-  offsetRef: React.MutableRefObject<number>,
   timeRef: React.MutableRefObject<number>,
   enableBeatTick: boolean,
 }) => {
   /* beat ticks */
-  const nextBeat = React.useRef(0);
+  const beatIndex = React.useRef(0);
   const beatSounder = React.useCallback(() => {
-    if (enableBeatTick
-        && nextBeat.current < offsetRef.current) {
-      if (playSound(destinations.suppressed, audioBuffers.beat)) {
-        nextBeat.current = offsetRef.current - (offsetRef.current % 0.25) + 0.25;
+    if (chart.beatTimeline[beatIndex.current]
+        && chart.beatTimeline[beatIndex.current].time <= timeRef.current) {
+      if (enableBeatTick) {
+        playSound(destinations.suppressed, audioBuffers.beat)
+      }
+      while (chart.beatTimeline[beatIndex.current]
+          && chart.beatTimeline[beatIndex.current].time <= timeRef.current) {
+        beatIndex.current++;
       }
     }
-  }, [enableBeatTick, offsetRef, nextBeat]);
+  }, [timeRef, beatIndex, chart, enableBeatTick]);
 
   /* arrow ticks */
   const arrowIndex = React.useRef(0);
@@ -57,37 +60,36 @@ const PreviewSound = ({ chart, offsetRef, timeRef, enableBeatTick }: {
 
   /* bpm ticks */
   const stopIndex = React.useRef(chart.bpmTimeline.findIndex((e) => (
-    offsetRef.current < e.offset && e.bpm === 0
+    timeRef.current < e.time && e.bpm === 0
   )));
   const stopSounder = React.useCallback(() => {
     if (chart.bpmTimeline[stopIndex.current]
-        && chart.bpmTimeline[stopIndex.current].offset <= offsetRef.current) {
+        && chart.bpmTimeline[stopIndex.current].time <= timeRef.current) {
       playSound(destinations.suppressed, audioBuffers.stop);
       while (chart.bpmTimeline[stopIndex.current] && (
         chart.bpmTimeline[stopIndex.current].bpm !== 0
-        || chart.bpmTimeline[stopIndex.current].offset <= offsetRef.current
+        || chart.bpmTimeline[stopIndex.current].time <= timeRef.current
       )) {
         stopIndex.current++;
       }
     }
-  }, [offsetRef, stopIndex, chart]);
+  }, [timeRef, stopIndex, chart]);
 
-  const lastOffset = React.useRef(0);
+  const lastTime = React.useRef(0);
   const resetHandler = React.useCallback(() => {
-    if (offsetRef.current < lastOffset.current) {
-      nextBeat.current = offsetRef.current - (offsetRef.current % 0.25);
+    if (timeRef.current < lastTime.current) {
+      beatIndex.current = chart.beatTimeline.findIndex((b) => (
+        timeRef.current < b.time
+      ))
       arrowIndex.current = chart.arrowTimeline.findIndex((a) => (
-        offsetRef.current < a.offset
+        timeRef.current < a.time
       ));
       stopIndex.current = chart.bpmTimeline.findIndex((e) => (
-        offsetRef.current < e.offset && e.bpm === 0
-      ));
-      nextBeat.current = chart.bpmTimeline.findIndex((e) => (
-        offsetRef.current < e.offset && e.bpm === 0
+        timeRef.current < e.time && e.bpm === 0
       ));
     }
-    lastOffset.current = offsetRef.current;
-  }, [offsetRef, lastOffset, chart]);
+    lastTime.current = timeRef.current;
+  }, [timeRef, lastTime, beatIndex, arrowIndex, stopIndex, chart]);
 
   useAnimationFrame(() => {
     resetHandler();

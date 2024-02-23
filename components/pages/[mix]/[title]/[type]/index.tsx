@@ -345,7 +345,6 @@ const PreviewPage = ({ chart }: {
       </ChartPreview>
       <PreviewSound
           chart={options.canonicalMode ? chart.canonicalChart : chart.chart}
-          offsetRef={offsetRef}
           timeRef={timeRef}
           enableBeatTick={options.tick} />
     </>
