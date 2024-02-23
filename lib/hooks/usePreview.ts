@@ -67,6 +67,8 @@ export const usePreview = (chart?: AnalyzedStepchart<number> | null): [
 
   React.useEffect(() => {
     stop();
+    timeRef.current = 0;
+    offsetRef.current = 0;
   }, [chart, stop]);
 
   useAnimationFrame(() => {
