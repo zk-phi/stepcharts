@@ -399,7 +399,7 @@ export const ChartPreview = ({
   canonicalColors: boolean,
   children: React.ReactNode,
 }) => {
-  const ref = React.useRef<HTMLDivElement>(null);
+  const ref = React.useRef<HTMLDivElement>();
   const laneHeight = React.useRef<number>();
 
   const onRender = React.useCallback((el: HTMLDivElement) => {
@@ -409,30 +409,32 @@ export const ChartPreview = ({
   }, []);
 
   const handleScroll = React.useCallback(() => {
-    if (constantMode) {
-      setTime(
-        posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
-      );
-    } else {
-      setOffset(
-        posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
-      );
+    if (ref.current && laneHeight.current) {
+      if (constantMode) {
+        setTime(
+          posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
+        );
+      } else {
+        setOffset(
+          posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
+        );
+      }
     }
   }, [setOffset, setTime, speed, constantMode])
 
   React.useEffect(() => {
     if (playing) {
-      ref.current.removeEventListener("scroll", handleScroll);
+      ref.current?.removeEventListener("scroll", handleScroll);
     } else {
-      ref.current.addEventListener("scroll", handleScroll);
+      ref.current?.addEventListener("scroll", handleScroll);
     }
-    return () => ref.current.removeEventListener("scroll", handleScroll);
+    return () => ref.current?.removeEventListener("scroll", handleScroll);
   }, [handleScroll, playing]);
 
   const lastOffset = React.useRef<number>();
   const lastTime = React.useRef<number>();
   useAnimationFrame(() => {
-    if (ref.current) {
+    if (ref.current && laneHeight.current) {
       if (offsetRef.current && offsetRef.current != lastOffset.current) {
         lastOffset.current = offsetRef.current;
         if (!constantMode) {

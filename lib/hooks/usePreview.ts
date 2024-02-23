@@ -9,8 +9,10 @@ export const usePreview = (chart?: AnalyzedStepchart<number> | null): [
   React.MutableRefObject<number>,
   React.MutableRefObject<number>,
   boolean,
+  (resume?: boolean) => void,
   () => void,
-  () => void,
+  (time: number) => void,
+  (offset: number) => void,
 ] => {
   const startTimePos = React.useRef<number>();
   const startRealTime = React.useRef<number>();
@@ -68,7 +70,7 @@ export const usePreview = (chart?: AnalyzedStepchart<number> | null): [
   }, [chart, stop]);
 
   useAnimationFrame(() => {
-    if (playing && secToOffset && startRealTime.current) {
+    if (playing && secToOffset && startRealTime.current && startTimePos.current) {
       const elapsedTime = ((new Date()).getTime() - startRealTime.current) / 1000;
       timeRef.current = elapsedTime + startTimePos.current;
       offsetRef.current = secToOffset(timeRef.current);
