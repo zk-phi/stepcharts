@@ -411,27 +411,30 @@ export const ChartPreview = ({
   }, []);
 
   useAnimationFrame(() => {
-    if (ref.current && laneHeight.current) {
-      if (playing) {
-        if (constantMode) {
-          ref.current.scrollTop = (
-            (judgePos(timeRef.current!, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
-          );
-        } else {
-          ref.current.scrollTop = (
-            (judgePos(offsetRef.current!, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
-          );
-        }
+    if (!ref.current || !laneHeight.current) {
+      return;
+    }
+    if (playing) {
+      /* time / offset => scroll position */
+      if (constantMode) {
+        ref.current.scrollTop = (
+          (judgePos(timeRef.current!, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
+        );
       } else {
-        if (constantMode) {
-          setTime(
-            posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
-          );
-        } else {
-          setOffset(
-            posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
-          );
-        }
+        ref.current.scrollTop = (
+          (judgePos(offsetRef.current!, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
+        );
+      }
+    } else {
+      /* scroll position => time / offset */
+      if (constantMode) {
+        setTime(
+          posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
+        );
+      } else {
+        setOffset(
+          posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
+        );
       }
     }
   }, [speed, constantMode, playing]);
