@@ -403,8 +403,10 @@ export const ChartPreview = ({
   const laneHeight = React.useRef<number>();
 
   const onRender = React.useCallback((el: HTMLDivElement) => {
-    const rect = el.getBoundingClientRect();
-    laneHeight.current = rect.bottom - rect.top;
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      laneHeight.current = rect.bottom - rect.top;
+    }
     ref.current = el;
   }, []);
 
