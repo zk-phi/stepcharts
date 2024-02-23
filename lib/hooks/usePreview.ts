@@ -1,5 +1,6 @@
 import React from "react";
 import { useAnimationFrame } from "./useAnimationFrame";
+import { makeSecNumToOffsetConverter } from "../analyzers/timingAnalyzers";
 
 export const usePreview = (chart?: AnalyzedStepchart<number> | null): [
   React.MutableRefObject<number>,
@@ -20,27 +21,18 @@ export const usePreview = (chart?: AnalyzedStepchart<number> | null): [
     chart ? Math.floor(chart.arrowTimeline[chart.arrowTimeline.length - 1].offset) + 1 : 0
   ), [chart]);
 
-  const timelineIndex = React.useRef(0);
-  const secToOffset = React.useMemo(() => {
-    if (!chart) return null;
-    const timeline = chart.bpmTimeline;
-    return (sec: number) => {
-      let i;
-      for (i = timelineIndex.current; timeline[i + 1] && timeline[i + 1].time < sec; i++);
-      timelineIndex.current = i;
-      return (sec - timeline[i].time) * timeline[i].bpm / 60 / 4 + timeline[i].offset;
-    };
-  }, [chart, timelineIndex]);
+  const secToOffset = React.useMemo(() => (
+    makeSecNumToOffsetConverter(chart.bpmTimeline)
+  ), [chart]);
 
   const play = React.useCallback(() => {
     if (chart) {
       startTime.current = (new Date()).getTime();
-      timelineIndex.current = 0;
       timeRef.current = 0;
       offsetRef.current = 0;
       setPlaying(true);
     }
-  }, [chart, startTime, timelineIndex, timeRef, offsetRef, setPlaying]);
+  }, [chart, startTime, timeRef, offsetRef, setPlaying]);
 
   const stop = React.useCallback(() => {
     setPlaying(false);

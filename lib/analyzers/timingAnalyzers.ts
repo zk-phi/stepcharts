@@ -2,6 +2,7 @@ import Fraction from "fraction.js";
 
 export const doffsetToTime = (offset: Fraction, bpm: Fraction) => offset.mul(4).div(bpm).mul(60);
 export const dtimeToOffset = (sec: Fraction, bpm: Fraction) => bpm.mul(sec).div(60).div(4);
+export const dtimeNumToOffset = (sec: number, bpm: number) => bpm * sec / 60 / 4;
 
 // Align all stops and bpm-changes into a single timeline.
 // All timeline events will have both offset and timing value.
@@ -65,8 +66,8 @@ export const extractBpmEvents = (chart: Stepchart): BpmEvent<Fraction>[] => {
 
 // Generate a function that converts offset value (based on measures)
 // to time value in seconds.
-type Converter = (input: Fraction) => Fraction;
-export const makeOffsetToSecConverter = (bpmTimeline: BpmEvent<Fraction>[]): Converter => {
+type Converter<T> = (input: T) => T;
+export const makeOffsetToSecConverter = (bpmTimeline: BpmEvent<Fraction>[]): Converter<Fraction> => {
   let ix = 0;
   const offsetToSec = (offset: Fraction): Fraction => {
     if (offset.compare(0) === 0) {
@@ -79,10 +80,27 @@ export const makeOffsetToSecConverter = (bpmTimeline: BpmEvent<Fraction>[]): Con
       ix++;
     }
     const dt = doffsetToTime(offset.sub(bpmTimeline[ix].offset), bpmTimeline[ix].bpm);
-    const time = bpmTimeline[ix].time.add(dt);
-    return time;
+    return bpmTimeline[ix].time.add(dt);
   };
   return offsetToSec;
+}
+
+export const makeSecNumToOffsetConverter = (bpmTimeline: BpmEvent<number>[]): Converter<number> => {
+  let ix = 0;
+  const secToOffset = (sec: number): number => {
+    if (sec <= 0) {
+      ix = 0;
+    }
+    while (ix > 0 && sec <= bpmTimeline[ix].time) {
+      ix--;
+    }
+    while (bpmTimeline[ix + 1] && sec > bpmTimeline[ix + 1].time) {
+      ix++;
+    }
+    const doffset = dtimeNumToOffset(sec - bpmTimeline[ix].time, bpmTimeline[ix].bpm);
+    return bpmTimeline[ix].offset + doffset;
+  };
+  return secToOffset;
 }
 
 export const computeArrowTimings =
