@@ -434,22 +434,20 @@ export const ChartPreview = ({
   const lastOffset = React.useRef<number>();
   const lastTime = React.useRef<number>();
   useAnimationFrame(() => {
-    if (ref.current && laneHeight.current) {
-      if (offsetRef.current && offsetRef.current != lastOffset.current) {
-        lastOffset.current = offsetRef.current;
-        if (!constantMode) {
-          ref.current.scrollTop = (
-            (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
-          );
-        }
+    if (offsetRef.current != lastOffset.current) {
+      lastOffset.current = offsetRef.current;
+      if (!constantMode && offsetRef.current != null && ref.current && laneHeight.current) {
+        ref.current.scrollTop = (
+          (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
+        );
       }
-      if (timeRef.current && timeRef.current != lastTime.current) {
-        lastTime.current = timeRef.current;
-        if (constantMode) {
-          ref.current.scrollTop = (
-            (judgePos(timeRef.current, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
-          );
-        }
+    }
+    if (timeRef.current != lastTime.current) {
+      lastTime.current = timeRef.current;
+      if (constantMode && timeRef.current != null && ref.current && laneHeight.current) {
+        ref.current.scrollTop = (
+          (judgePos(timeRef.current, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
+        );
       }
     }
   }, [speed, constantMode]);
