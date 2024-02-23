@@ -23,17 +23,11 @@ export const usePreview = (chart?: AnalyzedStepchart<number> | null): [
   const timeRef = React.useRef<number>(0);
   const offsetRef = React.useRef<number>(0);
 
-  const lastMeasure = React.useMemo(() => (
-    chart ? Math.floor(chart.arrowTimeline[chart.arrowTimeline.length - 1].offset) + 1 : 0
-  ), [chart]);
-
-  const secToOffset = React.useMemo(() => (
-    chart ? makeSecNumToOffsetConverter(chart.bpmTimeline) : null
-  ), [chart]);
-
-  const offsetToSec = React.useMemo(() => (
-    chart ? makeOffsetNumToSecConverter(chart.bpmTimeline) : null
-  ), [chart]);
+  const [lastMeasure, secToOffset, offsetToSec] = React.useMemo(() => chart ? [
+    Math.floor(chart.arrowTimeline[chart.arrowTimeline.length - 1].offset) + 1,
+    makeSecNumToOffsetConverter(chart.bpmTimeline),
+    makeOffsetNumToSecConverter(chart.bpmTimeline),
+  ] : [0, null, null], [chart]);
 
   const setOffset = React.useCallback((offset: number) => {
     if (!playing && offsetToSec) {
@@ -47,7 +41,7 @@ export const usePreview = (chart?: AnalyzedStepchart<number> | null): [
       timeRef.current = time;
       offsetRef.current = secToOffset(time);
     }
-  }, [playing, timeRef, offsetRef]);
+  }, [playing]);
 
   const play = React.useCallback((resume?: boolean) => {
     if (chart) {
