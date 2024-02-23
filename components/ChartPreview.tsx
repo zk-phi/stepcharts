@@ -415,6 +415,7 @@ export const ChartPreview = ({
         }
       }
       if (timeRef.current && timeRef.current != lastTime.current) {
+        lastTime.current = timeRef.current;
         if (constantMode) {
           ref.current.scrollTop = (
             (judgePos(timeRef.current, speed) - JUDGE_LINE_POS) * laneHeight / 100
