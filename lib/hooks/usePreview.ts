@@ -66,7 +66,7 @@ export const usePreview = (chart?: AnalyzedStepchart<number> | null): [
   }, [chart, stop]);
 
   useAnimationFrame(() => {
-    if (playing && secToOffset && startRealTime.current && startTimePos.current !== null) {
+    if (playing && secToOffset && startRealTime.current && startTimePos.current != null) {
       const elapsedTime = ((new Date()).getTime() - startRealTime.current) / 1000;
       timeRef.current = elapsedTime + startTimePos.current;
       offsetRef.current = secToOffset(timeRef.current);
