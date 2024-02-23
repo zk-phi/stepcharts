@@ -27,7 +27,7 @@ const PreviewSound = ({ chart, timeRef, playing, enableBeatTick }: {
   const beatSounder = React.useCallback(() => {
     if (chart.beatTimeline[beatIndex.current]
         && chart.beatTimeline[beatIndex.current].time <= timeRef.current) {
-      if (enableBeatTick) {
+      if (playing && enableBeatTick) {
         playSound(destinations.suppressed, audioBuffers.beat)
       }
       while (chart.beatTimeline[beatIndex.current]
@@ -35,7 +35,7 @@ const PreviewSound = ({ chart, timeRef, playing, enableBeatTick }: {
         beatIndex.current++;
       }
     }
-  }, [chart, enableBeatTick]);
+  }, [chart, enableBeatTick, playing]);
 
   /* arrow ticks */
   const arrowIndex = React.useRef(0);
@@ -43,13 +43,15 @@ const PreviewSound = ({ chart, timeRef, playing, enableBeatTick }: {
     if (chart.arrowTimeline[arrowIndex.current]
         && chart.arrowTimeline[arrowIndex.current].time <= timeRef.current) {
       const isShock = chart.arrowTimeline[arrowIndex.current].direction.match(/M/);
-      if (isShock) {
-        playSound(destinations.suppressed, audioBuffers.shock);
-      } else {
-        const isJump = chart.arrowTimeline[arrowIndex.current].direction.match(/[12].*[12]/);
-        playSound(destinations.normal, audioBuffers.tick);
-        if (isJump) {
+      if (playing) {
+        if (isShock) {
+          playSound(destinations.suppressed, audioBuffers.shock);
+        } else {
+          const isJump = chart.arrowTimeline[arrowIndex.current].direction.match(/[12].*[12]/);
           playSound(destinations.normal, audioBuffers.tick);
+          if (isJump) {
+            playSound(destinations.normal, audioBuffers.tick);
+          }
         }
       }
       while (chart.arrowTimeline[arrowIndex.current]
@@ -57,7 +59,7 @@ const PreviewSound = ({ chart, timeRef, playing, enableBeatTick }: {
         arrowIndex.current++;
       }
     }
-  }, [chart]);
+  }, [chart, playing]);
 
   /* bpm ticks */
   const stopIndex = React.useRef(chart.bpmTimeline.findIndex((e) => (
@@ -66,7 +68,9 @@ const PreviewSound = ({ chart, timeRef, playing, enableBeatTick }: {
   const stopSounder = React.useCallback(() => {
     if (chart.bpmTimeline[stopIndex.current]
         && chart.bpmTimeline[stopIndex.current].time <= timeRef.current) {
-      playSound(destinations.suppressed, audioBuffers.stop);
+      if (playing) {
+        playSound(destinations.suppressed, audioBuffers.stop);
+      }
       while (chart.bpmTimeline[stopIndex.current] && (
         chart.bpmTimeline[stopIndex.current].bpm !== 0
         || chart.bpmTimeline[stopIndex.current].time <= timeRef.current
@@ -74,7 +78,7 @@ const PreviewSound = ({ chart, timeRef, playing, enableBeatTick }: {
         stopIndex.current++;
       }
     }
-  }, [chart]);
+  }, [chart, playing]);
 
   const lastTime = React.useRef(0);
   const resetHandler = React.useCallback(() => {

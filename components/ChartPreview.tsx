@@ -2,7 +2,6 @@ import React from "react";
 import { useAnimationFrame } from "../lib/hooks/useAnimationFrame";
 import { makeOffsetToSecConverter } from "../lib/analyzers/timingAnalyzers";
 import { TURN_VALUES } from "../constants/turn";
-import { prepareAudioContext } from "../lib/audioContext";
 
 const ARROW_HEIGHT = 13.5; /* vh */
 const LANE_HEIGHT = 100; /* vh */
@@ -428,7 +427,6 @@ export const ChartPreview = ({
       ref.current?.removeEventListener("scroll", handleScroll);
     } else {
       ref.current?.addEventListener("scroll", handleScroll);
-      ref.current?.addEventListener("scroll", prepareAudioContext, { once: true });
     }
     return () => ref.current?.removeEventListener("scroll", handleScroll);
   }, [handleScroll, playing]);
