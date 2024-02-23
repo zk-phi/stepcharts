@@ -410,49 +410,31 @@ export const ChartPreview = ({
     ref.current = el;
   }, []);
 
-  const handleScroll = React.useCallback(() => {
-    if (ref.current && laneHeight.current) {
-      if (constantMode) {
-        setTime(
-          posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
-        );
-      } else {
-        setOffset(
-          posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
-        );
-      }
-    }
-  }, [setOffset, setTime, speed, constantMode])
-
-  React.useEffect(() => {
-    if (playing) {
-      ref.current?.removeEventListener("scroll", handleScroll);
-    } else {
-      ref.current?.addEventListener("scroll", handleScroll);
-    }
-    return () => ref.current?.removeEventListener("scroll", handleScroll);
-  }, [handleScroll, playing]);
-
-  const lastOffset = React.useRef<number>();
-  const lastTime = React.useRef<number>();
   useAnimationFrame(() => {
-    if (offsetRef.current != lastOffset.current) {
-      lastOffset.current = offsetRef.current;
-      if (!constantMode && offsetRef.current != null && ref.current && laneHeight.current) {
-        ref.current.scrollTop = (
-          (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
-        );
+    if (ref.current && laneHeight.current) {
+      if (playing) {
+        if (constantMode) {
+          ref.current.scrollTop = (
+            (judgePos(timeRef.current!, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
+          );
+        } else {
+          ref.current.scrollTop = (
+            (judgePos(offsetRef.current!, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
+          );
+        }
+      } else {
+        if (constantMode) {
+          setTime(
+            posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
+          );
+        } else {
+          setOffset(
+            posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
+          );
+        }
       }
     }
-    if (timeRef.current != lastTime.current) {
-      lastTime.current = timeRef.current;
-      if (constantMode && timeRef.current != null && ref.current && laneHeight.current) {
-        ref.current.scrollTop = (
-          (judgePos(timeRef.current, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
-        );
-      }
-    }
-  }, [speed, constantMode]);
+  }, [speed, constantMode, playing]);
 
   const alignContainerStyle: React.CSSProperties = {
     position: "relative",
