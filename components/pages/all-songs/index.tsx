@@ -113,8 +113,8 @@ const AllSongsTable = ({
       { previewChart && (
         <PreviewSound
             chart={previewChart}
-            offsetRef={offset}
             timeRef={time}
+            playing={playing}
             enableBeatTick={enableBeatTick} />
       ) }
     </div>

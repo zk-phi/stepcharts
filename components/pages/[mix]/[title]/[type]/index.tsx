@@ -280,7 +280,7 @@ const PreviewPage = ({ chart }: {
     canonicalMode: false,
   });
 
-  const [offsetRef, timeRef, playing, start, stop] = usePreview(
+  const [offsetRef, timeRef, playing, start, stop, setTime, setOffset] = usePreview(
     options.canonicalMode ? chart.canonicalChart : chart.chart
   );
 
@@ -289,7 +289,7 @@ const PreviewPage = ({ chart }: {
 
   const onPlay = React.useCallback(async () => {
     await prepareAudioContext();
-    start();
+    start(true);
   }, [start]);
 
   const panelStyle: React.CSSProperties = {
@@ -315,6 +315,8 @@ const PreviewPage = ({ chart }: {
           speed={options.speed}
           offsetRef={offsetRef}
           timeRef={timeRef}
+          setOffset={setOffset}
+          setTime={setTime}
           playing={playing}
           turn={options.turn}
           showBeat={options.tick}
@@ -346,6 +348,7 @@ const PreviewPage = ({ chart }: {
       <PreviewSound
           chart={options.canonicalMode ? chart.canonicalChart : chart.chart}
           timeRef={timeRef}
+          playing={playing}
           enableBeatTick={options.tick} />
     </>
   );

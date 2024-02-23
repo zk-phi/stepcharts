@@ -2,7 +2,8 @@ import Fraction from "fraction.js";
 
 export const doffsetToTime = (offset: Fraction, bpm: Fraction) => offset.mul(4).div(bpm).mul(60);
 export const dtimeToOffset = (sec: Fraction, bpm: Fraction) => bpm.mul(sec).div(60).div(4);
-export const dtimeNumToOffset = (sec: number, bpm: number) => bpm * sec / 60 / 4;
+export const doffsetNumToTime = (offset: number, bpm: number) => offset * 4 * 60 / bpm;
+export const dtimeNumToOffset = (sec: number, bpm: number) => sec * bpm / 60 / 4;
 
 // Align all stops and bpm-changes into a single timeline.
 // All timeline events will have both offset and timing value.
@@ -81,6 +82,24 @@ export const makeOffsetToSecConverter = (bpmTimeline: BpmEvent<Fraction>[]): Con
     }
     const dt = doffsetToTime(offset.sub(bpmTimeline[ix].offset), bpmTimeline[ix].bpm);
     return bpmTimeline[ix].time.add(dt);
+  };
+  return offsetToSec;
+}
+
+export const makeOffsetNumToSecConverter = (bpmTimeline: BpmEvent<number>[]): Converter<number> => {
+  let ix = 0;
+  const offsetToSec = (offset: number): number => {
+    if (offset <= 0) {
+      ix = 0;
+    }
+    while (ix > 0 && offset <= bpmTimeline[ix].offset) {
+      ix--;
+    }
+    while (bpmTimeline[ix + 1] && offset > bpmTimeline[ix + 1].offset) {
+      ix++;
+    }
+    const dt = doffsetNumToTime(offset - bpmTimeline[ix].offset, bpmTimeline[ix].bpm);
+    return bpmTimeline[ix].time + dt;
   };
   return offsetToSec;
 }

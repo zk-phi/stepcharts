@@ -49,6 +49,10 @@ const judgePos = (offset: number, speed: number) => (
   offset * 4 * HEIGHT_PER_BEAT * speed + JUDGE_LINE_POS
 );
 
+const posOffset = (pos: number, speed: number) => (
+  (pos - JUDGE_LINE_POS) / 4 / HEIGHT_PER_BEAT / speed
+);
+
 const Spacer = ({ offset, speed }: {
   offset: number,
   speed: number,
@@ -361,6 +365,8 @@ export const ChartPreview = ({
   turn = "OFF",
   offsetRef,
   timeRef,
+  setOffset,
+  setTime,
   playing,
   showBeat,
   constantMode = false,
@@ -379,6 +385,8 @@ export const ChartPreview = ({
   turn: Turn,
   offsetRef: React.MutableRefObject<number>,
   timeRef: React.MutableRefObject<number>,
+  setOffset: (offset: number) => void,
+  setTime: (time: number) => void,
   playing: boolean,
   showBeat: boolean,
   constantMode: boolean,
@@ -392,15 +400,34 @@ export const ChartPreview = ({
   children: React.ReactNode,
 }) => {
   const ref = React.useRef<HTMLDivElement>(null);
+  const laneHeight = React.useRef<number>();
 
-  const laneHeight = React.useMemo(() => {
-    if (ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      return rect.bottom - rect.top;
+  const onRender = React.useCallback((el: HTMLDivElement) => {
+    const rect = el.getBoundingClientRect();
+    laneHeight.current = rect.bottom - rect.top;
+    ref.current = el;
+  }, []);
+
+  const handleScroll = React.useCallback(() => {
+    if (constantMode) {
+      setTime(
+        posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
+      );
     } else {
-      return 0;
+      setOffset(
+        posOffset(ref.current.scrollTop * 100 / laneHeight.current + JUDGE_LINE_POS, speed)
+      );
     }
-  }, [ref, playing]);
+  }, [setOffset, setTime, speed, constantMode])
+
+  React.useEffect(() => {
+    if (playing) {
+      ref.current.removeEventListener("scroll", handleScroll);
+    } else {
+      ref.current.addEventListener("scroll", handleScroll);
+    }
+    return () => ref.current.removeEventListener("scroll", handleScroll);
+  }, [handleScroll, playing]);
 
   const lastOffset = React.useRef<number>();
   const lastTime = React.useRef<number>();
@@ -410,7 +437,7 @@ export const ChartPreview = ({
         lastOffset.current = offsetRef.current;
         if (!constantMode) {
           ref.current.scrollTop = (
-            (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * laneHeight / 100
+            (judgePos(offsetRef.current, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
           );
         }
       }
@@ -418,12 +445,12 @@ export const ChartPreview = ({
         lastTime.current = timeRef.current;
         if (constantMode) {
           ref.current.scrollTop = (
-            (judgePos(timeRef.current, speed) - JUDGE_LINE_POS) * laneHeight / 100
+            (judgePos(timeRef.current, speed) - JUDGE_LINE_POS) * laneHeight.current / 100
           );
         }
       }
     }
-  }, [ref, offsetRef, timeRef, lastOffset, lastTime, speed, laneHeight, constantMode]);
+  }, [speed, constantMode]);
 
   const alignContainerStyle: React.CSSProperties = {
     position: "relative",
@@ -440,7 +467,7 @@ export const ChartPreview = ({
   };
 
   return (
-    <div style={scrollContainerStyle} ref={ref}>
+    <div style={scrollContainerStyle} ref={onRender}>
       <div style={alignContainerStyle}>
         <BeatIndicators
             chart={chart}
