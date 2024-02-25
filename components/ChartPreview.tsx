@@ -208,7 +208,7 @@ const BeatIndicatorsRaw = ({
   return (
     <>
       {showBeat && chart.beatTimeline.map((b, i) => (
-        <Bar key={`b${i}`} pos={toPos(b)} color={i % 4 === 0 ? "#fffa" : "#fff5"} />
+        <Bar key={`b${i}`} pos={toPos(b)} color={i % 4 === 0 ? "#aaa" : "#555"} />
       ))}
       {chart.bpmTimeline.map((e, i, es) => {
         const end = es[i + 1] ?? chart.beatTimeline[chart.beatTimeline.length - 1];
