@@ -80,10 +80,7 @@ const Arrow = ({ beat, direction, pos, highlight = false, verboseColors = false 
     position: "absolute",
     top: `${pos - ARROW_HEIGHT / 2}vh`,
     left: `${direction * ARROW_HEIGHT}vh`,
-    height: `${ARROW_HEIGHT}vh`,
     width: `${ARROW_HEIGHT}vh`,
-    backgroundImage: `url(${verboseColors ? VERBOSE_ARROW_IMG[beat] : ARROW_IMG[beat]})`,
-    backgroundSize: "cover",
     backgroundColor: highlight ? "#fff6" : undefined,
     boxShadow: highlight ? `0 0 ${ARROW_HEIGHT / 4}vh #fff` : undefined,
     borderRadius: `${ARROW_HEIGHT / 2}vh`,
@@ -91,7 +88,7 @@ const Arrow = ({ beat, direction, pos, highlight = false, verboseColors = false 
   };
 
   return (
-    <div style={style} />
+    <img style={style} src={verboseColors ? VERBOSE_ARROW_IMG[beat] : ARROW_IMG[beat]} />
   );
 };
 
