@@ -187,7 +187,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
                 + 100 * (1 - phraseVariance(analyzedChart.arrowTimeline))
               ),
               canonicalChartErrorRate: canonicalChart.arrowTimeline.filter((a) => (
-                a.beat > 24
+                a.beat === "other" || a.beat > 24
               )).length / canonicalChart.arrowTimeline.length * 100,
               ...bpmStats,
               ...stats,
