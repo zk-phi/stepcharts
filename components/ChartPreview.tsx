@@ -128,21 +128,17 @@ const Freeze = ({ direction, pos, endPos, diminished }: {
   );
 };
 
-const Bar = ({ pos, endPos, color, bgColor, value }: {
+const Bar = ({ pos, color, value }: {
   pos: number,
-  endPos?: number,
   color?: string,
-  bgColor?: string,
   value?: number,
 }) => {
   const style: React.CSSProperties = {
     position: "absolute",
-    height: `${endPos ? endPos - pos : 0}vh`,
     width: `${LANE_WIDTH}vh`,
     left: 0,
     top: `${pos}vh`,
     borderTop: color ? `4px solid ${color}` : undefined,
-    backgroundColor: bgColor,
   };
 
   const innerStyle: React.CSSProperties = {
@@ -158,6 +154,23 @@ const Bar = ({ pos, endPos, color, bgColor, value }: {
       {value && <div style={innerStyle}>{value}</div>}
     </div>
   );
+};
+
+const Bg = ({ pos, endPos, color }: {
+  pos: number,
+  endPos: number,
+  color: string,
+}) => {
+  const style: React.CSSProperties = {
+    position: "absolute",
+    height: `${endPos ? endPos - pos : 0}vh`,
+    width: `${LANE_WIDTH}vh`,
+    left: 0,
+    top: `${pos}vh`,
+    backgroundColor: color,
+    opacity: 0.25,
+  };
+  return <div style={style} />;
 };
 
 const JudgeLine = () => {
@@ -207,52 +220,33 @@ const BeatIndicatorsRaw = ({
 }) => {
   const toPos = posFn(speed, constantMode);
   const mainBpm = chart.mainBpm;
+  const lastBeat = chart.beatTimeline[chart.beatTimeline.length - 1];
   return (
     <>
       {showBeat && chart.beatTimeline.map((b, i) => (
         <Bar key={`b${i}`} pos={toPos(b)} color={i % 4 === 0 ? "#aaa" : "#555"} />
       ))}
-      {chart.bpmTimeline.map((e, i, es) => {
-        const end = es[i + 1] ?? chart.beatTimeline[chart.beatTimeline.length - 1];
-        return (
-          i === 0 ? (
-            mainBpm !== e.bpm && (
-              <Bar
-                  key={`ts${i}`}
-                  pos={0}
-                  endPos={toPos(end)}
-                  color={!soflanValue ? undefined : mainBpm < e.bpm ? "#F6AA00" : "#4DC4FF"}
-                  bgColor={!soflanBg ? undefined : mainBpm < e.bpm ? "#F6AA0044" : "#4DC4FF44"}
-                  value={soflanValue ? e.bpm : undefined} />
-            )
-          ) : e.bpm === 0 ? (
-            <Bar
-                key={`ts${i}`}
-                pos={toPos(e)}
-                endPos={toPos(end)}
-                color={!soflanValue ? undefined : "#FF8082"}
-                bgColor={!soflanBg ? undefined : "#FF808244"} />
-          ) : (es[i - 1].bpm || es[i - 2]!.bpm) < e.bpm ? (
-            <Bar
-                key={`ts${i}`}
-                pos={toPos(e)}
-                endPos={mainBpm !== e.bpm ? toPos(end) : undefined}
-                color={!soflanValue ? undefined : "#F6AA00"}
-                bgColor={!soflanBg ? undefined : mainBpm < e.bpm ? "#F6AA0044" : "#4DC4FF44"}
-                value={soflanValue ? e.bpm : undefined} />
-          ) : e.bpm < (es[i - 1].bpm || es[i - 2]!.bpm) ? (
-            <Bar
-                key={`ts${i}`}
-                pos={toPos(e)}
-                endPos={mainBpm !== e.bpm ? toPos(end) : undefined}
-                color={!soflanValue ? undefined : "#4DC4FF"}
-                bgColor={!soflanBg ? undefined : mainBpm < e.bpm ? "#F6AA0044" : "#4DC4FF44"}
-                value={soflanValue ? e.bpm : undefined} />
-          ) : (
-            null
-          )
-        );
-      })}
+      {soflanBg && chart.bpmTimeline.map((e, i, es) => mainBpm !== e.bpm && (
+        <Bg
+            key={`bg${i}`}
+            pos={toPos(e)}
+            endPos={toPos(es[i + 1] ?? lastBeat)}
+            color={e.bpm === 0 ? "#FF8082" : e.bpm > mainBpm ? "#F6AA00" : "#4DC4FF"} />
+      ))}
+      {soflanValue && chart.bpmTimeline.map((e, i, es) => i > 0 && (
+        e.bpm === 0 ? (
+          <Bar
+              key={`bar${i}`}
+              pos={toPos(e)}
+              color={"#FF8082"} />
+        ) : (es[i - 1].bpm || es[i - 2]!.bpm) < e.bpm ? (
+          <Bar key={`bar${i}`} pos={toPos(e)} color={"#F6AA00"} value={e.bpm} />
+        ) : e.bpm < (es[i - 1].bpm || es[i - 2]!.bpm) ? (
+          <Bar key={`bar${i}`} pos={toPos(e)} color={"#4DC4FF"} value={e.bpm} />
+        ) : (
+          null
+        )
+      ))}
     </>
   );
 };
