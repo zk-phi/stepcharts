@@ -1,4 +1,4 @@
-type ArrowTags = "soflanTrigger";
+type ArrowTags = "soflanTrigger" | "jump" | "shock";
 
 type MixMeta = {
   mixId: string;

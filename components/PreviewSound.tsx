@@ -42,13 +42,12 @@ const PreviewSound = ({ chart, timeRef, playing, enableBeatTick }: {
   const arrowSounder = React.useCallback(() => {
     if (chart.arrowTimeline[arrowIndex.current]
         && chart.arrowTimeline[arrowIndex.current].time <= timeRef.current) {
-      const isShock = chart.arrowTimeline[arrowIndex.current].direction.match(/M/);
-      if (isShock) {
+      const { shock, jump } = chart.arrowTimeline[arrowIndex.current].tags;
+      if (shock) {
         playSound(destinations.suppressed, audioBuffers.shock);
       } else {
-        const isJump = chart.arrowTimeline[arrowIndex.current].direction.match(/[12].*[12]/);
         playSound(destinations.normal, audioBuffers.tick);
-        if (isJump) {
+        if (jump) {
           playSound(destinations.normal, audioBuffers.tick);
         }
       }

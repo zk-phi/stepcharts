@@ -172,6 +172,14 @@ const allData: AllData = mixDirs.map((mixDir) => {
             beatTimeline: computeBeatTimings(lastMeasure, bpmTimeline),
             ...bpmStats,
           };
+          analyzedChart.arrowTimeline.forEach((arrow) => {
+            if (arrow.direction.match(/M/)) {
+              arrow.tags.shock = true;
+            }
+            if (arrow.direction.match(/[12].*[12]/)) {
+              arrow.tags.jump = true;
+            }
+          });
           tagSoflanTriggers(analyzedChart.arrowTimeline, bpmTimeline);
           const canonicalChart = computeCanonicalChart(simfile.title.titleDir, analyzedChart);
           return {
