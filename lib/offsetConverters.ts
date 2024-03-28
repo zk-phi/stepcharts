@@ -1,5 +1,6 @@
 import Fraction from "fraction.js";
-import { doffsetToTime, doffsetNumToTime, dtimeNumToOffset } from "./util";
+import { quantizeOS } from "../constants/precision";
+import { doffsetToTime, dtimeToOffset, doffsetNumToTime, dtimeNumToOffset } from "./util";
 
 export type Converter<T> = (input: T) => T;
 
@@ -20,6 +21,25 @@ export const makeOffsetToSecConverter =
       return bpmTimeline[ix].time.add(dt);
     };
     return offsetToSec;
+  }
+
+export const makeSecToOffsetConverter =
+  (bpmTimeline: BpmEvent<Fraction>[]): Converter<Fraction> => {
+    let ix = 0;
+    const secToOffset = (sec: Fraction): Fraction => {
+      if (sec.compare(0) <= 0) {
+        ix = 0;
+      }
+      while (ix > 0 && sec.compare(bpmTimeline[ix].time) <= 0) {
+        ix--;
+      }
+      while (bpmTimeline[ix + 1] && sec.compare(bpmTimeline[ix + 1].time) > 0) {
+        ix++;
+      }
+      const dOffset = dtimeToOffset(sec.sub(bpmTimeline[ix].time), bpmTimeline[ix].bpm);
+      return quantizeOS(bpmTimeline[ix].offset.add(dOffset));
+    };
+    return secToOffset;
   }
 
 export const makeOffsetNumToSecConverter =

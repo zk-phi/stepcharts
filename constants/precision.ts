@@ -13,3 +13,7 @@ export const bpmFrac = (value: number) => (
 export const offsetFrac = (value: number) => (
   new Fraction(Math.round(value * OFFSET_PRECISION), OFFSET_PRECISION)
 );
+
+export const quantizeOS = (value: Fraction) => {
+  return value.mul(OFFSET_PRECISION).round().div(OFFSET_PRECISION);
+};

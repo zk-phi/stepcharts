@@ -1,7 +1,6 @@
 import Fraction from "fraction.js";
-import { canonicalBpm } from "./analyzers/computeCanonicalChart";
 import { STOP_QUANTIZATION_THRESHOLD } from "../constants/precision";
-import { doffsetToTime, dtimeToOffset } from "./util";
+import { doffsetToTime, dtimeToOffset, canonicalBpm } from "./util";
 
 // Quantize inaccurate stop durations hard-coded in simfiles.
 // The quantizer first try to quantize a duration to either 12th or 16th.

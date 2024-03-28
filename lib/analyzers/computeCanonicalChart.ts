@@ -1,43 +1,9 @@
 import Fraction from "fraction.js";
-import { OFFSET_PRECISION } from "../../constants/precision";
-import { dtimeToOffset, doffsetToTime } from "../util";
+import { quantizeOS } from "../../constants/precision";
+import { dtimeToOffset, doffsetToTime, determineBeat, canonicalBpm } from "../util";
 import { computeBeatTimings } from "./timingAnalyzers";
 import { calculateBpmStats } from "./calculateBpmStats";
-import { determineBeat } from "../util";
-
-// Convert bpm to a canonical value, which is in range 120 - 240.
-export const canonicalBpm = (bpm: Fraction, _multiplier?: Fraction): [Fraction, Fraction] => (
-  bpm.compare(120) < 0 ? (
-    canonicalBpm(bpm.mul(2), _multiplier?.mul(2) ?? new Fraction(2))
-  ) : bpm.compare(240) >= 0 ? (
-    canonicalBpm(bpm.div(2), _multiplier?.div(2) ?? new Fraction(1, 2))
-  ) : (
-    [bpm, _multiplier ?? new Fraction(1)]
-  )
-);
-
-const _quantizeOS = (value: Fraction, aggressive?: boolean) => {
-  return value.mul(OFFSET_PRECISION).round().div(OFFSET_PRECISION);
-};
-
-type Converter = (input: Fraction) => Fraction;
-const _makeSecToOffsetConverter = (bpmTimeline: BpmEvent<Fraction>[]): Converter => {
-  let ix = 0;
-  const secToOffset = (sec: Fraction): Fraction => {
-    if (sec.compare(0) <= 0) {
-      ix = 0;
-    }
-    while (ix > 0 && sec.compare(bpmTimeline[ix].time) <= 0) {
-      ix--;
-    }
-    while (bpmTimeline[ix + 1] && sec.compare(bpmTimeline[ix + 1].time) > 0) {
-      ix++;
-    }
-    const dOffset = dtimeToOffset(sec.sub(bpmTimeline[ix].time), bpmTimeline[ix].bpm);
-    return _quantizeOS(bpmTimeline[ix].offset.add(dOffset));
-  };
-  return secToOffset;
-}
+import { makeSecToOffsetConverter } from "../offsetConverters";
 
 // Canonicalize a stepchart, by canonicalizing its bpms, and by removing its all stops.
 // This removes all VISUAL gimmicks from the chart (like bpm-shift from 200 to 400).
@@ -57,7 +23,7 @@ export const computeCanonicalChart =
     const _canonicalizeBpmEvent = (bi: number) => {
       const last = canonicalBpmTimeline[canonicalBpmTimeline.length - 1];
       const curr = bpms[bi];
-      const doffset = _quantizeOS(dtimeToOffset(curr.time.sub(last.time), last.bpm));
+      const doffset = quantizeOS(dtimeToOffset(curr.time.sub(last.time), last.bpm));
       const offset = last.offset.add(doffset);
       const [cBpm] = canonicalBpm(curr.bpm.equals(0) ? curr.stopBpm! : curr.bpm);
       canonicalBpmTimeline.push({ bpm: cBpm, time: curr.time, offset });
@@ -73,7 +39,7 @@ export const computeCanonicalChart =
       }
       const currentBpm = canonicalBpmTimeline[canonicalBpmTimeline.length - 1];
       const arr = arrows[ai];
-      const dOffset = _quantizeOS(dtimeToOffset(arr.time.sub(currentBpm.time), currentBpm.bpm));
+      const dOffset = quantizeOS(dtimeToOffset(arr.time.sub(currentBpm.time), currentBpm.bpm));
       const offset = currentBpm.offset.add(dOffset);
       canonicalArrowTimeline.push({
         direction: arr.direction,
@@ -84,8 +50,8 @@ export const computeCanonicalChart =
       });
     }
 
-    const converter1 = _makeSecToOffsetConverter(canonicalBpmTimeline);
-    const converter2 = _makeSecToOffsetConverter(canonicalBpmTimeline);
+    const converter1 = makeSecToOffsetConverter(canonicalBpmTimeline);
+    const converter2 = makeSecToOffsetConverter(canonicalBpmTimeline);
     const canonicalFreezeTimeline = freezes.map((f) => ({
       ...f,
       start: {

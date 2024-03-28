@@ -29,3 +29,14 @@ export const doffsetToTime = (offset: Fraction, bpm: Fraction) => offset.mul(4).
 export const dtimeToOffset = (sec: Fraction, bpm: Fraction) => bpm.mul(sec).div(60).div(4);
 export const doffsetNumToTime = (offset: number, bpm: number) => offset * 4 * 60 / bpm;
 export const dtimeNumToOffset = (sec: number, bpm: number) => sec * bpm / 60 / 4;
+
+// Convert bpm to a canonical value, which is in range 120 - 240.
+export const canonicalBpm = (bpm: Fraction, _multiplier?: Fraction): [Fraction, Fraction] => (
+  bpm.compare(120) < 0 ? (
+    canonicalBpm(bpm.mul(2), _multiplier?.mul(2) ?? new Fraction(2))
+  ) : bpm.compare(240) >= 0 ? (
+    canonicalBpm(bpm.div(2), _multiplier?.div(2) ?? new Fraction(1, 2))
+  ) : (
+    [bpm, _multiplier ?? new Fraction(1)]
+  )
+);
