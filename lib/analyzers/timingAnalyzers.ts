@@ -58,16 +58,11 @@ const _fixStopDuration = (
     } else if (!accepted1 && accepted2) {
       return [qTime2, { stopBpm: bpm2, stopDuration: qOfs2.toFraction(true) }];
     } else if (accepted1 && accepted2) {
-      console.log(
-        `WARNING: Both 2 quantization candidates are accepted:\n`
+      throw new Error(
+        `Both 2 quantization candidates are accepted:\n`
         + `${offset1.toFraction()} -> ${qOfs1.toFraction()} | ${qErr1.mul(60)}f @${bpm1}\n`
         + `${offset2.toFraction()} -> ${qOfs2.toFraction()} | ${qErr2.mul(60)}f @${bpm2}\n`
       );
-      if (qOfs1.d < qOfs2.d) {
-        return [qTime1, { stopBpm: bpm1, stopDuration: qOfs1.toFraction(true) }];
-      } else {
-        return [qTime2, { stopBpm: bpm2, stopDuration: qOfs2.toFraction(true) }];
-      }
     } else {
       if (!_conservative) {
         return _fixStopDuration(duration, bpm1, bpm2, true);
