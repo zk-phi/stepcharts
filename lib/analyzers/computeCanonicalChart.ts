@@ -1,3 +1,5 @@
+import { OFFSET_PRECISION } from "../../constants/precision";
+
 // EXPERIMENTAL
 // FIXME
 
@@ -42,25 +44,8 @@ const _canonicalBpm = (bpm: Fraction): Fraction => bpm.compare(120) < 0 ? (
   bpm
 );
 
-// Quantize offset to either 24th or 32nd.
-//
-// Canonicalized charts will have at least 120 bpm, so 64th notes will not
-// appear in these charts (cause 64ths are way too fast to be execute by humans).
-// Original (non-canonicalized) charts may have 64ths by their design, so this function
-// is suitable ONLY FOR CANONICALIZED CHARTS.
-//
-// If AGGRESSIVE is true, this function tries to correct offset more aggressively,
-// to be either 12nd or 16th.
 const _quantizeOS = (value: Fraction, aggressive?: boolean) => {
-  const twentyFourth = value.mul(aggressive ? 12 : 24).round().div(aggressive ? 12 : 24);
-  const thirtySecond = value.mul(aggressive ? 16 : 32).round().div(aggressive ? 16 : 32);
-  const diffTF = twentyFourth.sub(value).abs();
-  const diffTS = thirtySecond.sub(value).abs();
-  if (diffTF.compare(diffTS) <= 0) {
-    return twentyFourth;
-  } else {
-    return thirtySecond;
-  }
+  return value.mul(OFFSET_PRECISION).round().div(OFFSET_PRECISION);
 };
 
 type Converter = (input: Fraction) => Fraction;
