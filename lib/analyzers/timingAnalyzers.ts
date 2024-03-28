@@ -75,7 +75,6 @@ export const extractBpmEvents = (chart: Stepchart): BpmEvent<Fraction>[] => {
     offset: new Fraction(0),
     // @ts-ignore `bpm` can be undefined in type-level, but it's always defined in the real data
     bpm: bpmEvents.shift().bpm,
-    calib: new Fraction(0),
   }];
 
   for (let i = 0; i < bpmEvents.length; i++) {
@@ -84,18 +83,18 @@ export const extractBpmEvents = (chart: Stepchart): BpmEvent<Fraction>[] => {
     const lastBpm = timeline[0].bpm;
     const dt = doffsetToTime(e.offset.sub(timeline[0].offset), lastBpm);
     const time = dt.add(timeline[0].time);
-    const baseEntry = { offset: e.offset, calib: new Fraction(0) };
+    const baseEntry = { offset: e.offset };
     // stop and bpm-shift at the same time
     if (next && e.offset === next.offset) {
       if (('stop' in next) && ('bpm' in e)) {
-        const quantizedDuration = _fixStopDuration(next.stop, lastBpm, e.bpm);
+        const duration = _fixStopDuration(next.stop, lastBpm, e.bpm);
         timeline.unshift({ ...baseEntry, time,                              bpm: new Fraction(0) });
-        timeline.unshift({ ...baseEntry, time: time.add(quantizedDuration), bpm: e.bpm });
+        timeline.unshift({ ...baseEntry, time: time.add(duration), bpm: e.bpm });
         i++;
       } else if (('stop' in e) && ('bpm' in next)) {
-        const quantizedDuration = _fixStopDuration(e.stop, lastBpm, next.bpm);
+        const duration = _fixStopDuration(e.stop, lastBpm, next.bpm);
         timeline.unshift({ ...baseEntry, time,                              bpm: new Fraction(0) });
-        timeline.unshift({ ...baseEntry, time: time.add(quantizedDuration), bpm: next.bpm });
+        timeline.unshift({ ...baseEntry, time: time.add(duration), bpm: next.bpm });
         i++;
       } else {
         throw new Error("Unexpected: duplicated BPM events");
@@ -103,9 +102,9 @@ export const extractBpmEvents = (chart: Stepchart): BpmEvent<Fraction>[] => {
     } else if ('bpm' in e) {
       timeline.unshift({ ...baseEntry, time, bpm: e.bpm });
     } else if ('stop' in e){
-      const quantizedDuration = _fixStopDuration(e.stop, lastBpm);
+      const duration = _fixStopDuration(e.stop, lastBpm);
       timeline.unshift({ ...baseEntry, time,                              bpm: new Fraction(0) });
-      timeline.unshift({ ...baseEntry, time: time.add(quantizedDuration), bpm: lastBpm });
+      timeline.unshift({ ...baseEntry, time: time.add(duration), bpm: lastBpm });
     } else {
       throw new Error("Unexpected: BPM event is not stop nor bpm-shift");
     }
@@ -120,7 +119,7 @@ type Converter<T> = (input: T) => T;
 export const makeOffsetToSecConverter = (bpmTimeline: BpmEvent<Fraction>[]): Converter<Fraction> => {
   let ix = 0;
   const offsetToSec = (offset: Fraction): Fraction => {
-    if (offset.compare(0) === 0) {
+    if (offset.compare(0) <= 0) {
       ix = 0;
     }
     while (ix > 0 && offset.compare(bpmTimeline[ix].offset) <= 0) {

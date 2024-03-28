@@ -63,23 +63,21 @@ const _quantizeOS = (value: Fraction, aggressive?: boolean) => {
   }
 };
 
-type Converter = (input: Fraction) => Timestamp<Fraction>;
-export const _makeTimestampRecalculator = (bpmTimeline: BpmEvent<Fraction>[]): Converter => {
+type Converter = (input: Fraction) => Fraction;
+const _makeSecToOffsetConverter = (bpmTimeline: BpmEvent<Fraction>[]): Converter => {
   let ix = 0;
-  const secToOffset = (sec: Fraction): Timestamp<Fraction> => {
-    const time1 = sec.add(bpmTimeline[ix].calib);
-    if (time1.compare(0) < 0) {
+  const secToOffset = (sec: Fraction): Fraction => {
+    if (sec.compare(0) <= 0) {
       ix = 0;
     }
-    while (ix > 0 && time1.compare(bpmTimeline[ix].time) <= 0) {
+    while (ix > 0 && sec.compare(bpmTimeline[ix].time) <= 0) {
       ix--;
     }
-    while (bpmTimeline[ix + 1] && time1.compare(bpmTimeline[ix + 1].time) > 0) {
+    while (bpmTimeline[ix + 1] && sec.compare(bpmTimeline[ix + 1].time) > 0) {
       ix++;
     }
-    const time = sec.add(bpmTimeline[ix].calib);
-    const dOffset = dtimeToOffset(time.sub(bpmTimeline[ix].time), bpmTimeline[ix].bpm);
-    return { time, offset: _quantizeOS(bpmTimeline[ix].offset.add(dOffset)) };
+    const dOffset = dtimeToOffset(sec.sub(bpmTimeline[ix].time), bpmTimeline[ix].bpm);
+    return _quantizeOS(bpmTimeline[ix].offset.add(dOffset));
   };
   return secToOffset;
 }
@@ -96,90 +94,33 @@ export const computeCanonicalChart =
       time: new Fraction(0),
       offset: new Fraction(0),
       bpm: _canonicalBpm(bpms[0].bpm),
-      calib: new Fraction(0),
     }];
-
-    // number of confirmed canonical bpm events.
-    // (stop durations are hard-coded to simfiles, and can be NOT very accurate.
-    // so we may want to calibrate them)
-    let calibrated = true;
-
-    // Returns corrected time value.
-    // If the last bpm event is NOT calibrated, then calibrate before correction.
-    // HEURISTIC: This function assumes that, the very first event after a bpm change
-    // shoule not be a 24th or 32nd note.
-    const _calibratedTime = (time: Fraction): Fraction => {
-      const currentBpm = canonicalBpmTimeline[canonicalBpmTimeline.length - 1];
-      if (!calibrated) {
-        const rawDOffset = dtimeToOffset(time.sub(currentBpm.time), currentBpm.bpm);
-        const roundedDOffset = _quantizeOS(rawDOffset);
-        const correctedDOffset = _quantizeOS(rawDOffset, true);
-        const errTime = doffsetToTime(correctedDOffset.sub(roundedDOffset), currentBpm.bpm);
-        currentBpm.calib = currentBpm.calib.add(errTime);
-        calibrated = true;
-        if (!roundedDOffset.equals(correctedDOffset)) {
-          console.log(`caliburated offset ${roundedDOffset.toFraction(true)} (${roundedDOffset.toString()}) -> ${correctedDOffset.toFraction(true)} (${correctedDOffset.toString()}) || total: ${currentBpm.calib.toFraction(true)} (${currentBpm.calib.toString()})`);
-        }
-      }
-      return time.add(currentBpm.calib);
-    };
 
     // canonicalize chart.bpmTimeline[bi] and push to canonicalBpmTimeline.
     // returns number of consumed bpm events
     const _canonicalizeBpmEvent = (bi: number): number => {
       const last = canonicalBpmTimeline[canonicalBpmTimeline.length - 1];
       const curr = bpms[bi];
-      const currTime = _calibratedTime(curr.time);
-      // const currTime = curr.time;
-      const currOS = last.offset.add(_quantizeOS(dtimeToOffset(currTime.sub(last.time), last.bpm)));
+      const currOS = last.offset.add(_quantizeOS(dtimeToOffset(curr.time.sub(last.time), last.bpm)));
       if (!curr.bpm.equals(0)) {
         // simple bpm-shift event without stop
         canonicalBpmTimeline.push({
           bpm: _canonicalBpm(curr.bpm),
-          time: currTime,
+          time: curr.time,
           offset: currOS,
-          calib: last.calib,
         });
-        // calibrated = false;
         return 1;
-      }
-      // else if (SPECIAL_STOP_BPMS[songId]?.[bi]) {
-      //   // "special" stop event, that
-      //   // - may counts in different BPM
-      //   // - should not be recalibrated
-      //   const next = bpms[bi + 1]!; // another bpm event MUST EXIST after a stop event
-      //   const nextBpm = _canonicalBpm(next.bpm);
-      //   // we do not recalibrate next.time here
-      //   const doffset = dtimeToOffset(next.time.sub(currTime), SPECIAL_STOP_BPMS[songId][bi]);
-      //   const quantized = _quantizeOS(doffset);
-      //   canonicalBpmTimeline.push({
-      //     bpm: SPECIAL_STOP_BPMS[songId][bi],
-      //     time: currTime,
-      //     offset: currOS,
-      //     calib: last.calib,
-      //   });
-      //   canonicalBpmTimeline.push({
-      //     bpm: nextBpm,
-      //     time: next.time,
-      //     offset: currOS.add(doffset),
-      //     calib: last.calib,
-      //   });
-      //   calibrated = false;
-      //   return 2; // we have canonicalized two events (shift and stop) here
-      // }
-      else {
+      } else {
         // stop event
         const next = bpms[bi + 1]!; // another bpm event MUST EXIST after a stop event
         const nextBpm = _canonicalBpm(next.bpm);
-        // const nextTime = _calibratedTime(next.time);
-        const nextTime = _calibratedTime(next.time); // ---
         if (last.bpm.equals(nextBpm)) {
           // simple stop-and-go without bpm-shift (-> just ignore)
         } else {
           // stop and bpm-shift.
           // we need to determine either this is (shift then stop) or (stop then shift).
-          const dOffset1 = dtimeToOffset(nextTime.sub(currTime), nextBpm);
-          const dOffset2 = dtimeToOffset(nextTime.sub(currTime), last.bpm);
+          const dOffset1 = dtimeToOffset(next.time.sub(curr.time), nextBpm);
+          const dOffset2 = dtimeToOffset(next.time.sub(curr.time), last.bpm);
           const quantizedD1 = _quantizeOS(dOffset1);
           const quantizedD2 = _quantizeOS(dOffset2);
           const errQ1 = quantizedD1.sub(dOffset1).abs();
@@ -188,21 +129,18 @@ export const computeCanonicalChart =
             // nextBpm is more suitable for this stop (= shift then stop)
             canonicalBpmTimeline.push({
               bpm: nextBpm,
-              time: currTime,
+              time: curr.time,
               offset: currOS,
-              calib: last.calib,
             });
           } else {
             // last.bpm is more suitable for this stop (= stop then shift)
             canonicalBpmTimeline.push({
               bpm: nextBpm,
-              time: nextTime,
+              time: next.time,
               offset: currOS.add(quantizedD2),
-              calib: last.calib
             });
           }
         }
-        calibrated = false;
         return 2; // we have canonicalized two events (shift and stop) here
       }
     };
@@ -216,24 +154,29 @@ export const computeCanonicalChart =
       }
       const currentBpm = canonicalBpmTimeline[canonicalBpmTimeline.length - 1];
       const arr = arrows[ai];
-      const arrTime = _calibratedTime(arr.time);
-      const dOffset = _quantizeOS(dtimeToOffset(arrTime.sub(currentBpm.time), currentBpm.bpm));
+      const dOffset = _quantizeOS(dtimeToOffset(arr.time.sub(currentBpm.time), currentBpm.bpm));
       const offset = currentBpm.offset.add(dOffset);
       canonicalArrowTimeline.push({
         direction: arr.direction,
         tags: arr.tags,
         beat: determineBeat(offset),
-        time: arrTime,
+        time: arr.time,
         offset,
       });
     }
 
-    const recalculator1 = _makeTimestampRecalculator(canonicalBpmTimeline);
-    const recalculator2 = _makeTimestampRecalculator(canonicalBpmTimeline);
+    const converter1 = _makeSecToOffsetConverter(canonicalBpmTimeline);
+    const converter2 = _makeSecToOffsetConverter(canonicalBpmTimeline);
     const canonicalFreezeTimeline = freezes.map((f) => ({
       ...f,
-      start: recalculator1(f.start.time),
-      end: recalculator2(f.end.time),
+      start: {
+        time: f.start.time,
+        offset: converter1(f.start.time),
+      },
+      end: {
+        time: f.end.time,
+        offset: converter2(f.end.time),
+      },
     }));
 
     const lastArrowOffset = canonicalArrowTimeline[canonicalArrowTimeline.length - 1].offset;
