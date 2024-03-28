@@ -93,7 +93,7 @@ export const extractBpmEvents =
       a.offset - b.offset
     ));
 
-    const specialBpms = SPECIAL_BPMS[songId]?.[difficulty];
+    const specialBpms = SPECIAL_BPMS[songId];
 
     while (!('bpm' in bpmEvents[0])) {
       bpmEvents.shift();
@@ -120,9 +120,11 @@ export const extractBpmEvents =
         if (!stopEvent || !shiftEvent) {
           throw new Error("Unexpected: duplicated BPM events");
         }
-        const stops = specialBpms?.[timeline.length] ?? [
-          _fixStopDuration(timeline.length, stopEvent.stop, lastBpm, shiftEvent.bpm)
-        ];
+        const stops = (
+          specialBpms?.[difficulty]?.[timeline.length]
+          ?? specialBpms?.all?.[timeline.length]
+          ?? [_fixStopDuration(timeline.length, stopEvent.stop, lastBpm, shiftEvent.bpm)]
+        );
         _verifyQuantization(stopEvent.stop, stops, true);
         stops.forEach((s) => {
           timeline.unshift({ ...baseEntry, time, bpm: new Fraction(0), ...s[1] });
@@ -135,9 +137,11 @@ export const extractBpmEvents =
         timeline.unshift({ ...baseEntry, time, bpm: e.bpm });
       } else if ('stop' in e){
         // simple stop-and-go
-        const stops = specialBpms?.[timeline.length] ?? [
-          _fixStopDuration(timeline.length, e.stop, lastBpm)
-        ];
+        const stops = (
+          specialBpms?.[difficulty]?.[timeline.length]
+          ?? specialBpms?.all?.[timeline.length]
+          ?? [_fixStopDuration(timeline.length, e.stop, lastBpm)]
+        );
         _verifyQuantization(e.stop, stops, true);
         stops.forEach((s) => {
           timeline.unshift({ ...baseEntry, time, bpm: new Fraction(0), ...s[1] });
