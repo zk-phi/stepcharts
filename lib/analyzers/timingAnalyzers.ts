@@ -8,9 +8,9 @@ export const doffsetNumToTime = (offset: number, bpm: number) => offset * 4 * 60
 export const dtimeNumToOffset = (sec: number, bpm: number) => sec * bpm / 60 / 4;
 
 // Quantize offset to either 12th or 16th.
-const _quantizeOS = (value: Fraction) => {
-  const twentyFourth = value.mul(12).round().div(12);
-  const thirtySecond = value.mul(16).round().div(16);
+const _quantizeOS = (value: Fraction, conservative?: boolean) => {
+  const twentyFourth = value.roundTo(conservative ? "1/24" : "1/12");
+  const thirtySecond = value.roundTo(conservative ? "1/32" : "1/16");
   const diffTF = twentyFourth.sub(value).abs();
   const diffTS = thirtySecond.sub(value).abs();
   if (diffTF.compare(diffTS) <= 0) {
@@ -25,16 +25,20 @@ const _fixStopDuration = (
   duration: Fraction,
   bpm1: Fraction,
   bpm2?: Fraction,
+  _conservative?: boolean,
 ): [Fraction, { stopBpm: Fraction, stopDuration: string }] => {
   const [cBpm1, bpmMult1] = canonicalBpm(bpm1);
   const offset1 = dtimeToOffset(duration, cBpm1);
-  const qOfs1 = _quantizeOS(offset1).div(bpmMult1);
+  const qOfs1 = _quantizeOS(offset1, _conservative).div(bpmMult1);
   const qTime1 = doffsetToTime(qOfs1, bpm1);
   const qErr1 = qTime1.sub(duration).abs();
   const accepted1 = qErr1.compare(QUANTIZATION_THRESHOLD) <= 0;
 
   if (!bpm2) {
     if (!accepted1) {
+      if (!_conservative) {
+        return _fixStopDuration(duration, bpm1, bpm2, true);
+      }
       throw new Error(
         `Cannot quantize offset\n`
         + `${offset1.toFraction()} -> ${qOfs1.toFraction()} | ${qErr1.mul(60)}f @${bpm1}\n`
@@ -44,7 +48,7 @@ const _fixStopDuration = (
   } else {
     const [cBpm2, bpmMult2] = canonicalBpm(bpm2);
     const offset2 = dtimeToOffset(duration, cBpm2);
-    const qOfs2 = _quantizeOS(offset2).div(bpmMult2);
+    const qOfs2 = _quantizeOS(offset2, _conservative).div(bpmMult2);
     const qTime2 = doffsetToTime(qOfs2, bpm2);
     const qErr2 = qTime2.sub(duration).abs();
     const accepted2 = qErr2.compare(QUANTIZATION_THRESHOLD) <= 0;
@@ -65,6 +69,9 @@ const _fixStopDuration = (
         return [qTime2, { stopBpm: bpm2, stopDuration: qOfs2.toFraction(true) }];
       }
     } else {
+      if (!_conservative) {
+        return _fixStopDuration(duration, bpm1, bpm2, true);
+      }
       throw new Error(
         `Cannot quantize offset\n`
         + `${offset1.toFraction()} -> ${qOfs1.toFraction()} | ${qErr1.mul(60)}f @${bpm1}\n`
