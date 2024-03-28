@@ -198,7 +198,6 @@ const allData: AllData = mixDirs.map((mixDir) => {
 ));
 
 const allMixesData: MixMeta[] = allData.map((mix) => mix.meta);
-console.log(`Writing _data/mixes.json ...`);
 fs.writeFileSync(`public/_data/mixes.json`, JSON.stringify(allMixesData));
 
 const index: Index = allData.map((mix) => ({
@@ -210,7 +209,6 @@ const index: Index = allData.map((mix) => ({
     })),
   })),
 }));
-console.log(`Writing _data/index.json ...`);
 fs.writeFileSync(`public/_data/index.json`, JSON.stringify(index));
 
 const allMixes: AllMeta[] = allData.flatMap((mix) => {
@@ -232,25 +230,19 @@ const allMixes: AllMeta[] = allData.flatMap((mix) => {
         chart: chart.chart,
         canonicalChart: chart.canonicalChart,
       };
-      console.log(
-        `Writing _data/${mix.meta.mixId}/${song.meta.songId}/${chart.meta.difficulty}.json ...`
-      );
       fs.writeFileSync(
         `public/_data/${mix.meta.mixId}/${song.meta.songId}/${chart.meta.difficulty}.json`,
         JSON.stringify(chartData),
       );
       return allMeta;
     });
-    console.log(`Writing _data/${mix.meta.mixId}/${song.meta.songId}/all.json ...`);
     fs.writeFileSync(
       `public/_data/${mix.meta.mixId}/${song.meta.songId}/all.json`,
       JSON.stringify(allCharts),
     );
     return allCharts;
   });
-  console.log(`Writing _data/${mix.meta.mixId}/all.json ...`);
   fs.writeFileSync(`public/_data/${mix.meta.mixId}/all.json`, JSON.stringify(allSongs));
   return allSongs;
 });
-console.log(`Writing _data/all.json ...`);
 fs.writeFileSync(`public/_data/all.json`, JSON.stringify(allMixes));
