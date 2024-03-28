@@ -76,6 +76,9 @@ export const fixStopDuration = (
   } else if (accepted.length === 0 && !_conservative) {
     return fixStopDuration(ix, duration, bpm1, bpm2, true);
   } else {
+    // Either:
+    // - two or more candidates satisfy the threshold
+    // - both two candidates violate the threshold
     throw new Error(
       `Cannot quantize stop:\n- index: ${ix}\n- duration: ${duration}\nCandidates:\n`
       + candidates.map((c) => (

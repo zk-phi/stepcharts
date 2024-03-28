@@ -12,11 +12,7 @@ const s = (bpm: number, n: number, d: number): Stop => {
 
 export
 const SPECIAL_BPMS: Record<string, Partial<Record<Difficulty | "all", Record<number, Stop[]>>>> = {
-  "over-the-period": {
-    all: {
-      5: [s(200, 4, 4)],
-    },
-  },
+  // ---- 意図的な 32/64 分ズレを含む譜面（途中から全矢印が緑になる系）
   "fascination-maxx": {
     all: {
       13: [s(200, 11, 32)],
@@ -36,11 +32,13 @@ const SPECIAL_BPMS: Record<string, Partial<Record<Difficulty | "all", Record<num
       77: [s(170,  7, 32)],
     },
   },
-  "the-reason": {
+  // ---- 直前後と違う BPM で停止する譜面
+  "over-the-period": {
     all: {
-      2: [s(98, 1, 16)],
+      5: [s(200, 4, 4)],
     },
   },
+  // ---- 謎の長さの停止が入る譜面
   "awa-odori-awaodori-yappari-odori-wa-yame-rarenai": {
     all: {
       2:  [s(178, 5, 4), s(190, 3, 4)],
@@ -48,7 +46,69 @@ const SPECIAL_BPMS: Record<string, Partial<Record<Difficulty | "all", Record<num
       13: [s(222, 5, 4), s(170, 1, 4)],
     },
   },
-  // FIXME
+  "stella-sinistra": {
+    all: {
+      8: [s(110, 3, 4)],
+    },
+  },
+  "insertion": {
+    all: {
+      2: [s(131, 3, 4)],
+    }
+  },
+  "a": {
+    all: {
+      2: [s(93, 1, 4), s(191, 2, 4)],
+    },
+  },
+  "max-300": {
+    // 実際には謎の長さではないのだが、じわじわ遅くなるギミックのせいで謎になってる
+    // これなんとかできたらなあ
+    all: {
+      22: [s(190, 11, 16)],
+    },
+  },
+  "go-for-the-top": {
+    all: {
+      25: [s(172, 2, 4)],
+    },
+  },
+  // ---- 停止が短すぎて 24 分か 32 分か自動判定できないやつ
+  "let-me-know": {
+    all: {
+      1: [s(150, 1, 32)],
+      3: [s(150, 1, 32)],
+      5: [s(150, 1, 32)],
+      7: [s(150, 1, 32)],
+    },
+  },
+  "breaking-the-future": {
+    // ６分になってしまう
+    all: {
+      26: [s(360, 3, 16)],
+      28: [s(360, 3, 16)],
+      34: [s(360, 3, 16)],
+      36: [s(360, 3, 16)],
+      42: [s(360, 3, 16)],
+      44: [s(360, 3, 16)],
+      50: [s(360, 3, 16)],
+      52: [s(360, 3, 16)],
+      58: [s(360, 3, 16)],
+      60: [s(360, 3, 16)],
+    },
+  },
+  // ---- シンプルに元データが間違ってるっぽい譜面
+  "the-reason": {
+    all: {
+      2: [s(98, 1, 16)],
+    },
+  },
+  "the-legend-of-max": {
+    all: {
+      5: [s(83.5, 1, 4)],
+    },
+  },
+  // ---- TODO
   "tokyoevolved-type1": {
     all: {
       7:  [s(257, 1, 4)],
@@ -57,7 +117,6 @@ const SPECIAL_BPMS: Record<string, Partial<Record<Difficulty | "all", Record<num
       36: [s(257, 1, 4)],
     },
   },
-  // FIXME
   "tokyoevolved-type2": {
     all: {
       7:  [s(257, 1, 4)],
@@ -67,7 +126,6 @@ const SPECIAL_BPMS: Record<string, Partial<Record<Difficulty | "all", Record<num
       45: [s(264.5, 1, 4)],
     },
   },
-  // FIXME
   "tokyoevolved-type3": {
     all: {
       7:  [s(257, 1, 4)],
@@ -76,6 +134,11 @@ const SPECIAL_BPMS: Record<string, Partial<Record<Difficulty | "all", Record<num
       36: [s(257, 1, 4)],
       49: [s(257, 3, 16)],
       53: [s(257, 3, 16)],
+    },
+  },
+  "xmix1-midnight-dawn": {
+    all: {
+      10: [s(144, 1, 4)],
     },
   },
 };
