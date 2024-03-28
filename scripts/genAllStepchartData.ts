@@ -6,6 +6,7 @@ import { calculateStats } from "../lib/calculateStats";
 import { dateReleased, mixNames, shortMixNames } from "../constants/meta";
 import { analyzeChartEvents } from "../lib/analyzers/timingAnalyzers";
 import { computeCanonicalChart } from "../lib/analyzers/computeCanonicalChart";
+import { tagJumpsAndShocks } from "../lib/analyzers/tagJumpsAndShocks";
 import { tagSoflanTriggers } from "../lib/analyzers/tagSoflanTriggers";
 import { calculateBpmStats } from "../lib/analyzers/calculateBpmStats";
 
@@ -162,14 +163,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
             chartType.difficulty,
             chart,
           );
-          analyzedChart.arrowTimeline.forEach((arrow) => {
-            if (arrow.direction.match(/M/)) {
-              arrow.tags.shock = true;
-            }
-            if (arrow.direction.match(/[12].*[12]/)) {
-              arrow.tags.jump = true;
-            }
-          });
+          tagJumpsAndShocks(analyzedChart.arrowTimeline);
           tagSoflanTriggers(analyzedChart.arrowTimeline, analyzedChart.bpmTimeline);
           const canonicalChart = computeCanonicalChart(simfile.title.titleDir, analyzedChart);
           return {
