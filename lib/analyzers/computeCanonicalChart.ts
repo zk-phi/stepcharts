@@ -36,12 +36,14 @@ import { determineBeat } from "../util";
 // };
 
 // Convert bpm to a canonical value, which is in range 120 - 240.
-const _canonicalBpm = (bpm: Fraction): Fraction => bpm.compare(120) < 0 ? (
-  _canonicalBpm(bpm.mul(2))
-) : bpm.compare(240) >= 0 ? (
-  _canonicalBpm(bpm.div(2))
-) : (
-  bpm
+export const canonicalBpm = (bpm: Fraction, _multiplier?: Fraction): [Fraction, Fraction] => (
+  bpm.compare(120) < 0 ? (
+    canonicalBpm(bpm.mul(2), _multiplier?.mul(2) ?? new Fraction(2))
+  ) : bpm.compare(240) >= 0 ? (
+    canonicalBpm(bpm.div(2), _multiplier?.div(2) ?? new Fraction(1, 2))
+  ) : (
+    [bpm, _multiplier ?? new Fraction(1)]
+  )
 );
 
 const _quantizeOS = (value: Fraction, aggressive?: boolean) => {
@@ -78,7 +80,7 @@ export const computeCanonicalChart =
     const canonicalBpmTimeline: BpmEvent<Fraction>[] = [{
       time: new Fraction(0),
       offset: new Fraction(0),
-      bpm: _canonicalBpm(bpms[0].bpm),
+      bpm: canonicalBpm(bpms[0].bpm)[0],
     }];
 
     // canonicalize chart.bpmTimeline[bi] and push to canonicalBpmTimeline.
@@ -91,13 +93,13 @@ export const computeCanonicalChart =
 
       if (!curr.bpm.equals(0)) {
         // bpm-shift event without stop
-        canonicalBpmTimeline.push({ bpm: _canonicalBpm(curr.bpm), time: curr.time, offset });
+        canonicalBpmTimeline.push({ bpm: canonicalBpm(curr.bpm)[0], time: curr.time, offset });
         return 1;
       } else {
         // stop event
         const next = bpms[bi + 1]!; // another bpm event MUST EXIST after a stop event
-        const bpmHint = _canonicalBpm(curr.bpmHint!);
-        const nextBpm = _canonicalBpm(next.bpm);
+        const [bpmHint] = canonicalBpm(curr.bpmHint!);
+        const [nextBpm] = canonicalBpm(next.bpm);
         if (last.bpm.equals(bpmHint)) {
           if (bpmHint.equals(nextBpm)) {
             // simple stop-and-go without bpm-shift (-> just ignore)

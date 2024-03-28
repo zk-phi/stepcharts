@@ -1,4 +1,5 @@
 import Fraction from "fraction.js";
+import { canonicalBpm } from "./computeCanonicalChart";
 import { SPECIAL_BPMS } from "../../constants/specialBpms";
 
 export const doffsetToTime = (offset: Fraction, bpm: Fraction) => offset.mul(4).div(bpm).mul(60);
@@ -24,8 +25,9 @@ const _quantizeOS = (value: Fraction, aggressive?: boolean) => {
 const QUANTIZATION_THRESHOLD = new Fraction(2, 60); // 2f in 60fps
 const _fixStopDuration =
   (duration: Fraction, bpm1: Fraction, bpm2?: Fraction): [Fraction, Fraction] => {
-    const offset1 = dtimeToOffset(duration, bpm1);
-    const qOfs1 = _quantizeOS(offset1);
+    const [cBpm1, bpmMult1] = canonicalBpm(bpm1);
+    const offset1 = dtimeToOffset(duration, cBpm1);
+    const qOfs1 = _quantizeOS(offset1).div(bpmMult1);
     const qTime1 = doffsetToTime(qOfs1, bpm1);
     const qErr1 = qTime1.sub(duration).abs();
 
@@ -36,8 +38,9 @@ const _fixStopDuration =
         + `${offset1.toFraction()} -> ${qOfs1.toFraction()} | ${qErr1.mul(60)}f @${bpm1}\n`
       );
     } else {
-      const offset2 = dtimeToOffset(duration, bpm2);
-      const qOfs2 = _quantizeOS(offset2);
+      const [cBpm2, bpmMult2] = canonicalBpm(bpm2);
+      const offset2 = dtimeToOffset(duration, cBpm2);
+      const qOfs2 = _quantizeOS(offset2).div(bpmMult2);
       const qTime2 = doffsetToTime(qOfs2, bpm2);
       const qErr2 = qTime2.sub(duration).abs();
       if (qErr1.compare(qErr2) <= 0) {
