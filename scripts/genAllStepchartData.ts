@@ -162,7 +162,11 @@ const allData: AllData = mixDirs.map((mixDir) => {
           const chart = simfile.charts[chartType.difficulty];
           const stats = calculateStats(chart);
           const lastMeasure = Math.floor(chart.arrows[chart.arrows.length - 1].offset);
-          const bpmTimeline = extractBpmEvents(chart);
+          const bpmTimeline = extractBpmEvents(
+            simfile.title.titleDir,
+            chartType.difficulty,
+            chart,
+          );
           const arrowTimeline = computeArrowTimings(chart.arrows, bpmTimeline);
           const bpmStats = calculateBpmStats(arrowTimeline, bpmTimeline);
           const analyzedChart = {
