@@ -7,12 +7,10 @@ export const dtimeToOffset = (sec: Fraction, bpm: Fraction) => bpm.mul(sec).div(
 export const doffsetNumToTime = (offset: number, bpm: number) => offset * 4 * 60 / bpm;
 export const dtimeNumToOffset = (sec: number, bpm: number) => sec * bpm / 60 / 4;
 
-// Quantize offset to either 24th or 32nd.
-// If AGGRESSIVE is true, this function tries to quantize offset more aggressively,
-// to be either 12nd or 16th.
-const _quantizeOS = (value: Fraction, aggressive?: boolean) => {
-  const twentyFourth = value.mul(aggressive ? 12 : 24).round().div(aggressive ? 12 : 24);
-  const thirtySecond = value.mul(aggressive ? 16 : 32).round().div(aggressive ? 16 : 32);
+// Quantize offset to either 12th or 16th.
+const _quantizeOS = (value: Fraction) => {
+  const twentyFourth = value.mul(12).round().div(12);
+  const thirtySecond = value.mul(16).round().div(16);
   const diffTF = twentyFourth.sub(value).abs();
   const diffTS = thirtySecond.sub(value).abs();
   if (diffTF.compare(diffTS) <= 0) {
