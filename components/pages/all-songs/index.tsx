@@ -41,18 +41,13 @@ const AllSongsTable = ({
 }) => {
   const [previewChartId, setPreviewChartId] = useState<[string, string, string]>();
   const [previewChart, setPreviewChart] = useState<AnalyzedStepchart<number>>();
-  const [offset, time, playing, start, stop] = usePreview(previewChart);
-
-  const enableBeatTick = React.useMemo(() => !!previewChart && (
-    previewChart.arrowTimeline.reduce((l, r) => l + (r.beat === 4 ? 1 : 0), 0)
-    >= previewChart.arrowTimeline.length / 4
-  ) , [previewChart]);
+  const [offset, time, playing, start, stop] = usePreview(previewChart?.chart);
 
   const play = React.useCallback(async ([mix, song, difficulty]) => {
     const response = await fetch(`/stepcharts/_data/${mix}/${song}/${difficulty}.json`);
     await prepareAudioContext();
     setPreviewChartId([mix, song, difficulty]);
-    setPreviewChart((await response.json()).chart);
+    setPreviewChart(await response.json());
   }, [setPreviewChart]);
 
   useEffect(() => {
@@ -112,10 +107,12 @@ const AllSongsTable = ({
       </table>
       { previewChart && (
         <PreviewSound
-            chart={previewChart}
+            chart={previewChart.chart}
+            canonicalChart={previewChart.canonicalChart}
             timeRef={time}
             playing={playing}
-            enableBeatTick={enableBeatTick} />
+            enableBeatTick={true}
+            canonicalTicks={true} />
       ) }
     </div>
   );

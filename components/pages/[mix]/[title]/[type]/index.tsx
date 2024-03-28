@@ -25,6 +25,7 @@ type Options = {
   highlightSoflan: boolean,
   verboseColors: boolean,
   canonicalColors: boolean,
+  canonicalTicks: boolean,
 };
 
 const OptionsPanel = ({
@@ -111,6 +112,11 @@ const OptionsPanel = ({
   const onChangeCanonicalColors = React.useCallback((e) => onChange({
     ...options,
     canonicalColors: e.target.checked,
+  }), [options, onChange]);
+
+  const onChangeCanonicalTicks = React.useCallback((e) => onChange({
+    ...options,
+    canonicalTicks: e.target.checked,
   }), [options, onChange]);
 
   const { minBpm, mainBpm, maxBpm } = options.canonicalMode ? chart.canonicalChart : chart.chart;
@@ -207,9 +213,16 @@ const OptionsPanel = ({
       </div>
       <div>
         <label>
-          色分けをソフランに追従（β：一部の譜面で非対応）
+          色分けをソフランに追従（β）
           {" "}
           <input type="checkbox" checked={options.canonicalColors} onChange={onChangeCanonicalColors} />
+        </label>
+      </div>
+      <div>
+        <label>
+          メトロノームをソフランに追従（β）
+          {" "}
+          <input type="checkbox" checked={options.canonicalTicks} onChange={onChangeCanonicalTicks} />
         </label>
       </div>
       <div>
@@ -277,6 +290,7 @@ const PreviewPage = ({ chart }: {
     highlightSoflan: true,
     verboseColors: true,
     canonicalColors: false,
+    canonicalTicks: false,
     canonicalMode: false,
   });
 
@@ -347,9 +361,11 @@ const PreviewPage = ({ chart }: {
       </ChartPreview>
       <PreviewSound
           chart={options.canonicalMode ? chart.canonicalChart : chart.chart}
+          canonicalChart={chart.canonicalChart}
           timeRef={timeRef}
           playing={playing}
-          enableBeatTick={options.tick} />
+          enableBeatTick={options.tick}
+          canonicalTicks={options.canonicalTicks} />
     </>
   );
 };

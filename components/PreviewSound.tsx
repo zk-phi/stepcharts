@@ -16,26 +16,43 @@ const playSound = (
   return false;
 };
 
-const PreviewSound = ({ chart, timeRef, playing, enableBeatTick }: {
+const PreviewSound = ({ chart, canonicalChart, timeRef, playing, enableBeatTick, canonicalTicks }: {
   chart: AnalyzedStepchart<number>,
+  canonicalChart: AnalyzedStepchart<number>,
   timeRef: React.MutableRefObject<number>,
   playing: boolean,
   enableBeatTick: boolean,
+  canonicalTicks?: boolean,
 }) => {
   /* beat ticks */
   const beatIndex = React.useRef(0);
   const beatSounder = React.useCallback(() => {
     if (chart.beatTimeline[beatIndex.current]
         && chart.beatTimeline[beatIndex.current].time <= timeRef.current) {
-      if (enableBeatTick) {
-        playSound(destinations.suppressed, audioBuffers.beat)
+      if (enableBeatTick && !canonicalTicks) {
+        playSound(destinations.suppressed, audioBuffers.beat);
       }
       while (chart.beatTimeline[beatIndex.current]
           && chart.beatTimeline[beatIndex.current].time <= timeRef.current) {
         beatIndex.current++;
       }
     }
-  }, [chart, enableBeatTick]);
+  }, [chart, enableBeatTick, canonicalTicks]);
+
+  /* beat ticks (canonical) */
+  const cBeatIndex = React.useRef(0);
+  const cBeatSounder = React.useCallback(() => {
+    if (canonicalChart.beatTimeline[cBeatIndex.current]
+        && canonicalChart.beatTimeline[cBeatIndex.current].time <= timeRef.current) {
+      if (enableBeatTick && canonicalTicks) {
+        playSound(destinations.suppressed, audioBuffers.beat);
+      }
+      while (canonicalChart.beatTimeline[cBeatIndex.current]
+          && canonicalChart.beatTimeline[cBeatIndex.current].time <= timeRef.current) {
+        cBeatIndex.current++;
+      }
+    }
+  }, [canonicalChart, enableBeatTick, canonicalTicks]);
 
   /* arrow ticks */
   const arrowIndex = React.useRef(0);
@@ -81,6 +98,9 @@ const PreviewSound = ({ chart, timeRef, playing, enableBeatTick }: {
       beatIndex.current = chart.beatTimeline.findIndex((b) => (
         timeRef.current < b.time
       ))
+      cBeatIndex.current = canonicalChart.beatTimeline.findIndex((b) => (
+        timeRef.current < b.time
+      ))
       arrowIndex.current = chart.arrowTimeline.findIndex((a) => (
         timeRef.current < a.time
       ));
@@ -89,16 +109,17 @@ const PreviewSound = ({ chart, timeRef, playing, enableBeatTick }: {
       ));
     }
     lastTime.current = timeRef.current;
-  }, [chart]);
+  }, [chart, canonicalChart]);
 
   useAnimationFrame(() => {
     if (playing) {
       resetHandler();
       beatSounder();
+      cBeatSounder();
       arrowSounder();
       stopSounder();
     }
-  }, [resetHandler, beatSounder, arrowSounder, stopSounder, playing]);
+  }, [resetHandler, beatSounder, cBeatSounder, arrowSounder, stopSounder, playing]);
 
   return null;
 };
