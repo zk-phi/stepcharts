@@ -11,7 +11,7 @@ const s = (bpm: number, n: number, d: number): Stop => {
 };
 
 const overThePeriod = {
-  5: [s(220, 4, 4)],
+  5: [s(200, 4, 4)],
 };
 
 const faxx = {
@@ -35,7 +35,7 @@ const theReason = {
 };
 
 const awaodori = {
-  2:  [s(185, 5, 4), s(190, 3, 4)],
+  2:  [s(178, 5, 4), s(190, 3, 4)],
   6:  [s(190, 5, 4), s(130, 3, 4)],
   13: [s(222, 5, 4), s(170, 1, 4)],
 };
