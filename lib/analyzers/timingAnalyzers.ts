@@ -1,13 +1,12 @@
 import Fraction from "fraction.js";
 import { canonicalBpm } from "./computeCanonicalChart";
+import { STOP_QUANTIZATION_THRESHOLD } from "../../constants/precision";
 import { SPECIAL_BPMS } from "../../constants/specialBpms";
 
 export const doffsetToTime = (offset: Fraction, bpm: Fraction) => offset.mul(4).div(bpm).mul(60);
 export const dtimeToOffset = (sec: Fraction, bpm: Fraction) => bpm.mul(sec).div(60).div(4);
 export const doffsetNumToTime = (offset: number, bpm: number) => offset * 4 * 60 / bpm;
 export const dtimeNumToOffset = (sec: number, bpm: number) => sec * bpm / 60 / 4;
-
-const QUANTIZATION_THRESHOLD = new Fraction(1, 60); // 1f in 60fps
 
 const _quantizeDuration = (
   duration: Fraction,
@@ -30,7 +29,7 @@ const _verifyQuantization = (
   verbose?: boolean,
 ): boolean => {
   const total = stops.reduce((l, r) => l.add(r[0]), new Fraction(0));
-  if (duration.sub(total).abs().compare(QUANTIZATION_THRESHOLD) <= 0) {
+  if (duration.sub(total).abs().compare(STOP_QUANTIZATION_THRESHOLD) <= 0) {
     return true;
   } else {
     if (verbose) {
