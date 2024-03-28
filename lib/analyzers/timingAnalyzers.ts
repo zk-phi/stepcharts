@@ -3,6 +3,7 @@ import { SPECIAL_BPMS } from "../../constants/specialBpms";
 import { makeOffsetToSecConverter } from "../offsetConverters";
 import { fixStopDuration, verifyQuantization } from "../stopQuantizer";
 import { doffsetToTime, doffsetNumToTime, dtimeNumToOffset } from "../util";
+import { calculateBpmStats } from "./calculateBpmStats";
 
 // Align all stops and bpm-changes into a single timeline.
 // All timeline events will have both offset and timing value.
@@ -10,7 +11,7 @@ import { doffsetToTime, doffsetNumToTime, dtimeNumToOffset } from "../util";
 //
 // Stop durations are fixed here (basically) by quantization.
 // Some stops are hard-coded in the SPECIAL_BPMS constant.
-export const extractBpmEvents =
+const _extractBpmEvents =
   (songId: string, difficulty: Difficulty, chart: Stepchart): BpmEvent<Fraction>[] => {
     const bpmEvents = [
       ...chart.bpm.map((b) => (
@@ -86,13 +87,13 @@ export const extractBpmEvents =
     return timeline.reverse();
   };
 
-export const computeArrowTimings =
+export const _computeArrowTimings =
   (arrows: Arrow[], bpms: BpmEvent<Fraction>[]): ArrowEvent<Fraction>[] => {
     const converter = makeOffsetToSecConverter(bpms);
     return arrows.map((arrow) => ({ ...arrow, tags: {}, time: converter(arrow.offset) }));
   };
 
-export const computeFreezeTimings =
+const _computeFreezeTimings =
   (freezes: FreezeBody[], bpms: BpmEvent<Fraction>[]): FreezeEvent<Fraction>[] => {
     const converter1 = makeOffsetToSecConverter(bpms);
     const converter2 = makeOffsetToSecConverter(bpms);
@@ -118,3 +119,21 @@ export const computeBeatTimings =
       return { offset, time: converter(offset) };
     });
   };
+
+export const analyzeChartEvents = (
+  songId: string,
+  difficulty: Difficulty,
+  chart: Stepchart,
+): AnalyzedStepchart<Fraction> => {
+  const lastMeasure = Math.floor(chart.arrows[chart.arrows.length - 1].offset);
+  const bpmTimeline = _extractBpmEvents(songId, difficulty, chart);
+  const arrowTimeline = _computeArrowTimings(chart.arrows, bpmTimeline);
+
+  return {
+    bpmTimeline,
+    arrowTimeline,
+    freezeTimeline: _computeFreezeTimings(chart.freezes, bpmTimeline),
+    beatTimeline: computeBeatTimings(lastMeasure, bpmTimeline),
+    ...calculateBpmStats(arrowTimeline, bpmTimeline),
+  };
+}

@@ -4,12 +4,7 @@ import Fraction from "fraction.js";
 import { parseSimfile } from "../lib/parsers/parseSimfile";
 import { calculateStats } from "../lib/calculateStats";
 import { dateReleased, mixNames, shortMixNames } from "../constants/meta";
-import {
-  extractBpmEvents,
-  computeArrowTimings,
-  computeFreezeTimings,
-  computeBeatTimings,
-} from "../lib/analyzers/timingAnalyzers";
+import { analyzeChartEvents } from "../lib/analyzers/timingAnalyzers";
 import { computeCanonicalChart } from "../lib/analyzers/computeCanonicalChart";
 import { tagSoflanTriggers } from "../lib/analyzers/tagSoflanTriggers";
 import { calculateBpmStats } from "../lib/analyzers/calculateBpmStats";
@@ -162,21 +157,11 @@ const allData: AllData = mixDirs.map((mixDir) => {
         charts: simfile.availableTypes.map((chartType: StepchartType) => {
           const chart = simfile.charts[chartType.difficulty];
           const stats = calculateStats(chart);
-          const lastMeasure = Math.floor(chart.arrows[chart.arrows.length - 1].offset);
-          const bpmTimeline = extractBpmEvents(
+          const analyzedChart = analyzeChartEvents(
             simfile.title.titleDir,
             chartType.difficulty,
             chart,
           );
-          const arrowTimeline = computeArrowTimings(chart.arrows, bpmTimeline);
-          const bpmStats = calculateBpmStats(arrowTimeline, bpmTimeline);
-          const analyzedChart = {
-            bpmTimeline,
-            arrowTimeline,
-            freezeTimeline: computeFreezeTimings(chart.freezes, bpmTimeline),
-            beatTimeline: computeBeatTimings(lastMeasure, bpmTimeline),
-            ...bpmStats,
-          };
           analyzedChart.arrowTimeline.forEach((arrow) => {
             if (arrow.direction.match(/M/)) {
               arrow.tags.shock = true;
@@ -185,7 +170,7 @@ const allData: AllData = mixDirs.map((mixDir) => {
               arrow.tags.jump = true;
             }
           });
-          tagSoflanTriggers(analyzedChart.arrowTimeline, bpmTimeline);
+          tagSoflanTriggers(analyzedChart.arrowTimeline, analyzedChart.bpmTimeline);
           const canonicalChart = computeCanonicalChart(simfile.title.titleDir, analyzedChart);
           return {
             meta: {
@@ -202,7 +187,9 @@ const allData: AllData = mixDirs.map((mixDir) => {
               canonicalChartErrorRate: canonicalChart.arrowTimeline.filter((a) => (
                 a.beat === "other" || a.beat > 24
               )).length / canonicalChart.arrowTimeline.length * 100,
-              ...bpmStats,
+              minBpm: analyzedChart.minBpm,
+              maxBpm: analyzedChart.maxBpm,
+              mainBpm: analyzedChart.mainBpm,
               ...stats,
             },
             chart: serializedChart(analyzedChart),
