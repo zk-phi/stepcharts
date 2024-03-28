@@ -91,7 +91,7 @@ export const extractBpmEvents =
       const next = bpmEvents[i + 1];
       const lastBpm = timeline[0].bpm;
       const dt = doffsetToTime(e.offset.sub(timeline[0].offset), lastBpm);
-      const time = dt.add(timeline[0].time);
+      let time = dt.add(timeline[0].time);
       const baseEntry = { offset: e.offset };
       if (next && e.offset === next.offset) {
         // stop and bpm-shift at the same time
@@ -100,22 +100,28 @@ export const extractBpmEvents =
         if (!stopEvent || !shiftEvent) {
           throw new Error("Unexpected: duplicated BPM events");
         }
-        const [duration, stop] = specialBpms?.[timeline.length] ?? (
-          _fixStopDuration(stopEvent.stop, lastBpm, shiftEvent.bpm)
-        );
-        timeline.unshift({ ...baseEntry, time,                     bpm: new Fraction(0), ...stop });
-        timeline.unshift({ ...baseEntry, time: time.add(duration), bpm: shiftEvent.bpm });
+        const stops = specialBpms?.[timeline.length] ?? [
+          _fixStopDuration(timeline.length, stopEvent.stop, lastBpm, shiftEvent.bpm)
+        ];
+        stops.forEach((s) => {
+          timeline.unshift({ ...baseEntry, time, bpm: new Fraction(0), ...s[1] });
+          time = time.add(s[0]);
+        });
+        timeline.unshift({ ...baseEntry, time, bpm: shiftEvent.bpm });
         i++;
       } else if ('bpm' in e) {
         // simple bpm-shift
         timeline.unshift({ ...baseEntry, time, bpm: e.bpm });
       } else if ('stop' in e){
         // simple stop-and-go
-        const [duration, stop] = specialBpms?.[timeline.length] ?? (
-          _fixStopDuration(e.stop, lastBpm)
-        );
-        timeline.unshift({ ...baseEntry, time,                     bpm: new Fraction(0), ...stop });
-        timeline.unshift({ ...baseEntry, time: time.add(duration), bpm: lastBpm });
+        const stops = specialBpms?.[timeline.length] ?? [
+          _fixStopDuration(timeline.length, e.stop, lastBpm)
+        ];
+        stops.forEach((s) => {
+          timeline.unshift({ ...baseEntry, time, bpm: new Fraction(0), ...s[1] });
+          time = time.add(s[0]);
+        });
+        timeline.unshift({ ...baseEntry, time, bpm: lastBpm });
       } else {
         throw new Error("Unexpected: BPM event is not stop nor bpm-shift");
       }
