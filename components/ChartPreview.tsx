@@ -1,6 +1,6 @@
 import React from "react";
 import { useAnimationFrame } from "../lib/hooks/useAnimationFrame";
-import { makeOffsetToSecConverter } from "../lib/analyzers/timingAnalyzers";
+import { makeOffsetToSecConverter } from "../lib/offsetConverters";
 import { TURN_VALUES } from "../constants/turn";
 
 const ARROW_HEIGHT = 13.5; /* vh */

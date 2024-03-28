@@ -3,7 +3,7 @@ import { useAnimationFrame } from "./useAnimationFrame";
 import {
   makeSecNumToOffsetConverter,
   makeOffsetNumToSecConverter,
-} from "../analyzers/timingAnalyzers";
+} from "../offsetConverters";
 
 export const usePreview = (chart?: AnalyzedStepchart<number> | null): [
   React.MutableRefObject<number>,
