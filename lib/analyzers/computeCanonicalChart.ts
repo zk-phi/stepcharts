@@ -101,44 +101,37 @@ export const computeCanonicalChart =
     const _canonicalizeBpmEvent = (bi: number): number => {
       const last = canonicalBpmTimeline[canonicalBpmTimeline.length - 1];
       const curr = bpms[bi];
-      const currOS = last.offset.add(_quantizeOS(dtimeToOffset(curr.time.sub(last.time), last.bpm)));
+      const doffset = _quantizeOS(dtimeToOffset(curr.time.sub(last.time), last.bpm));
+      const offset = last.offset.add(doffset);
+
       if (!curr.bpm.equals(0)) {
-        // simple bpm-shift event without stop
-        canonicalBpmTimeline.push({
-          bpm: _canonicalBpm(curr.bpm),
-          time: curr.time,
-          offset: currOS,
-        });
+        // bpm-shift event without stop
+        canonicalBpmTimeline.push({ bpm: _canonicalBpm(curr.bpm), time: curr.time, offset });
         return 1;
       } else {
         // stop event
         const next = bpms[bi + 1]!; // another bpm event MUST EXIST after a stop event
+        const bpmHint = _canonicalBpm(curr.bpmHint!);
         const nextBpm = _canonicalBpm(next.bpm);
-        if (last.bpm.equals(nextBpm)) {
-          // simple stop-and-go without bpm-shift (-> just ignore)
-        } else {
-          // stop and bpm-shift.
-          // we need to determine either this is (shift then stop) or (stop then shift).
-          const dOffset1 = dtimeToOffset(next.time.sub(curr.time), nextBpm);
-          const dOffset2 = dtimeToOffset(next.time.sub(curr.time), last.bpm);
-          const quantizedD1 = _quantizeOS(dOffset1);
-          const quantizedD2 = _quantizeOS(dOffset2);
-          const errQ1 = quantizedD1.sub(dOffset1).abs();
-          const errQ2 = quantizedD2.sub(dOffset2).abs();
-          if (errQ1.compare(errQ2) <= 0) {
-            // nextBpm is more suitable for this stop (= shift then stop)
-            canonicalBpmTimeline.push({
-              bpm: nextBpm,
-              time: curr.time,
-              offset: currOS,
-            });
+        if (last.bpm.equals(bpmHint)) {
+          if (bpmHint.equals(nextBpm)) {
+            // simple stop-and-go without bpm-shift (-> just ignore)
           } else {
-            // last.bpm is more suitable for this stop (= stop then shift)
-            canonicalBpmTimeline.push({
-              bpm: nextBpm,
-              time: next.time,
-              offset: currOS.add(quantizedD2),
-            });
+            // stop-then-bpmshift
+            const doffset = _quantizeOS(dtimeToOffset(next.time.sub(curr.time), last.bpm));
+            const nextOffset = offset.add(doffset);
+            canonicalBpmTimeline.push({ bpm: nextBpm, time: next.time, offset: nextOffset });
+          }
+        } else {
+          if (bpmHint.equals(nextBpm)) {
+            // bpmshift-then-stop
+            canonicalBpmTimeline.push({ bpm: nextBpm, time: curr.time, offset });
+          } else {
+            // shift-stop-then-shift-again (-> shift twice)
+            const doffset = _quantizeOS(dtimeToOffset(next.time.sub(curr.time), bpmHint));
+            const nextOffset = offset.add(doffset);
+            canonicalBpmTimeline.push({ bpm: bpmHint, time: curr.time, offset });
+            canonicalBpmTimeline.push({ bpm: nextBpm, time: next.time, offset: nextOffset });
           }
         }
         return 2; // we have canonicalized two events (shift and stop) here

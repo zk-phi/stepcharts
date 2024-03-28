@@ -40,8 +40,8 @@ type Timestamp<T extends Fraction | number> = {
 };
 
 // stops and bpm-changes with both timing and offset values
-// CALIB is used to cancel errors caused by inaccurate duration, when computing canonical chart
-type BpmEvent<T extends Fraction | number> = { bpm: T } & Timestamp<T>;
+// BPMHINT is defined iff its BPM=0 (stop event), and is used to quantize stop duration.
+type BpmEvent<T extends Fraction | number> = { bpm: T, bpmHint?: T } & Timestamp<T>;
 
 // arrows with both timing and offset values
 type ArrowEvent<T extends Fraction | number> =

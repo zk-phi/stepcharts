@@ -21,35 +21,36 @@ const _quantizeOS = (value: Fraction, aggressive?: boolean) => {
 };
 
 const QUANTIZATION_THRESHOLD = new Fraction(2, 60); // 2f in 60fps
-const _fixStopDuration = (duration: Fraction, bpm1: Fraction, bpm2?: Fraction): Fraction => {
-  const offset1 = dtimeToOffset(duration, bpm1);
-  const quantizedOffset1 = _quantizeOS(offset1);
-  const quantizedTime1 = doffsetToTime(quantizedOffset1, bpm1);
-  const qErr1 = quantizedTime1.sub(duration).abs();
+const _fixStopDuration =
+  (duration: Fraction, bpm1: Fraction, bpm2?: Fraction): [Fraction, Fraction] => {
+    const offset1 = dtimeToOffset(duration, bpm1);
+    const qOfs1 = _quantizeOS(offset1);
+    const qTime1 = doffsetToTime(qOfs1, bpm1);
+    const qErr1 = qTime1.sub(duration).abs();
 
-  if (!bpm2) {
-    if (qErr1.compare(QUANTIZATION_THRESHOLD) <= 0) return quantizedTime1;
-    throw new Error(
-      `Cannot quantize offset\n`
-      + `${offset1.toFraction()} -> ${quantizedOffset1.toFraction()} | ${qErr1.mul(60)}f @${bpm1}\n`
-    );
-  } else {
-    const offset2 = dtimeToOffset(duration, bpm2);
-    const quantizedOffset2 = _quantizeOS(offset2);
-    const quantizedTime2 = doffsetToTime(quantizedOffset2, bpm2);
-    const qErr2 = quantizedTime2.sub(duration).abs();
-    if (qErr1.compare(qErr2) <= 0) {
-      if (qErr1.compare(QUANTIZATION_THRESHOLD) <= 0) return quantizedTime1;
+    if (!bpm2) {
+      if (qErr1.compare(QUANTIZATION_THRESHOLD) <= 0) return [qTime1, bpm1];
+      throw new Error(
+        `Cannot quantize offset\n`
+        + `${offset1.toFraction()} -> ${qOfs1.toFraction()} | ${qErr1.mul(60)}f @${bpm1}\n`
+      );
     } else {
-      if (qErr2.compare(QUANTIZATION_THRESHOLD) <= 0) return quantizedTime2;
+      const offset2 = dtimeToOffset(duration, bpm2);
+      const qOfs2 = _quantizeOS(offset2);
+      const qTime2 = doffsetToTime(qOfs2, bpm2);
+      const qErr2 = qTime2.sub(duration).abs();
+      if (qErr1.compare(qErr2) <= 0) {
+        if (qErr1.compare(QUANTIZATION_THRESHOLD) <= 0) return [qTime1, bpm1];
+      } else {
+        if (qErr2.compare(QUANTIZATION_THRESHOLD) <= 0) return [qTime2, bpm2];
+      }
+      throw new Error(
+        `Cannot quantize offset\n`
+        + `${offset1.toFraction()} -> ${qOfs1.toFraction()} | ${qErr1.mul(60)}f @${bpm1}\n`
+        + `${offset2.toFraction()} -> ${qOfs2.toFraction()} | ${qErr2.mul(60)}f @${bpm2}\n`
+      );
     }
-    throw new Error(
-      `Cannot quantize offset\n`
-      + `${offset1.toFraction()} -> ${quantizedOffset1.toFraction()} | ${qErr1.mul(60)}f @${bpm1}\n`
-      + `${offset2.toFraction()} -> ${quantizedOffset2.toFraction()} | ${qErr2.mul(60)}f @${bpm2}\n`
-    );
-  }
-};
+  };
 
 // Align all stops and bpm-changes into a single timeline.
 // All timeline events will have both offset and timing value.
@@ -87,14 +88,14 @@ export const extractBpmEvents = (chart: Stepchart): BpmEvent<Fraction>[] => {
     // stop and bpm-shift at the same time
     if (next && e.offset === next.offset) {
       if (('stop' in next) && ('bpm' in e)) {
-        const duration = _fixStopDuration(next.stop, lastBpm, e.bpm);
-        timeline.unshift({ ...baseEntry, time,                              bpm: new Fraction(0) });
-        timeline.unshift({ ...baseEntry, time: time.add(duration), bpm: e.bpm });
+        const [duration, bpmHint] = _fixStopDuration(next.stop, lastBpm, e.bpm);
+        timeline.unshift({ ...baseEntry, time,                     bpm: new Fraction(0), bpmHint });
+        timeline.unshift({ ...baseEntry, time: time.add(duration), bpm: e.bpm,           bpmHint });
         i++;
       } else if (('stop' in e) && ('bpm' in next)) {
-        const duration = _fixStopDuration(e.stop, lastBpm, next.bpm);
-        timeline.unshift({ ...baseEntry, time,                              bpm: new Fraction(0) });
-        timeline.unshift({ ...baseEntry, time: time.add(duration), bpm: next.bpm });
+        const [duration, bpmHint] = _fixStopDuration(e.stop, lastBpm, next.bpm);
+        timeline.unshift({ ...baseEntry, time,                     bpm: new Fraction(0), bpmHint });
+        timeline.unshift({ ...baseEntry, time: time.add(duration), bpm: next.bpm,        bpmHint });
         i++;
       } else {
         throw new Error("Unexpected: duplicated BPM events");
@@ -102,9 +103,9 @@ export const extractBpmEvents = (chart: Stepchart): BpmEvent<Fraction>[] => {
     } else if ('bpm' in e) {
       timeline.unshift({ ...baseEntry, time, bpm: e.bpm });
     } else if ('stop' in e){
-      const duration = _fixStopDuration(e.stop, lastBpm);
-      timeline.unshift({ ...baseEntry, time,                              bpm: new Fraction(0) });
-      timeline.unshift({ ...baseEntry, time: time.add(duration), bpm: lastBpm });
+      const [duration, bpmHint] = _fixStopDuration(e.stop, lastBpm);
+      timeline.unshift({ ...baseEntry, time,                     bpm: new Fraction(0), bpmHint });
+      timeline.unshift({ ...baseEntry, time: time.add(duration), bpm: lastBpm,         bpmHint });
     } else {
       throw new Error("Unexpected: BPM event is not stop nor bpm-shift");
     }
