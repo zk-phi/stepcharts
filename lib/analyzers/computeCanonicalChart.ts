@@ -1,41 +1,10 @@
+import Fraction from "fraction.js";
 import { OFFSET_PRECISION } from "../../constants/precision";
 import { SPECIAL_CANONICAL_OFFSETS } from "../../constants/specialCanonicalOffsets";
-
-// EXPERIMENTAL
-// FIXME
-
-// over the period の開幕みたいな超絶キモい停止には対応できないのでどうするか。
-// ... 22.5 でせり上がり、矢印の直前で停止、一瞬 22.5 で続きスクロールして矢印に到達、
-// そこからは bpm 200。んで、停止の時間は「一瞬の 22.5 スクロール」と合わせると、
-// 実質 200 の１小節相当になる。
-// - over the period
-// - the reason
-// - hou
-// - etc
-
-// schwarzchild field あたりを見るに、そもそも停止の duration の精度が良くないやつも
-// ありそう、元の sm/dwi の問題
-
-// 後続の矢印見てから calib するんじゃなく、最初から停止の duration 自体を calib しちゃう
-// んでもいいんじゃないかな。なんなら parseSimfile の時点で、とか。
-// parseSimfile の時点で全てが整然とした状態になっていれば、 canonicalize はスムーズ
-// になると思われる（そうであってくれ）。
-// 懸念は「全ての停止が 24/16 分に収まる」という仮定が果たして成り立つか。あと矢印
-// を見ないとオバピリみたいな変態ソフランはどうにもならんのではという懸念。
-// 少なくとも calib の幅がデカくなりすぎた時は多分なにかがおかしいので、
-// エラーなり warning なり出して検出できるようにはしておきたい
-
-import Fraction from "fraction.js";
 import { dtimeToOffset, doffsetToTime } from "../util";
 import { computeBeatTimings } from "./timingAnalyzers";
 import { calculateBpmStats } from "./calculateBpmStats";
 import { determineBeat } from "../util";
-
-// const SPECIAL_STOP_BPMS: Record<string, Record<number, Fraction>> = {
-//   'over-the-period': {
-//     6: new Fraction(200),
-//   },
-// };
 
 // Convert bpm to a canonical value, which is in range 120 - 240.
 export const canonicalBpm = (bpm: Fraction, _multiplier?: Fraction): [Fraction, Fraction] => (

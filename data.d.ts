@@ -52,13 +52,14 @@ type FreezeEvent<T extends Fraction | number> =
   Omit<FreezeBody, "startOffset" | "endOffset"> & { start: Timestamp<T>, end: Timestamp<T> };
 
 type AnalyzedStepchart<T extends Fraction | number> = {
-  minBpm: number;
-  maxBpm: number;
-  mainBpm: number;
   freezeTimeline: FreezeEvent<T>[];
   arrowTimeline: ArrowEvent<T>[];
   bpmTimeline: BpmEvent<T>[];
   beatTimeline: Timestamp<T>[];
+  // bpms of canonical charts may be different from the original ones
+  minBpm: number;
+  maxBpm: number;
+  mainBpm: number;
 };
 
 

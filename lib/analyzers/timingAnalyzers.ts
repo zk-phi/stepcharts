@@ -6,7 +6,10 @@ import { doffsetToTime, doffsetNumToTime, dtimeNumToOffset } from "../util";
 
 // Align all stops and bpm-changes into a single timeline.
 // All timeline events will have both offset and timing value.
-// Stops are represented by bpm-changes to zero.
+// Stops are represented by "bpm-changes to zero".
+//
+// Stop durations are fixed here (basically) by quantization.
+// Some stops are hard-coded in the SPECIAL_BPMS constant.
 export const extractBpmEvents =
   (songId: string, difficulty: Difficulty, chart: Stepchart): BpmEvent<Fraction>[] => {
     const bpmEvents = [
