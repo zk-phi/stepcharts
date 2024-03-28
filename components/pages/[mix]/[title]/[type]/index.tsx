@@ -5,12 +5,7 @@ import { usePreview } from "../../../../../lib/hooks/usePreview";
 import { prepareAudioContext } from "../../../../../lib/audioContext";
 import { TURNS } from "../../../../../constants/turn";
 
-const defaultSpeedFn = (mainBpm: number) => Math.floor(620 / mainBpm * 4) / 4
-
-const defaultEnableTick = (chart: AnalyzedStepchart<number>) => (
-  chart.arrowTimeline.reduce((l, r) => l + (r.beat === 4 ? 1 : 0), 0)
-  >= chart.arrowTimeline.length / 4
-);
+const defaultSpeedFn = (mainBpm: number) => Math.floor(600 / mainBpm * 4) / 4
 
 type Options = {
   speed: number,
@@ -76,7 +71,6 @@ const OptionsPanel = ({
     ) : (
       chart.chart.mainBpm
     )),
-    tick: defaultEnableTick(e.target.checked ? chart.canonicalChart : chart.chart),
   }), [options, onChange]);
 
   const onChangeColorFreezes = React.useCallback((e) => onChange({
@@ -291,7 +285,7 @@ const PreviewPage = ({ chart }: {
   const [options, setOptions] = React.useState<Options>({
     speed: defaultSpeedFn(chart.chart.mainBpm),
     turn: "OFF",
-    tick: defaultEnableTick(chart.chart),
+    tick: true,
     constantMode: false,
     colorFreezes: true,
     diminishFreezes: true,
@@ -300,7 +294,7 @@ const PreviewPage = ({ chart }: {
     highlightSoflan: true,
     verboseColors: true,
     canonicalColors: false,
-    canonicalTicks: false,
+    canonicalTicks: true,
     canonicalMode: false,
   });
 
