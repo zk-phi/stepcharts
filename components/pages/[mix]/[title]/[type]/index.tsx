@@ -147,13 +147,6 @@ const OptionsPanel = ({
         )}
       </div>
       <div>
-        <label>
-          スクロール速度を一定に
-          {" "}
-          <input type="checkbox" checked={options.constantMode} onChange={onChangeConstantMode} />
-        </label>
-      </div>
-      <div>
         TURN:
         {" "}
         <select value={options.turn} onInput={onChangeTurn}>
@@ -164,70 +157,87 @@ const OptionsPanel = ({
       </div>
       <div>
         <label>
-          フリーズも色分けする
-          {" "}
-          <input type="checkbox" checked={options.colorFreezes} onChange={onChangeColorFreezes} />
-        </label>
-      </div>
-      <div>
-        <label>
-          フリーズの棒部分を控えめに表示
-          {" "}
-          <input type="checkbox" checked={options.diminishFreezes} onChange={onChangeDiminishFreezes} />
-        </label>
-      </div>
-      <div>
-        <label>
-          低速・高速地帯を色分け
-          {" "}
-          <input type="checkbox" checked={options.soflanBg} onChange={onChangeSoflanBg} />
-        </label>
-      </div>
-      <div>
-        <label>
-          ソフラン箇所に目印を表示
-          {" "}
-          <input type="checkbox" checked={options.soflanValue} onChange={onChangeSoflanValue} />
-        </label>
-      </div>
-      <div>
-        <label>
-          ソフラン直前のノートをハイライト
-          {" "}
-          <input type="checkbox" checked={options.highlightSoflan} onChange={onChangeHighlightSoflan} />
-        </label>
-      </div>
-      <div>
-        <label>
-          24 分以下のノートも色分け
-          {" "}
-          <input type="checkbox" checked={options.verboseColors} onChange={onChangeVerboseColors} />
-        </label>
-      </div>
-      <div>
-        <label>
-          小節線を表示＆メトロノームを再生
+          小節線を表示＆メトロノームを再生:
           {" "}
           <input type="checkbox" checked={options.tick} onChange={onChangeTick} />
         </label>
       </div>
       <div>
         <label>
-          色分けをソフランに追従（β）
+          24 分以下のノートも色分け:
+          {" "}
+          <input type="checkbox" checked={options.verboseColors} onChange={onChangeVerboseColors} />
+        </label>
+      </div>
+      <div>
+        矢印の色:
+        {" "}
+        <select>
+          <option>多様性対応</option>
+        </select>
+      </div>
+      <h3 style={{ fontWeight: "bold" }}>フリーズ補助</h3>
+      <div>
+        <label>
+          フリーズも色分けする:
+          {" "}
+          <input type="checkbox" checked={options.colorFreezes} onChange={onChangeColorFreezes} />
+        </label>
+      </div>
+      <div>
+        <label>
+          フリーズの棒部分を控えめに表示:
+          {" "}
+          <input type="checkbox" checked={options.diminishFreezes} onChange={onChangeDiminishFreezes} />
+        </label>
+      </div>
+      <h3 style={{ fontWeight: "bold" }}>ソフラン補助</h3>
+      <div>
+        <label>
+          低速・高速地帯の背景色を変える:
+          {" "}
+          <input type="checkbox" checked={options.soflanBg} onChange={onChangeSoflanBg} />
+        </label>
+      </div>
+      <div>
+        <label>
+          ソフラン箇所に目印を設置:
+          {" "}
+          <input type="checkbox" checked={options.soflanValue} onChange={onChangeSoflanValue} />
+        </label>
+      </div>
+      <div>
+        <label>
+          ソフラン直前の矢印をハイライト:
+          {" "}
+          <input type="checkbox" checked={options.highlightSoflan} onChange={onChangeHighlightSoflan} />
+        </label>
+      </div>
+      <div>
+        <label>
+          スクロール速度をソフランに追従:
+          {" "}
+          <input type="checkbox" checked={options.constantMode} onChange={onChangeConstantMode} />
+        </label>
+      </div>
+      <div>
+        <label>
+          矢印の色分けをソフランに追従（β）:
           {" "}
           <input type="checkbox" checked={options.canonicalColors} onChange={onChangeCanonicalColors} />
         </label>
       </div>
       <div>
         <label>
-          メトロノームをソフランに追従（β）
+          メトロノームをソフランに追従（β）:
           {" "}
           <input type="checkbox" checked={options.canonicalTicks} onChange={onChangeCanonicalTicks} />
         </label>
       </div>
+      <h3 style={{ fontWeight: "bold" }}>他</h3>
       <div>
         <label>
-          show canonical chart（※デバッグ用）
+          show canonical chart（※デバッグ用）:
           {" "}
           <input type="checkbox" checked={options.canonicalMode} onChange={onChangeCanonicalMode} />
         </label>
