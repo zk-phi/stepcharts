@@ -1,4 +1,4 @@
-const dateReleased: Record<string, string> = {
+export const dateReleased: Record<string, string> = {
   "1stmix": "1998-09-26",
   "2013": "2013-03-14",
   "2014": "2014-05-12",
@@ -22,7 +22,7 @@ const dateReleased: Record<string, string> = {
   "lsp": "9999-12-31",
 };
 
-const mixNames: Record<string, string> = {
+export const mixNames: Record<string, string> = {
   "1stmix": "初代",
   "2013": "2013",
   "2014": "2014",
@@ -46,7 +46,7 @@ const mixNames: Record<string, string> = {
   "lsp": "EDIT: LSP",
 };
 
-const shortMixNames: Record<string, string> = {
+export const shortMixNames: Record<string, string> = {
   "1stmix": "1st",
   "2013": "2013",
   "2014": "2014",
@@ -69,5 +69,3 @@ const shortMixNames: Record<string, string> = {
   "x3-vs-2nd-mix": "X3",
   "lsp": "LSP",
 };
-
-export { dateReleased, mixNames, shortMixNames };
