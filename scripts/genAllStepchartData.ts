@@ -105,7 +105,8 @@ const serializedChart = (chart: AnalyzedStepchart<Fraction>): AnalyzedStepchart<
     bpm: b.bpm.n / b.bpm.d,
     time: b.time.n / b.time.d,
     offset: b.offset.n / b.offset.d,
-    bpmHint: b.bpmHint && (b.bpmHint.n / b.bpmHint.d),
+    stopBpm: b.stopBpm && (b.stopBpm.n / b.stopBpm.d),
+    stopDuration: b.stopDuration,
   })),
   arrowTimeline: chart.arrowTimeline.map((a: ArrowEvent<Fraction>): ArrowEvent<number> => ({
     ...a,

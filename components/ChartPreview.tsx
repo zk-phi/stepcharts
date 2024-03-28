@@ -128,10 +128,11 @@ const Freeze = ({ direction, pos, endPos, diminished }: {
   );
 };
 
-const Bar = ({ pos, color, value }: {
+const Bar = ({ pos, color, value, hint }: {
   pos: number,
   color?: string,
   value?: number,
+  hint?: string,
 }) => {
   const style: React.CSSProperties = {
     position: "absolute",
@@ -149,9 +150,18 @@ const Bar = ({ pos, color, value }: {
     top: "4px",
   };
 
+  const hintStyle: React.CSSProperties = {
+    position: "absolute",
+    width: "100%",
+    color: color,
+    textAlign: "right",
+    top: "4px",
+  };
+
   return (
     <div style={style}>
       {value && <div style={innerStyle}>{value}</div>}
+      {hint && <div style={hintStyle}>{hint}</div>}
     </div>
   );
 };
@@ -238,7 +248,8 @@ const BeatIndicatorsRaw = ({
           <Bar
               key={`bar${i}`}
               pos={toPos(e)}
-              color={"#FF8082"} />
+              color={"#FF8082"}
+              hint={`${e.stopDuration} @${e.stopBpm}`} />
         ) : (es[i - 1].bpm || es[i - 2]!.bpm) < e.bpm ? (
           <Bar key={`bar${i}`} pos={toPos(e)} color={"#F6AA00"} value={e.bpm} />
         ) : e.bpm < (es[i - 1].bpm || es[i - 2]!.bpm) ? (
