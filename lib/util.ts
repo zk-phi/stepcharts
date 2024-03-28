@@ -24,3 +24,8 @@ export function determineBeat(offset: Fraction): Arrow["beat"] {
 export const mergeSameBpms = (bpms: Bpm[]): Bpm[] => (
   bpms.filter((b, i) => i === 0 || !bpms[i - 1].bpm.equals(b.bpm))
 );
+
+export const doffsetToTime = (offset: Fraction, bpm: Fraction) => offset.mul(4).div(bpm).mul(60);
+export const dtimeToOffset = (sec: Fraction, bpm: Fraction) => bpm.mul(sec).div(60).div(4);
+export const doffsetNumToTime = (offset: number, bpm: number) => offset * 4 * 60 / bpm;
+export const dtimeNumToOffset = (sec: number, bpm: number) => sec * bpm / 60 / 4;

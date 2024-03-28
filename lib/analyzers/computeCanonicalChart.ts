@@ -26,7 +26,8 @@ import { SPECIAL_CANONICAL_OFFSETS } from "../../constants/specialCanonicalOffse
 // エラーなり warning なり出して検出できるようにはしておきたい
 
 import Fraction from "fraction.js";
-import { dtimeToOffset, doffsetToTime, computeBeatTimings } from "./timingAnalyzers";
+import { dtimeToOffset, doffsetToTime } from "../util";
+import { computeBeatTimings } from "./timingAnalyzers";
 import { calculateBpmStats } from "./calculateBpmStats";
 import { determineBeat } from "../util";
 

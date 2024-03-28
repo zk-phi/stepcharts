@@ -2,11 +2,12 @@ import Fraction from "fraction.js";
 import { canonicalBpm } from "./computeCanonicalChart";
 import { STOP_QUANTIZATION_THRESHOLD } from "../../constants/precision";
 import { SPECIAL_BPMS } from "../../constants/specialBpms";
-
-export const doffsetToTime = (offset: Fraction, bpm: Fraction) => offset.mul(4).div(bpm).mul(60);
-export const dtimeToOffset = (sec: Fraction, bpm: Fraction) => bpm.mul(sec).div(60).div(4);
-export const doffsetNumToTime = (offset: number, bpm: number) => offset * 4 * 60 / bpm;
-export const dtimeNumToOffset = (sec: number, bpm: number) => sec * bpm / 60 / 4;
+import {
+  doffsetToTime,
+  dtimeToOffset,
+  doffsetNumToTime,
+  dtimeNumToOffset,
+} from "../util";
 
 const _quantizeDuration = (
   duration: Fraction,
