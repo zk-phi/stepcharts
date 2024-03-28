@@ -37,6 +37,18 @@ const _extractBpmEvents =
       bpm: bpmEvents.shift().bpm,
     }];
 
+    const specialOffsets = specialBpms?.[difficulty]?.[0] ?? specialBpms?.all?.[0];
+    if (specialOffsets) {
+      const bpm = timeline[0].bpm;
+      const offset = new Fraction(0);
+      let time = new Fraction(0);
+      specialOffsets.forEach((o) => {
+        timeline.unshift({ offset, time, bpm: new Fraction(0), ...o[1] });
+        time = time.add(o[0]);
+      });
+      timeline.unshift({ offset, time, bpm });
+    }
+
     for (let i = 0; i < bpmEvents.length; i++) {
       const e = bpmEvents[i]!;
       const next = bpmEvents[i + 1];
