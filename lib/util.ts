@@ -11,7 +11,7 @@ const beats = [
   new Fraction(1).div(64),
 ];
 
-function determineBeat(offset: Fraction): Arrow["beat"] {
+export function determineBeat(offset: Fraction): Arrow["beat"] {
   const match = beats.find((b) => offset.mod(b).n === 0);
 
   if (!match) {
@@ -21,30 +21,6 @@ function determineBeat(offset: Fraction): Arrow["beat"] {
   return match.d as Arrow["beat"];
 }
 
-const normalizedDifficultyMap: Record<string, Difficulty> = {
-  beginner: "beginner",
-  easy: "basic",
-  basic: "basic",
-  trick: "difficult",
-  another: "difficult",
-  medium: "difficult",
-  difficult: "expert",
-  expert: "expert",
-  maniac: "expert",
-  ssr: "expert",
-  hard: "expert",
-  challenge: "challenge",
-  smaniac: "challenge",
-  // TODO: filter edits out altogether
-  edit: "edit",
-};
-
-const mergeSameBpms = (bpms: Bpm[]): Bpm[] => (
+export const mergeSameBpms = (bpms: Bpm[]): Bpm[] => (
   bpms.filter((b, i) => i === 0 || !bpms[i - 1].bpm.equals(b.bpm))
 );
-
-export {
-  determineBeat,
-  normalizedDifficultyMap,
-  mergeSameBpms,
-};

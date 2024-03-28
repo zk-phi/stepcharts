@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import Fraction from "fraction.js";
-import { parseSimfile } from "../lib/parseSimfile";
+import { parseSimfile } from "../lib/parsers/parseSimfile";
 import { calculateStats } from "../lib/calculateStats";
 import { dateReleased, mixNames, shortMixNames } from "../lib/meta";
 import {

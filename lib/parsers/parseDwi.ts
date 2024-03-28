@@ -1,12 +1,8 @@
 import fs from "fs";
 import Fraction from "fraction.js";
-import { RawSimfile } from "./parseSimfile";
-import { bpmFrac, offsetFrac } from "../constants/precision";
-import {
-  determineBeat,
-  normalizedDifficultyMap,
-  mergeSameBpms,
-} from "./util";
+import { RawSimfile, normalizedDifficultyMap } from "./common";
+import { bpmFrac, offsetFrac } from "../../constants/precision";
+import { determineBeat, mergeSameBpms } from "../util";
 
 const metaTagsToConsume = ["title", "artist"];
 

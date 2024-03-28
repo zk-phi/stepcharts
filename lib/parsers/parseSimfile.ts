@@ -1,13 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
+import { RawSimfile, Parser } from "./common";
 import { parseDwi } from "./parseDwi";
 import { parseSm } from "./parseSm";
-
-type RawSimfile = Omit<Simfile, "title"> & {
-  title: string;
-  titletranslit: string | null;
-};
-type Parser = (simfileSource: string, titleDir: string) => RawSimfile;
 
 const INTRO_OFFSET = 1;
 
@@ -38,7 +33,7 @@ const mapObject = <K extends string | number | symbol, V, W>(
   Object.fromEntries((Object.keys(obj) as K[]).map((k) => [k, fn(obj[k])])) as Record<K, W>
 );
 
-function parseSimfile(
+export function parseSimfile(
   rootDir: string,
   mixDir: string,
   titleDir: string
@@ -90,6 +85,3 @@ function parseSimfile(
     })),
   };
 }
-
-export { parseSimfile };
-export type { RawSimfile };
