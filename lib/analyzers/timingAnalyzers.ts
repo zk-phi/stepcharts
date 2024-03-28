@@ -124,9 +124,7 @@ export const extractBpmEvents =
         if (!stopEvent || !shiftEvent) {
           throw new Error("Unexpected: duplicated BPM events");
         }
-        const [duration, stop] = specialBpms?.[i + 1] ? (
-          _fixStopDuration(stopEvent.stop, new Fraction(specialBpms[i + 1]))
-        ) : (
+        const [duration, stop] = specialBpms?.[timeline.length] ?? (
           _fixStopDuration(stopEvent.stop, lastBpm, shiftEvent.bpm)
         );
         timeline.unshift({ ...baseEntry, time,                     bpm: new Fraction(0), ...stop });
@@ -137,9 +135,7 @@ export const extractBpmEvents =
         timeline.unshift({ ...baseEntry, time, bpm: e.bpm });
       } else if ('stop' in e){
         // simple stop-and-go
-        const [duration, stop] = specialBpms?.[i] ? (
-          _fixStopDuration(e.stop, new Fraction(specialBpms[i]))
-        ) : (
+        const [duration, stop] = specialBpms?.[timeline.length] ?? (
           _fixStopDuration(e.stop, lastBpm)
         );
         timeline.unshift({ ...baseEntry, time,                     bpm: new Fraction(0), ...stop });

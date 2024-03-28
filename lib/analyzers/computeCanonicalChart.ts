@@ -1,4 +1,5 @@
 import { OFFSET_PRECISION } from "../../constants/precision";
+import { SPECIAL_CANONICAL_OFFSETS } from "../../constants/specialCanonicalOffsets";
 
 // EXPERIMENTAL
 // FIXME
@@ -79,7 +80,7 @@ export const computeCanonicalChart =
     const canonicalArrowTimeline: ArrowEvent<Fraction>[] = [];
     const canonicalBpmTimeline: BpmEvent<Fraction>[] = [{
       time: new Fraction(0),
-      offset: new Fraction(0),
+      offset: SPECIAL_CANONICAL_OFFSETS[songId] ?? new Fraction(0),
       bpm: canonicalBpm(bpms[0].bpm)[0],
     }];
 
