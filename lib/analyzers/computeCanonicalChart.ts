@@ -85,45 +85,13 @@ export const computeCanonicalChart =
     }];
 
     // canonicalize chart.bpmTimeline[bi] and push to canonicalBpmTimeline.
-    // returns number of consumed bpm events
-    const _canonicalizeBpmEvent = (bi: number): number => {
+    const _canonicalizeBpmEvent = (bi: number) => {
       const last = canonicalBpmTimeline[canonicalBpmTimeline.length - 1];
       const curr = bpms[bi];
       const doffset = _quantizeOS(dtimeToOffset(curr.time.sub(last.time), last.bpm));
       const offset = last.offset.add(doffset);
-
-      if (!curr.bpm.equals(0)) {
-        // bpm-shift event without stop
-        canonicalBpmTimeline.push({ bpm: canonicalBpm(curr.bpm)[0], time: curr.time, offset });
-        return 1;
-      } else {
-        // stop event
-        const next = bpms[bi + 1]!; // another bpm event MUST EXIST after a stop event
-        const [stopBpm] = canonicalBpm(curr.stopBpm!);
-        const [nextBpm] = canonicalBpm(next.bpm);
-        if (last.bpm.equals(stopBpm)) {
-          if (stopBpm.equals(nextBpm)) {
-            // simple stop-and-go without bpm-shift (-> just ignore)
-          } else {
-            // stop-then-bpmshift
-            const doffset = _quantizeOS(dtimeToOffset(next.time.sub(curr.time), last.bpm));
-            const nextOffset = offset.add(doffset);
-            canonicalBpmTimeline.push({ bpm: nextBpm, time: next.time, offset: nextOffset });
-          }
-        } else {
-          if (stopBpm.equals(nextBpm)) {
-            // bpmshift-then-stop
-            canonicalBpmTimeline.push({ bpm: nextBpm, time: curr.time, offset });
-          } else {
-            // shift-stop-then-shift-again (-> shift twice)
-            const doffset = _quantizeOS(dtimeToOffset(next.time.sub(curr.time), stopBpm));
-            const nextOffset = offset.add(doffset);
-            canonicalBpmTimeline.push({ bpm: stopBpm, time: curr.time, offset });
-            canonicalBpmTimeline.push({ bpm: nextBpm, time: next.time, offset: nextOffset });
-          }
-        }
-        return 2; // we have canonicalized two events (shift and stop) here
-      }
+      const [cBpm] = canonicalBpm(curr.bpm.equals(0) ? curr.stopBpm! : curr.bpm);
+      canonicalBpmTimeline.push({ bpm: cBpm, time: curr.time, offset });
     };
 
     // canonicalize arrow events and bpm events
@@ -131,7 +99,8 @@ export const computeCanonicalChart =
     for (let ai = 0; ai < chart.arrowTimeline.length; ai++) {
       // if arrow.offset > nextBpmEvent.offset, fetch (and canonicalize) next bpm event
       while (bpms[bi + 1] && arrows[ai].offset.compare(bpms[bi + 1].offset) > 0)  {
-        bi += _canonicalizeBpmEvent(bi + 1);
+        _canonicalizeBpmEvent(bi + 1);
+        bi++;
       }
       const currentBpm = canonicalBpmTimeline[canonicalBpmTimeline.length - 1];
       const arr = arrows[ai];

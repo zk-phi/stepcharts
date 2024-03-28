@@ -252,9 +252,9 @@ const BeatIndicatorsRaw = ({
               pos={toPos(e)}
               color={"#FF8082"}
               hint={`${e.stopDuration} @${e.stopBpm}`} />
-        ) : (es[i - 1].bpm || es[i - 2]!.bpm) < e.bpm ? (
+        ) : (es[i - 1].bpm || es[i - 2]!.bpm || es[i - 3]!.bpm) < e.bpm ? (
           <Bar key={`bar${i}`} pos={toPos(e)} color={"#F6AA00"} value={e.bpm} />
-        ) : e.bpm < (es[i - 1].bpm || es[i - 2]!.bpm) ? (
+        ) : e.bpm < (es[i - 1].bpm || es[i - 2]!.bpm || es[i - 3]!.bpm) ? (
           <Bar key={`bar${i}`} pos={toPos(e)} color={"#4DC4FF"} value={e.bpm} />
         ) : (
           null
