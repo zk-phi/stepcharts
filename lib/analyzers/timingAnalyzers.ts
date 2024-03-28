@@ -24,6 +24,26 @@ const _quantizeDuration = (
   }];
 }
 
+const _verifyQuantization = (
+  duration: Fraction,
+  stops: [Fraction, { stopBpm: Fraction, stopDuration: string }][],
+  verbose?: boolean,
+): boolean => {
+  const total = stops.reduce((l, r) => l.add(r[0]), new Fraction(0));
+  if (duration.sub(total).abs().compare(QUANTIZATION_THRESHOLD) <= 0) {
+    return true;
+  } else {
+    if (verbose) {
+      console.log(
+        `WARNING: Quantization violates the threshold:\n`
+        +`- duration: ${duration} -> ${total} (err: ${total.sub(duration).mul(60)}f @60fps)\n`
+        + stops.map((s) => `- ${s[1].stopDuration} @${s[1].stopBpm}`).join("\n")
+      );
+    }
+    return false;
+  }
+}
+
 const _fixStopDuration = (
   ix: number,
   duration: Fraction,
@@ -39,7 +59,7 @@ const _fixStopDuration = (
     candidates.push(_quantizeDuration(duration, bpm2, _conservative ? "1/24" : "1/12"));
   }
   const accepted = candidates.filter((c) => (
-    c[0].sub(duration).abs().compare(QUANTIZATION_THRESHOLD) <= 0
+    _verifyQuantization(duration, [c])
   )).filter((c, i, cs) => (
     i === 0 || !c[0].equals(cs[i - 1][0])
   ));
@@ -103,6 +123,7 @@ export const extractBpmEvents =
         const stops = specialBpms?.[timeline.length] ?? [
           _fixStopDuration(timeline.length, stopEvent.stop, lastBpm, shiftEvent.bpm)
         ];
+        _verifyQuantization(stopEvent.stop, stops, true);
         stops.forEach((s) => {
           timeline.unshift({ ...baseEntry, time, bpm: new Fraction(0), ...s[1] });
           time = time.add(s[0]);
@@ -117,6 +138,7 @@ export const extractBpmEvents =
         const stops = specialBpms?.[timeline.length] ?? [
           _fixStopDuration(timeline.length, e.stop, lastBpm)
         ];
+        _verifyQuantization(e.stop, stops, true);
         stops.forEach((s) => {
           timeline.unshift({ ...baseEntry, time, bpm: new Fraction(0), ...s[1] });
           time = time.add(s[0]);
