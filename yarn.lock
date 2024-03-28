@@ -1740,10 +1740,9 @@ for-in@^1.0.2:
   resolved "https://registry.yarnpkg.com/for-in/-/for-in-1.0.2.tgz#81068d295a8142ec0ac726c6e2200c30fb6d5e80"
   integrity sha1-gQaNKVqBQuwKxybG4iAMMPttXoA=
 
-fraction.js@^4.0.13:
-  version "4.0.13"
-  resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.0.13.tgz#3c1c315fa16b35c85fffa95725a36fa729c69dfe"
-  integrity sha512-E1fz2Xs9ltlUp+qbiyx9wmt2n9dRzPsS11Jtdb8D2o+cC7wr9xkkKsVKJuBX0ST+LVS+LhLO+SbLJNtfWcJvXA==
+fraction.js@rawify/Fraction.js#f9ccdb060d8b1525295e70364fb8022243886ff2:
+  version "4.3.7"
+  resolved "https://codeload.github.com/rawify/Fraction.js/tar.gz/f9ccdb060d8b1525295e70364fb8022243886ff2"
 
 fragment-cache@^0.2.1:
   version "0.2.1"
