@@ -30,29 +30,46 @@ const _fixStopDuration =
     const qOfs1 = _quantizeOS(offset1).div(bpmMult1);
     const qTime1 = doffsetToTime(qOfs1, bpm1);
     const qErr1 = qTime1.sub(duration).abs();
+    const accepted1 = qErr1.compare(QUANTIZATION_THRESHOLD) <= 0;
 
     if (!bpm2) {
-      if (qErr1.compare(QUANTIZATION_THRESHOLD) <= 0) return [qTime1, bpm1];
-      throw new Error(
-        `Cannot quantize offset\n`
-        + `${offset1.toFraction()} -> ${qOfs1.toFraction()} | ${qErr1.mul(60)}f @${bpm1}\n`
-      );
+      if (!accepted1) {
+        throw new Error(
+          `Cannot quantize offset\n`
+          + `${offset1.toFraction()} -> ${qOfs1.toFraction()} | ${qErr1.mul(60)}f @${bpm1}\n`
+        );
+      }
+      return [qTime1, bpm1];
     } else {
       const [cBpm2, bpmMult2] = canonicalBpm(bpm2);
       const offset2 = dtimeToOffset(duration, cBpm2);
       const qOfs2 = _quantizeOS(offset2).div(bpmMult2);
       const qTime2 = doffsetToTime(qOfs2, bpm2);
       const qErr2 = qTime2.sub(duration).abs();
-      if (qErr1.compare(qErr2) <= 0) {
-        if (qErr1.compare(QUANTIZATION_THRESHOLD) <= 0) return [qTime1, bpm1];
+      const accepted2 = qErr2.compare(QUANTIZATION_THRESHOLD) <= 0;
+
+      if (accepted1 && !accepted2) {
+        return [qTime1, bpm1];
+      } else if (!accepted1 && accepted2) {
+        return [qTime2, bpm2];
+      } else if (accepted1 && accepted2) {
+        console.log(
+          `WARNING: Both 2 quantization candidates are accepted:\n`
+          + `${offset1.toFraction()} -> ${qOfs1.toFraction()} | ${qErr1.mul(60)}f @${bpm1}\n`
+          + `${offset2.toFraction()} -> ${qOfs2.toFraction()} | ${qErr2.mul(60)}f @${bpm2}\n`
+        );
+        if (qOfs1.d < qOfs2.d) {
+          return [qTime1, bpm1];
+        } else {
+          return [qTime2, bpm2];
+        }
       } else {
-        if (qErr2.compare(QUANTIZATION_THRESHOLD) <= 0) return [qTime2, bpm2];
+        throw new Error(
+          `Cannot quantize offset\n`
+          + `${offset1.toFraction()} -> ${qOfs1.toFraction()} | ${qErr1.mul(60)}f @${bpm1}\n`
+          + `${offset2.toFraction()} -> ${qOfs2.toFraction()} | ${qErr2.mul(60)}f @${bpm2}\n`
+        );
       }
-      throw new Error(
-        `Cannot quantize offset\n`
-        + `${offset1.toFraction()} -> ${qOfs1.toFraction()} | ${qErr1.mul(60)}f @${bpm1}\n`
-        + `${offset2.toFraction()} -> ${qOfs2.toFraction()} | ${qErr2.mul(60)}f @${bpm2}\n`
-      );
     }
   };
 
