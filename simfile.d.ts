@@ -12,14 +12,8 @@ type StepchartType = {
 };
 
 type Stats = {
-  jumps: number;
   jacks: number;
-  freezes: number;
-  gallops: number;
   shocks: number;
-  eighths: number;
-  sixteenths: number;
-  trips: number;
 };
 
 type Arrow = {

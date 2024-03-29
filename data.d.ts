@@ -1,4 +1,5 @@
-type ArrowTags = "soflanTrigger" | "jump" | "shock";
+type ArrowTag =
+  "soflanTrigger" | "jump" | "shock" | "freeze" | "backbeat" | "gallop" | "offbeat" | "trip";
 
 type MixMeta = {
   mixId: string;
@@ -21,11 +22,16 @@ type ChartMeta = Stats & {
   level: number;
   arrows: number;
   stops: number;
+  jumps: number;
+  freezes: number;
   bpmShifts: number;
   minBpm: number;
   maxBpm: number;
   mainBpm: number;
-  complexity: number;
+  backbeats: number;
+  gallops: number;
+  trips: number;
+  offbeats: number;
   // FOR DEBUG
   // % of 32nd+ notes, which is considered as errors
   canonicalChartErrorRate: number;
@@ -46,7 +52,7 @@ type BpmEvent<T extends Fraction | number> =
 
 // arrows with both timing and offset values
 type ArrowEvent<T extends Fraction | number> =
-  Omit<Arrow, "offset"> & { tags: Partial<Record<ArrowTags, boolean>> } & Timestamp<T>;
+  Omit<Arrow, "offset"> & { tags: Partial<Record<ArrowTag, boolean>> } & Timestamp<T>;
 
 type FreezeEvent<T extends Fraction | number> =
   Omit<FreezeBody, "startOffset" | "endOffset"> & { start: Timestamp<T>, end: Timestamp<T> };

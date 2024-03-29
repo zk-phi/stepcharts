@@ -6,8 +6,12 @@ import { calculateStats } from "../lib/calculateStats";
 import { dateReleased, mixNames, shortMixNames } from "../constants/meta";
 import { analyzeChartEvents } from "../lib/analyzers/timingAnalyzers";
 import { computeCanonicalChart } from "../lib/analyzers/computeCanonicalChart";
-import { tagJumpsAndShocks } from "../lib/analyzers/tagJumpsAndShocks";
+import { tagJumpsFreezesAndShocks } from "../lib/analyzers/tagJumpsFreezesAndShocks";
 import { tagSoflanTriggers } from "../lib/analyzers/tagSoflanTriggers";
+import { tagBackbeats } from "../lib/analyzers/tagBackbeats";
+import { tagGallops } from "../lib/analyzers/tagGallops";
+import { tagOffbeats } from "../lib/analyzers/tagOffbeats";
+import { tagTrips } from "../lib/analyzers/tagTrips";
 import { calculateBpmStats } from "../lib/analyzers/calculateBpmStats";
 
 const ROOT = "./stepcharts-data/simfiles";
@@ -163,27 +167,36 @@ const allData: AllData = mixDirs.map((mixDir) => {
             chartType.difficulty,
             chart,
           );
-          tagJumpsAndShocks(analyzedChart.arrowTimeline);
-          tagSoflanTriggers(analyzedChart.arrowTimeline, analyzedChart.bpmTimeline);
           const canonicalChart = computeCanonicalChart(simfile.title.titleDir, analyzedChart);
+          tagJumpsFreezesAndShocks(analyzedChart.arrowTimeline);
+          tagSoflanTriggers(analyzedChart.arrowTimeline, analyzedChart.bpmTimeline);
+          tagBackbeats(analyzedChart.arrowTimeline, canonicalChart.arrowTimeline);
+          tagGallops(analyzedChart.arrowTimeline, canonicalChart.arrowTimeline);
+          tagOffbeats(analyzedChart.arrowTimeline, canonicalChart.arrowTimeline);
+          tagTrips(analyzedChart.arrowTimeline, canonicalChart.arrowTimeline);
+          const taggedArrowsPercentage = (tag: ArrowTag) => (
+            analyzedChart.arrowTimeline.filter((a) => a.tags[tag]).length * 100
+            / analyzedChart.arrowTimeline.length
+          );
           return {
             meta: {
               difficulty: chartType.difficulty,
               level: chartType.feet,
               arrows: chart.arrows.length,
               stops: chart.stops.length,
+              jumps: taggedArrowsPercentage("jump"),
+              freezes: taggedArrowsPercentage("freeze"),
               bpmShifts: chart.bpm.length - 1,
-              complexity: (
-                stats.sixteenths
-                + stats.trips
-                + 100 * (1 - phraseVariance(analyzedChart.arrowTimeline))
-              ),
               canonicalChartErrorRate: canonicalChart.arrowTimeline.filter((a) => (
                 a.beat === "other" || a.beat > 24
               )).length / canonicalChart.arrowTimeline.length * 100,
               minBpm: analyzedChart.minBpm,
               maxBpm: analyzedChart.maxBpm,
               mainBpm: analyzedChart.mainBpm,
+              backbeats: taggedArrowsPercentage("backbeat"),
+              gallops: taggedArrowsPercentage("gallop"),
+              trips: taggedArrowsPercentage("trip"),
+              offbeats: taggedArrowsPercentage("offbeat"),
               ...stats,
             },
             chart: serializedChart(analyzedChart),
