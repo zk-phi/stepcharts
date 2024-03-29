@@ -32,6 +32,11 @@ const SPECIAL_BPMS: Record<string, Partial<Record<Difficulty | "all", Record<num
       77: [s(170,  7, 32)],
     },
   },
+  "saber-wing-akira-ishihara-headshot-mix": {
+    all: {
+      0: [s(316, 1, 4)],
+    },
+  },
   // ---- 直前後と違う BPM で停止する譜面
   "over-the-period": {
     all: {
