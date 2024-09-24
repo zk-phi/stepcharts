@@ -279,7 +279,7 @@ const ChartObjectsRaw = ({
   constantMode,
   colorFreezes,
   diminishFreezes,
-  highlightSoflan,
+  highlightTag,
   verboseColors,
   canonicalColors,
 }: {
@@ -290,7 +290,7 @@ const ChartObjectsRaw = ({
   constantMode: boolean,
   colorFreezes: boolean,
   diminishFreezes: boolean,
-  highlightSoflan: boolean,
+  highlightTag: ArrowTag | "",
   verboseColors: boolean,
   canonicalColors: boolean,
 }) => {
@@ -317,7 +317,7 @@ const ChartObjectsRaw = ({
       {chart.arrowTimeline.map((a, i) => {
         const props: ArrowCommonProps = {
           beat: "shock",
-          highlight: highlightSoflan && !!a.tags.soflanTrigger,
+          highlight: !!highlightTag && !!a.tags[highlightTag],
           pos: toPos(a),
         };
         return a.direction === "MMMM" && (
@@ -335,14 +335,14 @@ const ChartObjectsRaw = ({
             beat={beatFn(i)}
             direction={TURN_VALUES[turn][2]}
             pos={toPos(a)}
-            highlight={highlightSoflan && !!a.tags.soflanTrigger}
+            highlight={!!highlightTag && !!a.tags[highlightTag]}
             verboseColors={verboseColors} />
       ))}
       {chart.arrowTimeline.map((a, i) => {
         const props: ArrowCommonProps = {
           beat: beatFn(i),
           pos: toPos(a),
-          highlight: highlightSoflan && !!a.tags.soflanTrigger,
+          highlight: !!highlightTag && !!a.tags[highlightTag],
           verboseColors,
         }
         return (
@@ -380,7 +380,7 @@ export const ChartPreview = ({
   diminishFreezes = false,
   soflanBg = false,
   soflanValue = false,
-  highlightSoflan = false,
+  highlightTag = "",
   verboseColors = false,
   canonicalColors = false,
   children,
@@ -400,7 +400,7 @@ export const ChartPreview = ({
   diminishFreezes: boolean,
   soflanBg: boolean,
   soflanValue: boolean,
-  highlightSoflan: boolean,
+  highlightTag: ArrowTag | "",
   verboseColors: boolean,
   canonicalColors: boolean,
   children: React.ReactNode,
@@ -478,7 +478,7 @@ export const ChartPreview = ({
             constantMode={constantMode}
             colorFreezes={colorFreezes}
             diminishFreezes={diminishFreezes}
-            highlightSoflan={highlightSoflan}
+            highlightTag={highlightTag}
             verboseColors={verboseColors}
             canonicalColors={canonicalColors} />
         {children}

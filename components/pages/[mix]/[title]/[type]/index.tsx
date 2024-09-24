@@ -17,7 +17,7 @@ type Options = {
   diminishFreezes: boolean,
   soflanBg: boolean,
   soflanValue: boolean,
-  highlightSoflan: boolean,
+  highlightTag: ArrowTag | "",
   verboseColors: boolean,
   canonicalColors: boolean,
   canonicalTicks: boolean,
@@ -93,9 +93,9 @@ const OptionsPanel = ({
     soflanValue: e.target.checked,
   }), [options, onChange]);
 
-  const onChangeHighlightSoflan = React.useCallback((e) => onChange({
+  const onChangeHighlightTag = React.useCallback((e) => onChange({
     ...options,
-    highlightSoflan: e.target.checked,
+    highlightTag: e.target.value,
   }), [options, onChange]);
 
   const onChangeVerboseColors = React.useCallback((e) => onChange({
@@ -170,6 +170,20 @@ const OptionsPanel = ({
           <option>多様性対応</option>
         </select>
       </div>
+      <div>
+        <label>
+          ハイライト:
+          {" "}
+          <select value={options.highlightTag} onChange={onChangeHighlightTag}>
+            <option value="">なし</option>
+            <option value="soflanTrigger">ソフラン直前</option>
+            <option value="backbeat">連続裏拍</option>
+            <option value="gallop">ハネ、スキップ</option>
+            <option value="trip">三連符</option>
+            <option value="offbeat">その他、謎リズム</option>
+          </select>
+        </label>
+      </div>
       <h3 style={{ fontWeight: "bold" }}>フリーズ補助</h3>
       <div>
         <label>
@@ -198,13 +212,6 @@ const OptionsPanel = ({
           ソフラン箇所に目印を設置:
           {" "}
           <input type="checkbox" checked={options.soflanValue} onChange={onChangeSoflanValue} />
-        </label>
-      </div>
-      <div>
-        <label>
-          ソフラン直前の矢印をハイライト:
-          {" "}
-          <input type="checkbox" checked={options.highlightSoflan} onChange={onChangeHighlightSoflan} />
         </label>
       </div>
       <div>
@@ -291,9 +298,9 @@ const PreviewPage = ({ chart }: {
     diminishFreezes: true,
     soflanBg: true,
     soflanValue: true,
-    highlightSoflan: true,
+    highlightTag: "soflanTrigger",
     verboseColors: true,
-    canonicalColors: false,
+    canonicalColors: true,
     canonicalTicks: true,
     canonicalMode: false,
   });
@@ -343,7 +350,7 @@ const PreviewPage = ({ chart }: {
           diminishFreezes={options.diminishFreezes}
           soflanBg={options.soflanBg}
           soflanValue={options.soflanValue}
-          highlightSoflan={options.highlightSoflan}
+          highlightTag={options.highlightTag}
           verboseColors={options.verboseColors}
           canonicalColors={options.canonicalColors}>
         <div style={controlStyle}>
