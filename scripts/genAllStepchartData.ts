@@ -15,6 +15,7 @@ import { tagTrips } from "../lib/analyzers/tagTrips";
 import { calculateBpmStats } from "../lib/analyzers/calculateBpmStats";
 
 const ROOT = "./stepcharts-data/simfiles";
+// const ROOT = "./stepcharts-data/dev-simfiles";
 
 const phraseVariance = (arrowTimeline: ArrowEvent<Fraction>[]): number => {
   const table: Record<string, number> = {};
